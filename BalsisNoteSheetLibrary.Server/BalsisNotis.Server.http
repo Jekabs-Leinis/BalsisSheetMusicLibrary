@@ -1,0 +1,6 @@
+@BalsisNoteSheetLibrary.Server_HostAddress = http://localhost:5124
+
+GET {{BalsisNoteSheetLibrary.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

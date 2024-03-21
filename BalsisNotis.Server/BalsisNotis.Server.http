@@ -1,0 +1,6 @@
+@BalsisNotis.Server_HostAddress = http://localhost:5124
+
+GET {{BalsisNotis.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

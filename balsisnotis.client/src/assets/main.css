@@ -1,0 +1,280 @@
+﻿@import "bootstrap/scss/bootstrap.scss";
+@import "loading.css";
+
+/*  style Balsis nošu arhīvs */
+
+body {
+    font-family: "Courier New";
+    background-color: #373737;
+}
+
+.login {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    background-color: white;
+    padding: 5px;
+    z-index: 1000;
+}
+
+h2 {
+    text-decoration: underline;
+    font-size: 18px;
+    padding-top: 30px;
+}
+
+h3 {
+    color: #f0f0f0;
+    text-decoration: none !important;
+    font-weight: normal;
+}
+
+.center {
+    width: 900px;
+    margin: 0 auto;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    a:hover {
+        text-decoration: underline;
+    }
+/*
+header
+{
+ padding: 3px 0px 5px 0px;;
+ margin: -10px -10px 0px -10px;
+ background-color: #dcddd8;
+}
+*/
+
+.logo {
+    position: relative;
+    width: 900px;
+    height: 460px;
+}
+
+
+.aktuals {
+    background-color: #dcddd8;
+    margin: -25px -10px 0px -10px;
+    padding: 40px 0 40px 0;
+}
+
+.latviesi {
+    background-color: #373737;
+    margin: -25px -10px 0px -10px;
+    padding: 40px 0 40px 0;
+    color: white;
+    color: #f0f0f0;
+}
+
+    .latviesi a:link {
+        color: #f0f0f0;
+    }
+
+    .latviesi a:visited {
+        color: #f0f0f0;
+    }
+
+ul {
+    list-style-type: none;
+    line-height: 160%;
+    margin-left: -43px;
+}
+
+.arzemes {
+    background-color: #dcddd8;
+    margin: -25px -10px -10px -10px;
+    padding: 40px 0 40px 0;
+}
+
+
+#login {
+    margin: -37px 0 15px 0;
+    text-align: right;
+}
+
+.menu {
+    position: relative;
+    padding: 100px 0 100px 0;
+    margin: 10% 20% 10% 20%;
+    background-color: #c0392b !important;
+    margin: -200px -10px 0 -10px;
+    z-index: 10;
+}
+
+    .menu a:hover {
+        text-decoration: none;
+    }
+
+#menu1 {
+    text-align: center;
+    padding-right: 650px;
+}
+
+#menu2 {
+    text-align: center;
+    margin-top: -265px;
+}
+
+#menu3 {
+    text-align: center;
+    margin-top: -265px;
+    padding-left: 650px;
+}
+
+
+@media screen and (max-width: 960px) {
+
+    .center {
+        width: 700px;
+    }
+
+    body {
+        background-size: 500px auto;
+        background-position: center 40px;
+    }
+
+    .logo {
+        width: 700px;
+    }
+
+    #menu1 {
+        padding-right: 500px;
+    }
+
+    #menu3 {
+        padding-left: 500px;
+    }
+
+    .menu {
+        padding: 40px 0px;
+    }
+}
+
+@media screen and (max-width: 758px) {
+
+    body {
+        background-size: 330px auto;
+    }
+
+    h3 {
+        font-size: 13px;
+    }
+
+    .center {
+        width: 450px;
+    }
+
+    .menu {
+        padding: 20px 0 20px 0;
+    }
+
+    .logo {
+        background-size: 400px;
+        width: 450px;
+        height: 380px;
+    }
+
+    img {
+        width: 150px;
+        height: auto;
+    }
+
+    #menu1 {
+        padding-right: 300px;
+    }
+
+    #menu2 {
+        margin-top: -196px;
+    }
+
+    #menu3 {
+        margin-top: -196px;
+        padding-left: 300px;
+    }
+
+
+    #aktuals-pakreisi {
+        margin-left: 36px;
+    }
+}
+
+@media screen and (max-width: 524px) {
+    body {
+        background-size: 180px auto;
+    }
+
+    .logo {
+        background-size: 250px auto;
+        height: 200px;
+        width: 200px;
+    }
+
+    .menu {
+        padding: 30px 0 0 0;
+        margin-top: -88px;
+    }
+
+    #menu1 {
+        padding-right: 180px;
+    }
+
+    #menu2 {
+        margin-top: -146px;
+    }
+
+    #menu3 {
+        margin-top: -146px;
+        padding-left: 180px;
+    }
+
+    h3 {
+        visibility: hidden;
+    }
+
+    .center {
+        width: 280px;
+    }
+
+    img {
+        width: 100px;
+        height: auto;
+    }
+}
+
+@media screen and (max-width: 310px) {
+
+    #menu1 {
+        text-align: center;
+    }
+
+    #menu2 {
+        text-align: center;
+        margin-top: -40px;
+    }
+
+    #menu3 {
+        text-align: center;
+        margin-top: -40px;
+    }
+
+    .center {
+        width: 90%;
+    }
+
+    .logo {
+        display: none;
+    }
+
+    .menu {
+        padding-top: 200px;
+        padding: 30px 0 0 0;
+        margin-top: -10px;
+    }
+}

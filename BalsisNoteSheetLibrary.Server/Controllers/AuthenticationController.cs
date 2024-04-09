@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
-[Route("Api/[controller]/[action]")]
+[Route("api/[controller]/[action]")]
 public class AuthenticationController(
     AppDbContext context,
     SignInManager<IdentityUser> signInManager,
-    IHostEnvironment env) : AppControllerBase(context)
+    IHostEnvironment env
+) : AppControllerBase(context)
 {
     [HttpPost]
     [AllowAnonymous]

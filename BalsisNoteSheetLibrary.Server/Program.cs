@@ -1,19 +1,28 @@
-using BalsisNoteSheetLibrary.Server.Filters;
 using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddDbContext<AppDbContext>();
+
+// Dev only services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<AppDbContext>();
+// Configure routing
+builder.Services.Configure<RouteOptions>(options =>
+{
+    options.LowercaseUrls = true;
+    options.LowercaseQueryStrings = true;
+});
+
+
 
 // Configure Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -40,15 +49,20 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
+
+// Setup logging
+builder.Services.AddLogging();
+
 // Configure antiforgery
 builder.Services.AddAntiforgery(options =>
 {
-    options.Cookie.Name = "X-CSRF-TOKEN";
+    options.Cookie.Name = "XSRF-TOKEN";
+    options.HeaderName = "X-CSRF-TOKEN";
 });
 
-builder.Services.AddControllers(options =>
+builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add<AntiforgeryTokenHeaderFilter>();
+    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
 });
 
 var app = builder.Build();
@@ -68,9 +82,19 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery();
 
 app.MapControllers();
 
-app.MapFallbackToFile("/index.html");
+
+//Fallback to 404
+app.MapFallback((context =>
+{
+    context.Response.StatusCode = 404;
+
+    return context.Response.CompleteAsync();
+}));
+
+
 
 app.Run();

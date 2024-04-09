@@ -1,48 +1,65 @@
-import './assets/main.css'
+import "./assets/main.css";
 
 // Mandatory import to initialize bs components
 // eslint-disable-next-line no-unused-vars
-import * as bootstrap from 'bootstrap'
+import * as bootstrap from "bootstrap";
 
-import axios from 'axios'
+import axios from "axios";
 
-// Read the CSRF token from the cookie
-const csrfToken = document.cookie
-    .split('; ')
-    .find(row => row.startsWith('XSRF-TOKEN='))
-
-// If the token is found, set it in the axios headers
-if (csrfToken) {
-    axios.defaults.headers.common['X-XSRF-TOKEN'] = csrfToken.split('=')[1]
+function getCsrfToken() {
+  return document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("CSRF-TOKEN="))
+    ?.split("=")[1];
 }
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+function setAxiosCsrfToken() {
+  axios.defaults.headers.common["X-CSRF-TOKEN"] = getCsrfToken();
+}
 
-import router from '@/router/routes'
+// If the token is found, set it in the axios headers
+if (getCsrfToken()) {
+  setAxiosCsrfToken();
+} else {
+  axios
+    .get("/api/csrf/getToken")
+    .then(() => {
+      // Token is set in the cookie, we can now set it in the axios headers
+      setAxiosCsrfToken();
+    })
+    .catch((e) => {
+      console.error(e);
+      console.error("Could not get CSRF token.");
+    });
+}
 
-import { useUserStore } from '@/stores/userStore'
+import { createApp } from "vue";
+import { createPinia } from "pinia";
 
-import vLoading from './directives/vLoading'
+import router from "@/router/routes";
 
-import App from './App.vue'
+import { useUserStore } from "@/stores/userStore";
 
-const app = createApp(App)
+import vLoading from "@/directives/vLoading";
 
-app.use(createPinia())
+import App from "@/App.vue";
 
-const userStore = useUserStore()
+const app = createApp(App);
+
+app.use(createPinia());
+
+const userStore = useUserStore();
 
 router.beforeEach((to) => {
-    if (userStore.isLoggedIn || to.name === "login") {
-        return;
-    }
+  if (userStore.isLoggedIn || to.name === "login") {
+    return;
+  }
 
-    return { name: 'login' };
-})
+  return { name: "login" };
+});
 
-app.use(router)
+app.use(router);
 
-app.directive('loading', vLoading)
+app.directive("loading", vLoading);
 
-app.mount('#app')
+app.mount("#app");

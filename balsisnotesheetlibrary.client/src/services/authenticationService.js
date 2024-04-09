@@ -4,8 +4,8 @@ import axios from "axios";
 
 export async function login(email, password) {
   const userStore = useUserStore();
-
-  const response = await axios.post("/Api/Authentication/Login", { email, password });
+  
+  const response = await axios.post("/api/authentication/login", { email, password });
 
   if (response.data.success) {
     userStore.setUser(new User(response.data.model));

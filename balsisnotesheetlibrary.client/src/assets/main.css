@@ -52,12 +52,6 @@ header
 }
 */
 
-.logo {
-    position: relative;
-    width: 900px;
-    height: 460px;
-}
-
 
 .aktuals {
     background-color: #dcddd8;
@@ -140,10 +134,6 @@ ul {
         background-position: center 40px;
     }
 
-    .logo {
-        width: 700px;
-    }
-
     #menu1 {
         padding-right: 500px;
     }
@@ -175,17 +165,6 @@ ul {
         padding: 20px 0 20px 0;
     }
 
-    .logo {
-        background-size: 400px;
-        width: 450px;
-        height: 380px;
-    }
-
-    img {
-        width: 150px;
-        height: auto;
-    }
-
     #menu1 {
         padding-right: 300px;
     }
@@ -208,12 +187,6 @@ ul {
 @media screen and (max-width: 524px) {
     body {
         background-size: 180px auto;
-    }
-
-    .logo {
-        background-size: 250px auto;
-        height: 200px;
-        width: 200px;
     }
 
     .menu {
@@ -241,11 +214,6 @@ ul {
     .center {
         width: 280px;
     }
-
-    img {
-        width: 100px;
-        height: auto;
-    }
 }
 
 @media screen and (max-width: 310px) {
@@ -266,10 +234,6 @@ ul {
 
     .center {
         width: 90%;
-    }
-
-    .logo {
-        display: none;
     }
 
     .menu {

@@ -1,67 +1,65 @@
-<script setup></script>
+<script setup>
+import SheetListHeader from "@/components/SheetListHeader.vue";
+import { ref } from "vue";
+import { NoteSheet, SetList } from "@/models/sheetModels";
+import SetListNoteList from "@/components/SetListNoteList.vue";
+
+/* @type {Ref<UnwrapRef<NoteSheet[]>>} */
+const noteSheets = ref([]);
+/* @type {Ref<UnwrapRef<SetList[]>>} */
+const setLists = ref([]);
+
+//TODO replace test data with actual data from server
+noteSheets.value = [
+  new NoteSheet({
+    id: 1,
+    title: "Mēness starus stīgo (Dārziņš)",
+    author: "Emīls Dārziņš",
+    lyricist: "Aspazija (Johanna Emīlija Lizete Rozenberga)",
+    year: 1912,
+    downloadLink:
+      "http://notis.balsis.lv/file/247/meness_starus_stigo_darzins_pko2014.pdf",
+  }),
+  new NoteSheet({
+    id: 2,
+    title: "Title 2",
+    author: "Author 2",
+    year: 2002,
+    downloadLink: "link2",
+  }),
+  new NoteSheet({
+    id: 3,
+    title: "Title 3",
+    author: "Author 3",
+    year: 2003,
+    downloadLink: "link3",
+  }),
+];
+
+setLists.value = [
+  new SetList({ ids: [1, 3], title: "BALSU baseinā" }),
+  new SetList({ ids: [1, 1, 1, 1, 1], title: "baseins Balsīs" }),
+  new SetList({ ids: [3, 3], title: "Basi baseinā" }),
+];
+</script>
 
 <template>
-  <div class="">
-    <div class="my-3 d-flex justify-content-center">
-      <img src="../assets/img/balsis_logo.png" alt="Balsis Logo" class="logo" />
-    </div>
-    <div class="section-links py-5 d-flex justify-content-center">
-      <div class="row flex-grow-1">
-        <div class="col-4 d-flex justify-content-center">
-          <a
-            href="#active-sheets"
-            class="d-flex flex-column align-items-center"
-          >
-            <img
-              src="../assets/img/aktuals.png"
-              alt="Saite uz aktuālajām notīm"
-            />
-            <h4 class="text-white text-decoration-none text-center">
-              Aktuālais
-            </h4>
-          </a>
-        </div>
-        <div class="col-4 d-flex justify-content-center">
-          <a href="#lv-sheets" class="d-flex flex-column align-items-center">
-            <img
-              src="../assets/img/latviesi.png"
-              alt="Saite uz Latviešu komponistu notīm"
-            />
-            <h4 class="text-white text-decoration-none text-center">
-              Latviešu skaņdarbi
-            </h4>
-          </a>
-        </div>
-        <div class="col-4 d-flex justify-content-center">
-          <a
-            href="#foreign-sheets"
-            class="d-flex flex-column align-items-center"
-          >
-            <img
-              src="../assets/img/pasaule.png"
-              alt="Saite uz ārzemju komponistu notīm"
-            />
-            <h4 class="text-white text-decoration-none text-center">
-              Ārzemju skaņdarbi
-            </h4>
-          </a>
-        </div>
-      </div>
-    </div>
+  <SheetListHeader />
+  <SetListNoteList :note-sheets="noteSheets" :set-lists="setLists" />
+  <div class="lv-chart">
+    <div class="container"></div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.logo {
-  max-width: 600px;
+.lv-chart {
+  background-color: #dcddd8;
   width: 100%;
-  height: auto;
 }
-
-.section-links {
-  background-color: #c0392b;
-  & > .row {
-    max-width: 1200px;
-  }
+</style>
+<style>
+a {
+  color: black;
+  text-decoration: none;
 }
 </style>

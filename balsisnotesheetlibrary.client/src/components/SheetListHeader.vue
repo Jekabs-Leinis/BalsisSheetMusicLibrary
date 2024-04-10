@@ -9,6 +9,7 @@
   <div class="section-links py-5 d-flex justify-content-center">
     <div class="row flex-grow-1">
       <div class="col-4 d-flex justify-content-center">
+        <!--suppress HtmlUnknownAnchorTarget -->
         <a class="d-flex flex-column align-items-center" href="#active-sheets">
           <img
             alt="Saite uz aktuālajām notīm"
@@ -18,6 +19,7 @@
         </a>
       </div>
       <div class="col-4 d-flex justify-content-center">
+        <!--suppress HtmlUnknownAnchorTarget -->
         <a class="d-flex flex-column align-items-center" href="#lv-sheets">
           <img
             alt="Saite uz Latviešu komponistu notīm"
@@ -29,6 +31,7 @@
         </a>
       </div>
       <div class="col-4 d-flex justify-content-center">
+        <!--suppress HtmlUnknownAnchorTarget -->
         <a class="d-flex flex-column align-items-center" href="#foreign-sheets">
           <img
             alt="Saite uz ārzemju komponistu notīm"

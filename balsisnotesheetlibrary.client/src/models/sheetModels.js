@@ -3,7 +3,7 @@ export class NoteSheet {
     Object.assign(this, props);
   }
 
-  /** @type {string} */
+  /** @type {Number} */
   id;
   /** @type {string} */
   title;
@@ -11,10 +11,12 @@ export class NoteSheet {
   author;
   /** @type {?string} */
   lyricist;
-  /** @type {?number} */
+  /** @type {?Number} */
   year;
   /** @type {string} */
-  downloadLink;
+  filename;
+  /** @type {boolean} */
+  isLatvian;
 
   getFormattedAdditionalData() {
     const dataParts = [this.author, this.lyricist, this.year].filter(Boolean);

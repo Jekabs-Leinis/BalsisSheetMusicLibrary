@@ -53,6 +53,10 @@
   height: auto;
 }
 
+a {
+  text-decoration: none;
+}
+
 .section-links {
   background-color: #c0392b;
 

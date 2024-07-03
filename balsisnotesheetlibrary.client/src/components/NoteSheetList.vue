@@ -15,8 +15,8 @@ defineProps({
 </script>
 
 <template>
-  <div>
-    <h1>{{ title }}</h1>
+  <div class="pt-4">
+    <h1 class="list-title fw-bold pb-2">{{ title }}</h1>
     <ul>
       <li v-for="sheet in noteSheets" :key="sheet.id">
         <a
@@ -30,8 +30,17 @@ defineProps({
   </div>
 </template>
 
-<style scoped>
-a:hover {
-  text-decoration: underline !important;
+<style lang="scss" scoped>
+a {
+  color: black;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.list-title {
+  font-size: 2em;
 }
 </style>

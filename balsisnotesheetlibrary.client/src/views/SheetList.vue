@@ -1,7 +1,7 @@
 <script setup>
 import SheetListHeader from "@/components/SheetListHeader.vue";
 import { ref, computed } from "vue";
-import { NoteSheet, SetList } from "@/models/sheetModels";
+import { SetList } from "@/models/sheetModels";
 import SetListNoteList from "@/components/SetListNoteList.vue";
 import { getAllNoteSheets } from "@/api/noteSheetApi";
 import NoteSheetList from "@/components/NoteSheetList.vue";
@@ -34,8 +34,12 @@ setLists.value = [
 
 <template>
   <SheetListHeader />
-  <SetListNoteList :note-sheets="noteSheets" :set-lists="setLists" />
-  <div class="lv-chart">
+  <SetListNoteList
+    id="active-sheets"
+    :note-sheets="noteSheets"
+    :set-lists="setLists"
+  />
+  <div class="invert" id="lv-sheets">
     <div class="container">
       <NoteSheetList
         title="Latviešu skaņdarbi"
@@ -43,7 +47,7 @@ setLists.value = [
       />
     </div>
   </div>
-  <div class="lv-chart">
+  <div id="foreign-sheets">
     <div class="container">
       <NoteSheetList
         title="Ārzemju skaņdarbi"
@@ -54,14 +58,14 @@ setLists.value = [
 </template>
 
 <style lang="scss" scoped>
-.lv-chart {
+#foreign-sheets {
   background-color: #dcddd8;
-  width: 100%;
 }
 </style>
+
 <style>
-a {
-  color: black;
-  text-decoration: none;
+.invert * {
+  background-color: inherit !important;
+  color: white !important;
 }
 </style>

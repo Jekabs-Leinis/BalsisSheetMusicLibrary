@@ -28,9 +28,8 @@ const props = defineProps({
               :key="noteSheet.id"
             >
               <a :href="noteSheet.downloadLink" class="text-decoration-none">
-                <b>{{ noteSheet.title }}</b
-                >{{ noteSheet.getFormattedAdditionalData() }}
-              </a>
+                <b>{{ noteSheet.title }}</b></a
+              >{{ noteSheet.getFormattedAdditionalData() }}
             </li>
           </ul>
         </div>
@@ -44,8 +43,13 @@ const props = defineProps({
   background-color: #dcddd8;
 }
 
-a:hover {
-  text-decoration: underline !important;
+a {
+  color: black;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline !important;
+  }
 }
 
 h2 {

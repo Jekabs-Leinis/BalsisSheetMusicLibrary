@@ -1,6 +1,7 @@
 ﻿<script setup>
 import { login } from "@/services/authenticationService";
 import { ref } from "vue";
+import router from "@/router/routes";
 
 let email = ref(""),
   password = ref(""),
@@ -21,6 +22,10 @@ async function attemptLogin() {
   loading.value = false;
   showError.value = !response.success;
   errorMessage.value = response.error;
+  
+  if (response.success) {
+    router.push({ name: "SheetList" });
+  }
 }
 </script>
 

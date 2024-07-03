@@ -55,7 +55,7 @@ router.beforeEach((to) => {
     return;
   }
 
-  return { name: "login" };
+  return { name: "Login" };
 });
 
 app.use(router);

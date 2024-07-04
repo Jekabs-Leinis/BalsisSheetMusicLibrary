@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="my-3 d-flex justify-content-center">
+  <div class="my-3 d-flex justify-content-center logo-container">
     <img alt="Balsis Logo" class="logo" src="../assets/img/balsis_logo.png" />
   </div>
   <div class="section-links py-5 d-flex justify-content-center">
@@ -47,6 +47,12 @@
 </template>
 
 <style lang="scss" scoped>
+.logo-container {
+  position: sticky;
+  top: 16px;
+  z-index: -1;
+}
+
 .logo {
   max-width: 600px;
   width: 100%;

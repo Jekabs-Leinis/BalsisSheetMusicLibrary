@@ -64,8 +64,8 @@ setLists.value = [
 </style>
 
 <style>
-.invert * {
-  background-color: inherit !important;
+#lv-sheets * {
   color: white !important;
+  background-color: #373737 !important;
 }
 </style>

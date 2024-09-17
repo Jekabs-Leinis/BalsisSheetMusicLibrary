@@ -64,7 +64,7 @@ setLists.value = [
 </style>
 
 <style>
-#lv-sheets * {
+#lv-sheets, #lv-sheets a {
   color: white !important;
   background-color: #373737 !important;
 }

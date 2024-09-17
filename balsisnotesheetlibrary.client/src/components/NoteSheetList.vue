@@ -15,18 +15,20 @@ defineProps({
 </script>
 
 <template>
-  <div class="pt-4">
-    <h1 class="list-title fw-bold pb-2">{{ title }}</h1>
-    <ul class="mb-0 pb-4">
-      <li v-for="sheet in noteSheets" :key="sheet.id">
-        <a
-          :href="`/api/download/${sheet.filename}`"
-          class="fw-bold"
-          target="_blank"
+  <div class="pt-4 row">
+    <div class="col-12" >
+      <h1 class="list-title fw-bold pb-2">{{ title }}</h1>
+      <ul class="mb-0 pb-4">
+        <li v-for="sheet in noteSheets" :key="sheet.id">
+          <a
+              :href="`/api/download/${sheet.filename}`"
+              class="fw-bold"
+              target="_blank"
           >{{ sheet.title }}</a
-        >{{ sheet.getFormattedAdditionalData() }}
-      </li>
-    </ul>
+          >{{ sheet.getFormattedAdditionalData() }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -38,6 +40,10 @@ a {
   &:hover {
     text-decoration: underline;
   }
+}
+
+.row {
+  --bs-gutter-x: -1rem;
 }
 
 .list-title {

@@ -52,6 +52,10 @@ a {
   }
 }
 
+.row {
+  --bs-gutter-x: -1rem;
+}
+
 h2 {
   text-decoration: underline;
   font-size: 18px;

@@ -3,10 +3,10 @@
 </script>
 
 <template>
-  <div class="my-3 d-flex justify-content-center logo-container">
+  <div class="m-3 d-flex justify-content-center logo-container">
     <img alt="Balsis Logo" class="logo" src="../assets/img/balsis_logo.png" />
   </div>
-  <div class="section-links py-5 d-flex justify-content-center">
+  <div class="section-links py-md-5 py-sm-3 py-2 d-flex justify-content-center">
     <div class="row flex-grow-1">
       <div class="col-4 d-flex justify-content-center">
         <!--suppress HtmlUnknownAnchorTarget -->
@@ -47,6 +47,10 @@
 </template>
 
 <style lang="scss" scoped>
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/mixins";
+
 .logo-container {
   position: sticky;
   top: 16px;
@@ -57,6 +61,28 @@
   max-width: 600px;
   width: 100%;
   height: auto;
+}
+
+//noinspection SassScssUnresolvedMixin
+@include media-breakpoint-down(md) {
+  img {
+    max-width: 150px;
+  }
+
+  .row {
+    --bs-gutter-x: -0.75rem;
+  }
+  
+  h4 {
+    font-size: 1rem;
+  }
+}
+
+//noinspection SassScssUnresolvedMixin
+@include media-breakpoint-down(sm) {
+  img {
+    max-width: 100px;
+  }
 }
 
 a {

@@ -6,6 +6,19 @@ import * as bootstrap from "bootstrap";
 
 import axios from "axios";
 
+// Redirect to login page if the user is not authenticated
+axios.interceptors.response.use(
+  (response) => response,
+  (request) => {
+      console.log(request);
+    if (request.response.status === 401 && request.response.headers.location.includes("login")) {
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(request);
+  },
+);
+
 function getCsrfToken() {
   return document.cookie
     .split("; ")

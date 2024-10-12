@@ -1,17 +1,15 @@
 <script setup>
 import SheetListHeader from "@/components/SheetListHeader.vue";
 import { ref, computed } from "vue";
-import { SetList } from "@/models/sheetModels";
 import SetListNoteList from "@/components/SetListNoteList.vue";
 import { getAllNoteSheets } from "@/api/noteSheetApi";
 import NoteSheetList from "@/components/NoteSheetList.vue";
+import { getAllSetLists } from "@/api/setListApi";
 
 /* @type {Ref<UnwrapRef<NoteSheet[]>>} */
 const noteSheets = ref([]);
 
 getAllNoteSheets().then((sheets) => {
-  console.log("sheets");
-  console.log(sheets);
   noteSheets.value = sheets;
 });
 
@@ -25,11 +23,9 @@ const foreignNoteSheets = computed(() =>
 /* @type {Ref<UnwrapRef<SetList[]>>} */
 const setLists = ref([]);
 
-setLists.value = [
-  new SetList({ ids: [2, 3], title: "BALSU baseinā" }),
-  new SetList({ ids: [2, 2, 2, 2, 2], title: "baseins Balsīs" }),
-  new SetList({ ids: [3, 3], title: "Basi baseinā" }),
-];
+getAllSetLists().then((lists) => {
+  setLists.value = lists;
+});
 </script>
 
 <template>
@@ -64,7 +60,8 @@ setLists.value = [
 </style>
 
 <style>
-#lv-sheets, #lv-sheets a {
+#lv-sheets,
+#lv-sheets a {
   color: white !important;
   background-color: #373737 !important;
 }

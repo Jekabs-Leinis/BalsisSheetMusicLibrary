@@ -1,7 +1,5 @@
 // ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
 
-using System.Text.Json.Serialization;
-
 namespace BalsisNoteSheetLibrary.Server.Models;
 
 public class SetList
@@ -10,5 +8,5 @@ public class SetList
     public string? Title { get; set; }
     public uint? Order { get; set; }
 
-    [JsonIgnore] public IEnumerable<SetListItem>? Items { get; set; }
+    public IEnumerable<SetListItem>? Items { get; set; }
 }

@@ -1,45 +1,37 @@
-using System.Globalization;
 using BalsisNoteSheetLibrary.Server.Helpers;
 using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
-[Route("api/[controller]/[action]")]
+[Route("api/[controller]/[action]", Name = "[controller]_[action]")]
 public class NoteSheetController(AppDbContext context) : AppControllerBase(context)
 {
-    [HttpGet(Name = "GetAll")]
     public AppResponse<IEnumerable<NoteSheet>> GetAll()
     {
-        var connection = Context.Database.GetDbConnection() as SqliteConnection;
+        SqliteExtensions.SetupInsensitiveCollation(Context);
 
-        // By default SQLite does not support case-insensitive and diacritic-insensitive sorting
-        connection!.CreateCollation("FOLD", (x, y) => string.Compare(
-            StringExtensions.FoldToASCII(x),
-            StringExtensions.FoldToASCII(y),
-            CultureInfo.CurrentCulture,
-            CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase
-        ));
-
-        var sheets = Context.NoteSheets.OrderBy(sheet => EF.Functions.Collate(sheet.Title, "FOLD"));
+        var sheets = Context.NoteSheets.OrderBy(sheet =>
+            EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation));
 
         return new AppResponse<IEnumerable<NoteSheet>>(sheets, true);
     }
 
-    [HttpGet("{id:int}", Name = "Get")]
+    [HttpGet("{id:int}")]
     public AppResponse<NoteSheet?> Get(uint id)
     {
         var sheet = Context.NoteSheets.Find(id);
 
-        return sheet is not null
-            ? new AppResponse<NoteSheet?>(sheet, true)
-            : new AppResponse<NoteSheet?>(null, false, "Note sheet not found");
+        return new AppResponse<NoteSheet?>(
+            sheet,
+            sheet is not null,
+            sheet is null ? "Note sheet not found" : string.Empty
+        );
     }
 
-    [HttpPost(Name = "Add")]
+    [HttpPost]
     public AppResponse<string> Add(NoteSheet noteSheet)
     {
         Context.NoteSheets.Add(noteSheet);
@@ -48,7 +40,7 @@ public class NoteSheetController(AppDbContext context) : AppControllerBase(conte
         return new AppResponse<string>("Note sheet added", true);
     }
 
-    [HttpPost(Name = "Update")]
+    [HttpPost]
     public AppResponse<string> Update(NoteSheet noteSheet)
     {
         var sheet = Context.NoteSheets.Find(noteSheet.Id);
@@ -64,7 +56,7 @@ public class NoteSheetController(AppDbContext context) : AppControllerBase(conte
         return new AppResponse<string>("Note sheet updated", true);
     }
 
-    [HttpDelete("{id:int}", Name = "Delete")]
+    [HttpDelete("{id:int}")]
     public AppResponse<string> Delete(uint id)
     {
         var sheet = Context.NoteSheets.Find(id);

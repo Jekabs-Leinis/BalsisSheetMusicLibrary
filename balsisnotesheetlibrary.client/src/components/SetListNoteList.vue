@@ -21,15 +21,15 @@ const props = defineProps({
         >
           <ul>
             <li>
-              <h2 class="fw-bold">{{ setList.title }}</h2>
+              <h2 class="fw-bold pt-0">{{ setList.title }}</h2>
             </li>
             <li
-              v-for="noteSheet in setList.getNoteSheets(props.noteSheets)"
-              :key="noteSheet.id"
+              v-for="sheet in setList.getNoteSheets(props.noteSheets)"
+              :key="sheet.id"
             >
-              <a :href="noteSheet.downloadLink" class="text-decoration-none">
-                <b>{{ noteSheet.title }}</b></a
-              >{{ noteSheet.getFormattedAdditionalData() }}
+              <a :href="`/api/download/${sheet.filename}`" class="text-decoration-none" target="_blank">
+                <b>{{ sheet.title }}</b></a
+              >{{ sheet.getFormattedAdditionalData() }}
             </li>
           </ul>
         </div>

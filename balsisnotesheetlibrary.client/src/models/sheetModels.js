@@ -28,10 +28,12 @@ export class NoteSheet {
 export class SetList {
   constructor(props = {}) {
     Object.assign(this, props);
+
+    this.items = props.items.map((item) => new SetListItem(item));
   }
 
-  /** @type {string[]} */
-  ids = [];
+  /** @type {SetListItem[]} */
+  items = [];
   /** @type {string} */
   title;
 
@@ -40,6 +42,23 @@ export class SetList {
    * @returns {NoteSheet[]}
    */
   getNoteSheets(allNoteSheets) {
-    return allNoteSheets.filter((noteSheet) => this.ids.includes(noteSheet.id));
+    const noteSheetIds = this.items.map((item) => item.noteSheetId);
+
+    return allNoteSheets.filter((noteSheet) =>
+      noteSheetIds.includes(noteSheet.id),
+    );
   }
+}
+
+export class SetListItem {
+  constructor(props = {}) {
+    Object.assign(this, props);
+  }
+
+  /** @type {string} */
+  noteSheetId;
+  /** @type {string} */
+  setListId;
+  /** @type {Number} */
+  order;
 }

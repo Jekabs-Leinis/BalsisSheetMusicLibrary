@@ -1,17 +1,85 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite; // Add this
+using BalsisNoteSheetLibrary.Server.Helpers; // Add this
+using System.Data; // Add this for ConnectionState
 
 namespace BalsisNoteSheetLibrary.Server.Models
 {
-    public class AppDbContext(DbContextOptions<AppDbContext> options) : IdentityDbContext(options)
+    public class AppDbContext : IdentityDbContext
     {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+            var connection = Database.GetDbConnection();
+
+            if (connection is not SqliteConnection sqliteConnection)
+            {
+                return;
+            }
+
+            sqliteConnection.StateChange += OnSqliteConnectionStateChange;
+
+            // In case the connection is already open (e.g., from a pool)
+            // when the DbContext is created, ensure collation is set.
+            // The StateChange event might not fire if it's already open.
+            // However, CreateCollation throws if already defined on the connection.
+            // Relying on StateChange from Closed to Open is generally safer.
+            // If issues persist with pooled connections, this part might need refinement
+            // to check if collation is already defined before attempting to create.
+            if (sqliteConnection.State != ConnectionState.Open)
+            {
+                return;
+            }
+
+            try
+            {
+                SqliteExtensions.RegisterCaseInsensitiveCollation(sqliteConnection);
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("collation") && ex.Message.Contains("already exists"))
+            {
+                // Collation already exists on this connection, ignore.
+            }
+        }
+
+        private static void OnSqliteConnectionStateChange(object? sender, StateChangeEventArgs e)
+        {
+            if (e.CurrentState != ConnectionState.Open || sender is not SqliteConnection connection)
+            {
+                return;
+            }
+
+            try
+            {
+                SqliteExtensions.RegisterCaseInsensitiveCollation(connection);
+            }
+            catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("collation") && ex.Message.Contains("already exists"))
+            {
+                // Collation already exists on this connection (e.g. if event fired multiple times for same open state), ignore.
+            }
+        }
+
         public DbSet<NoteSheet> NoteSheets { get; set; } = null!;
         public DbSet<SetList> SetLists { get; set; } = null!;
         public DbSet<SetListItem> SetListItems { get; set; } = null!;
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public override void Dispose()
         {
-            optionsBuilder.UseSqlite("Data Source=app.db");
+            var connection = Database.GetDbConnection();
+            if (connection is SqliteConnection sqliteConnection)
+            {
+                sqliteConnection.StateChange -= OnSqliteConnectionStateChange;
+            }
+            base.Dispose();
+        }
+
+        public override async ValueTask DisposeAsync()
+        {
+            var connection = Database.GetDbConnection();
+            if (connection is SqliteConnection sqliteConnection)
+            {
+                sqliteConnection.StateChange -= OnSqliteConnectionStateChange;
+            }
+            await base.DisposeAsync();
         }
     }
 }

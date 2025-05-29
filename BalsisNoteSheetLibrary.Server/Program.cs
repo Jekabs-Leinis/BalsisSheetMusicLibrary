@@ -3,14 +3,21 @@ using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-builder.Services.AddDbContext<AppDbContext>();
+
+// Configure DbContext
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+}
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 
 // Dev only services
 builder.Services.AddEndpointsApiExplorer();
@@ -22,8 +29,6 @@ builder.Services.Configure<RouteOptions>(options =>
     options.LowercaseUrls = true;
     options.LowercaseQueryStrings = true;
 });
-
-
 
 // Configure Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
@@ -52,7 +57,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     {
         OnRedirectToLogin = context =>
         {
-            context.Response.StatusCode = HttpStatusCode.Unauthorized.GetHashCode();
+            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Response.Headers.Location = context.RedirectUri;
             
             return Task.CompletedTask;
@@ -78,13 +83,28 @@ builder.Services.AddAntiforgery(options =>
 
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+    //options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DisableCSRFAndAuthForLocalhost",
+        b =>
+        {
+            b.WithOrigins("https://localhost:7171")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials();
+        });
 });
 
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UseHttpsRedirection();
+
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -92,16 +112,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
+    app.UseCors("DisableCSRFAndAuthForLocalhost");
+}
+else
+{
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseAntiforgery();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthentication();
-app.UseAuthorization();
-app.UseAntiforgery();
-
 app.MapControllers();
-
 
 //Fallback to 404
 app.MapFallback((context =>

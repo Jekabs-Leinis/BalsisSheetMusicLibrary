@@ -11,10 +11,12 @@ public class CsrfController(IAntiforgery antiforgery) : Controller
     [HttpGet]
     [AllowAnonymous]
     [IgnoreAntiforgeryToken]
-    public void GetToken()
+    public IActionResult GetToken()
     {
         var tokenSet = antiforgery.GetAndStoreTokens(HttpContext);
         HttpContext.Response.Cookies.Append("CSRF-TOKEN", tokenSet.RequestToken!,
             new CookieOptions { HttpOnly = false });
+        return Ok();
     }
 }
+

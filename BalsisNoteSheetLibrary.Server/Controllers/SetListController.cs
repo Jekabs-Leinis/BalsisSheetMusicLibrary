@@ -6,22 +6,23 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
-public class SetListController(AppDbContext context) : AppControllerBase(context)
+public class SetListController(AppDbContext context) : ControllerBase
 {
     [HttpGet(Name = "GetAll")]
-    public AppResponse<IEnumerable<SetList>> GetAll()
+    public async Task<AppResponse<IEnumerable<SetList>>> GetAll()
     {
-        var setLists = Context.SetLists
+        var setLists = await context.SetLists
             .Include(list => list.Items)
-            .OrderBy(list => list.Order);
+            .OrderBy(list => list.Order)
+            .ToListAsync();
 
         return new AppResponse<IEnumerable<SetList>>(setLists, true);
     }
 
     [HttpGet("{id:int}")]
-    public AppResponse<SetList?> Get(uint id)
+    public async Task<AppResponse<SetList?>> Get(uint id)
     {
-        var setList = Context.SetLists.Find(id);
+        var setList = await context.SetLists.FindAsync(id);
 
         return new AppResponse<SetList?>(
             setList,
@@ -31,43 +32,45 @@ public class SetListController(AppDbContext context) : AppControllerBase(context
     }
 
     [HttpPost]
-    public AppResponse<string> Add(SetList setList)
+    public async Task<AppResponse<string>> Add(SetList setList)
     {
-        Context.SetLists.Add(setList);
-        Context.SaveChanges();
+        context.SetLists.Add(setList);
+        await context.SaveChangesAsync();
 
         return new AppResponse<string>("Set list added", true);
     }
 
     [HttpPost]
-    public AppResponse<string> Update(SetList setList)
+    public async Task<AppResponse<string>> Update(SetList setList)
     {
-        var sheet = Context.SetLists.Find(setList.Id);
+        var existingSetList = await context.SetLists.FindAsync(setList.Id);
 
-        if (sheet is null)
+        if (existingSetList is null)
         {
             return new AppResponse<string>(null, false, "Set list not found");
         }
 
-        Context.SetLists.Update(setList);
-        Context.SaveChanges();
+        context.Entry(existingSetList).CurrentValues.SetValues(setList);
+
+        await context.SaveChangesAsync();
 
         return new AppResponse<string>("Set list updated", true);
     }
 
     [HttpDelete("{id:int}")]
-    public AppResponse<string> Delete(uint id)
+    public async Task<AppResponse<string>> Delete(uint id)
     {
-        var setList = Context.SetLists.Find(id);
+        var setList = await context.SetLists.FindAsync(id);
 
         if (setList is null)
         {
             return new AppResponse<string>(null, false, "Set list not found");
         }
 
-        Context.SetLists.Remove(setList);
-        Context.SaveChanges();
+        context.SetLists.Remove(setList);
+        await context.SaveChangesAsync();
 
         return new AppResponse<string>("Set list deleted", true);
     }
 }
+

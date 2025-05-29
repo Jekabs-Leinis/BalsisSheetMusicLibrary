@@ -10,10 +10,9 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]")]
 public class AuthenticationController(
-    AppDbContext context,
     SignInManager<IdentityUser> signInManager,
     IHostEnvironment env
-) : AppControllerBase(context)
+) : ControllerBase
 {
     [HttpPost]
     [AllowAnonymous]
@@ -24,7 +23,7 @@ public class AuthenticationController(
             return new AppResponse<UserDto>(null, false, "Invalid email or password");
         }
 
-        var result = await signInManager.PasswordSignInAsync(input.Email, input.Password, false, false);
+        var result = await signInManager.PasswordSignInAsync(input.Email, input.Password, true, lockoutOnFailure: false);
 
         if (!result.Succeeded)
         {
@@ -35,7 +34,8 @@ public class AuthenticationController(
 
         if (identityUser != null)
         {
-            return new AppResponse<UserDto>(new UserDto(identityUser), true);
+            var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, "Admin");
+            return new AppResponse<UserDto>(new UserDto(identityUser, isAdmin), true);
         }
 
         return new AppResponse<UserDto>(null, false, "Invalid email or password");
@@ -58,11 +58,19 @@ public class AuthenticationController(
 
         if (result.Succeeded)
         {
-            return Ok(new { Message = "User registered successfully!" });
+            return Ok(new { Success = true, Message = "User registered successfully!" });
         }
 
         foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
 
         return BadRequest(ModelState);
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> Logout()
+    {
+        await signInManager.SignOutAsync();
+        return Ok(new { Success = true, Message = "User logged out successfully!" });
+    }
 }
+

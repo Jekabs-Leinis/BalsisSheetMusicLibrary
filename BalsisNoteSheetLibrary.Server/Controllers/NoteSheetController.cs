@@ -7,22 +7,21 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
-public class NoteSheetController(AppDbContext context) : AppControllerBase(context)
+public class NoteSheetController(AppDbContext context) : ControllerBase
 {
-    public AppResponse<IEnumerable<NoteSheet>> GetAll()
+    public async Task<AppResponse<IEnumerable<NoteSheet>>> GetAll()
     {
-        SqliteExtensions.SetupInsensitiveCollation(Context);
-
-        var sheets = Context.NoteSheets.OrderBy(sheet =>
-            EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation));
+        var sheets = await context.NoteSheets.OrderBy(sheet =>
+            EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
+            .ToListAsync();
 
         return new AppResponse<IEnumerable<NoteSheet>>(sheets, true);
     }
 
     [HttpGet("{id:int}")]
-    public AppResponse<NoteSheet?> Get(uint id)
+    public async Task<AppResponse<NoteSheet?>> Get(uint id)
     {
-        var sheet = Context.NoteSheets.Find(id);
+        var sheet = await context.NoteSheets.FindAsync(id);
 
         return new AppResponse<NoteSheet?>(
             sheet,
@@ -32,43 +31,44 @@ public class NoteSheetController(AppDbContext context) : AppControllerBase(conte
     }
 
     [HttpPost]
-    public AppResponse<string> Add(NoteSheet noteSheet)
+    public async Task<AppResponse<string>> Add(NoteSheet noteSheet)
     {
-        Context.NoteSheets.Add(noteSheet);
-        Context.SaveChanges();
+        context.NoteSheets.Add(noteSheet);
+        await context.SaveChangesAsync();
 
         return new AppResponse<string>("Note sheet added", true);
     }
 
     [HttpPost]
-    public AppResponse<string> Update(NoteSheet noteSheet)
+    public async Task<AppResponse<string>> Update(NoteSheet noteSheet)
     {
-        var sheet = Context.NoteSheets.Find(noteSheet.Id);
+        var sheet = await context.NoteSheets.FindAsync(noteSheet.Id);
 
         if (sheet is null)
         {
             return new AppResponse<string>(null, false, "Note sheet not found");
         }
 
-        Context.NoteSheets.Update(noteSheet);
-        Context.SaveChanges();
+        context.Entry(sheet).CurrentValues.SetValues(noteSheet);
+        await context.SaveChangesAsync();
 
         return new AppResponse<string>("Note sheet updated", true);
     }
 
     [HttpDelete("{id:int}")]
-    public AppResponse<string> Delete(uint id)
+    public async Task<AppResponse<string>> Delete(uint id)
     {
-        var sheet = Context.NoteSheets.Find(id);
+        var sheet = await context.NoteSheets.FindAsync(id);
 
         if (sheet is null)
         {
             return new AppResponse<string>(null, false, "Note sheet not found");
         }
 
-        Context.NoteSheets.Remove(sheet);
-        Context.SaveChanges();
+        context.NoteSheets.Remove(sheet);
+        await context.SaveChangesAsync();
 
         return new AppResponse<string>("Note sheet deleted", true);
     }
 }
+

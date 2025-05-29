@@ -1,11 +1,59 @@
 <script setup>
-//TODO add logout button (here?)
+import { useUserStore } from "@/stores/userStore";
+import { logout } from "@/services/authenticationService";
+
+const userStore = useUserStore();
+
+const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
 </script>
 
 <template>
-  <div class="m-3 d-flex justify-content-center logo-container">
-    <img alt="Balsis Logo" class="logo" src="../assets/img/balsis_logo.png" />
-  </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">
+        <img
+          alt="Balsis Logo"
+          src="../assets/img/balsis_logo.png"
+          style="width: 100px"
+        />
+        <span class="d-none d-sm-inline ps-3">Nošu bibliotēka</span>
+      </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
+        aria-expanded="false"
+        aria-label="Toggle navigation bar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <form class="d-flex my-3 me-auto" role="search">
+          <div class="input-group search-box">
+            <span class="input-group-text" id="basic-addon1">
+              <i class="bi bi-search" />
+            </span>
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Meklē dziesmu"
+              aria-label="Meklē dziesmu"
+            />
+          </div>
+        </form>
+        <ul class="navbar-nav">
+          <li class="nav-item" v-if="isAdmin">
+            <a class="nav-link" href="#">Admin</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" @click="logout">Iziet</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
   <div class="section-links py-md-5 py-sm-3 py-2 d-flex justify-content-center">
     <div class="row flex-grow-1">
       <div class="col-4 d-flex justify-content-center">
@@ -50,17 +98,34 @@
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
-.logo-container {
-  position: sticky;
-  top: 16px;
-  z-index: -1;
-}
+.search-box {
+  width: 300px;
 
-.logo {
-  max-width: 600px;
-  width: 100%;
-  height: auto;
+  //noinspection SassScssUnresolvedMixin
+  @include media-breakpoint-down(lg) {
+    width: 100%;
+  }
+
+  span,
+  input {
+    background-color: transparent;
+    border: 0;
+    border-bottom: 1px solid white;
+    border-radius: 0;
+    color: white;
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    &::placeholder {
+      color: white;
+      opacity: 0.65;
+    }
+  }
 }
 
 //noinspection SassScssUnresolvedMixin
@@ -72,7 +137,7 @@
   .row {
     --bs-gutter-x: -0.75rem;
   }
-  
+
   h4 {
     font-size: 1rem;
   }

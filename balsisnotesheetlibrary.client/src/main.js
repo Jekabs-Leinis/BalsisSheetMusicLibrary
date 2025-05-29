@@ -64,7 +64,7 @@ app.use(createPinia());
 const userStore = useUserStore();
 
 router.beforeEach((to) => {
-  if (userStore.isLoggedIn || to.name === "login") {
+  if (userStore.isLoggedIn || to.name === "Login") {
     return;
   }
 

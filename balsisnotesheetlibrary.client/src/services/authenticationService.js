@@ -13,3 +13,17 @@ export async function login(email, password) {
 
   return response.data;
 }
+
+export async function logout() {
+  const userStore = useUserStore();
+
+  const response = await axios.post("/api/authentication/logout");
+
+  if (response.data.success) {
+    userStore.logout();
+    
+    window.location.href = "/login";
+  }
+
+  return response.data;
+}

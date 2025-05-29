@@ -54,6 +54,10 @@ getAllSetLists().then((lists) => {
 </template>
 
 <style lang="scss" scoped>
+.color1 {
+  background-color: #373737;
+}
+
 #foreign-sheets {
   background-color: #dcddd8;
 }

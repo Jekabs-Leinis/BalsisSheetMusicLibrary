@@ -12,7 +12,7 @@ const props = defineProps({
 <template>
   <div class="list-container w-100 pt-5 pb-3">
     <div class="container">
-      <h1 class="set-list-title fw-bold">Aktuālās notis</h1>
+      <h1 class="set-list-title fw-bold ps-2">Aktuālās notis</h1>
       <div class="row">
         <div
           v-for="setList in props.setLists"
@@ -50,6 +50,12 @@ a {
   &:hover {
     text-decoration: underline !important;
   }
+}
+
+ul {
+  list-style-type: none;
+  line-height: 160%;
+  margin-left: -43px;
 }
 
 .row {

@@ -42,6 +42,12 @@ a {
   }
 }
 
+ul {
+  list-style-type: none;
+  line-height: 160%;
+  margin-left: -43px;
+}
+
 .row {
   --bs-gutter-x: -1rem;
 }

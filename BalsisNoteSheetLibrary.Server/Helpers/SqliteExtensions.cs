@@ -10,18 +10,18 @@ public abstract class SqliteExtensions
     public const string InsensitiveCollation = "FOLD";
 
     /*
-     * Use this method when you need to sort SQLite data ignoring case and diacritics.
+     * By default, SQLite does not support case-insensitive and diacritic-insensitive sorting
      */
-    public static void SetupInsensitiveCollation(AppDbContext context)
+    public static void RegisterCaseInsensitiveCollation(SqliteConnection connection)
     {
-        var connection = context.Database.GetDbConnection() as SqliteConnection;
-
-        // By default SQLite does not support case-insensitive and diacritic-insensitive sorting
         connection!.CreateCollation(InsensitiveCollation, (x, y) => string.Compare(
-            StringExtensions.FoldToASCII(x),
-            StringExtensions.FoldToASCII(y),
+            x.FoldToASCII(),
+            y.FoldToASCII(),
             CultureInfo.CurrentCulture,
             CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase
         ));
+        
+        Console.WriteLine("Fold collation created for SQLite database.");
     }
 }
+

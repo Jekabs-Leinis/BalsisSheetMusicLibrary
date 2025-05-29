@@ -1,11 +1,18 @@
 ﻿@import "bootstrap/scss/bootstrap.scss";
 @import "loading.css";
 
-/*  style Balsis nošu arhīvs */
+:root{
+  --color-dark: rgba(55, 55, 55, 1);
+  --color-darker: rgba(44, 44, 44, 1);
+  --balsis-red: #c0392b;
+  --color-light: #f0f0f0;
+  --color-light-darker: #dcddd8
+}
+
 
 body {
   font-family: "Courier New", monospace;
-  background-color: #373737;
+  background-color: var(--color-dark);
 }
 
 h2 {
@@ -15,182 +22,7 @@ h2 {
 }
 
 h3 {
-  color: #f0f0f0;
+  color: var(--color-light);
   text-decoration: none !important;
   font-weight: normal;
-}
-
-.aktuals {
-  background-color: #dcddd8;
-  margin: -25px -10px 0 -10px;
-  padding: 40px 0 40px 0;
-}
-
-.latviesi {
-  background-color: #373737;
-  margin: -25px -10px 0 -10px;
-  padding: 40px 0 40px 0;
-  color: #f0f0f0;
-}
-
-.latviesi a:link {
-  color: #f0f0f0;
-}
-
-.latviesi a:visited {
-  color: #f0f0f0;
-}
-
-.arzemes {
-  background-color: #dcddd8;
-  margin: -25px -10px -10px -10px;
-  padding: 40px 0 40px 0;
-}
-
-#login {
-  margin: -37px 0 15px 0;
-  text-align: right;
-}
-
-.menu {
-  position: relative;
-  padding: 100px 0 100px 0;
-  background-color: #c0392b !important;
-  margin: -200px -10px 0 -10px;
-  z-index: 10;
-}
-
-.menu a:hover {
-  text-decoration: none;
-}
-
-#menu1 {
-  text-align: center;
-  padding-right: 650px;
-}
-
-#menu2 {
-  text-align: center;
-  margin-top: -265px;
-}
-
-#menu3 {
-  text-align: center;
-  margin-top: -265px;
-  padding-left: 650px;
-}
-
-@media screen and (max-width: 960px) {
-  .center {
-    width: 700px;
-  }
-
-  body {
-    background-size: 500px auto;
-    background-position: center 40px;
-  }
-
-  #menu1 {
-    padding-right: 500px;
-  }
-
-  #menu3 {
-    padding-left: 500px;
-  }
-
-  .menu {
-    padding: 40px 0;
-  }
-}
-
-@media screen and (max-width: 758px) {
-  body {
-    background-size: 330px auto;
-  }
-
-  h3 {
-    font-size: 13px;
-  }
-
-  .center {
-    width: 450px;
-  }
-
-  .menu {
-    padding: 20px 0 20px 0;
-  }
-
-  #menu1 {
-    padding-right: 300px;
-  }
-
-  #menu2 {
-    margin-top: -196px;
-  }
-
-  #menu3 {
-    margin-top: -196px;
-    padding-left: 300px;
-  }
-
-  #aktuals-pakreisi {
-    margin-left: 36px;
-  }
-}
-
-@media screen and (max-width: 524px) {
-  body {
-    background-size: 180px auto;
-  }
-
-  .menu {
-    padding: 30px 0 0 0;
-    margin-top: -88px;
-  }
-
-  #menu1 {
-    padding-right: 180px;
-  }
-
-  #menu2 {
-    margin-top: -146px;
-  }
-
-  #menu3 {
-    margin-top: -146px;
-    padding-left: 180px;
-  }
-
-  h3 {
-    visibility: hidden;
-  }
-
-  .center {
-    width: 280px;
-  }
-}
-
-@media screen and (max-width: 310px) {
-  #menu1 {
-    text-align: center;
-  }
-
-  #menu2 {
-    text-align: center;
-    margin-top: -40px;
-  }
-
-  #menu3 {
-    text-align: center;
-    margin-top: -40px;
-  }
-
-  .center {
-    width: 90%;
-  }
-
-  .menu {
-    padding: 30px 0 0 0;
-    margin-top: -10px;
-  }
 }

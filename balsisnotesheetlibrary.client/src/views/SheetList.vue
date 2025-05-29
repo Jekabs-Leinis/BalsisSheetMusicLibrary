@@ -54,19 +54,19 @@ getAllSetLists().then((lists) => {
 </template>
 
 <style lang="scss" scoped>
-.color1 {
-  background-color: #373737;
-}
-
 #foreign-sheets {
-  background-color: #dcddd8;
+  background-color: var(--color-light-darker);
+}
+
+#lv-sheets {
+  &, :deep(a) {
+    color: var(--color-light) !important;
+    background-color: var(--text-color) !important;
+  }
+}
+
+#lv-sheets, #foreign-sheets {
+  scroll-margin-top: 80px
 }
 </style>
 
-<style>
-#lv-sheets,
-#lv-sheets a {
-  color: white !important;
-  background-color: #373737 !important;
-}
-</style>

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "vue-draggable-next": "^2.2.1",
+    "vuedraggable": "^4.1.0"
+  }
+}

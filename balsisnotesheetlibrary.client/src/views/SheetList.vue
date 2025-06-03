@@ -1,9 +1,9 @@
 <script setup>
-import SheetListHeader from "@/components/SheetListHeader.vue";
+import SheetListHeader from "@/components/SheetList/SheetListHeader.vue";
 import { ref, computed } from "vue";
-import SetListNoteList from "@/components/SetListNoteList.vue";
+import SetListNoteList from "@/components/SheetList/SetListNoteList.vue";
 import { getAllNoteSheets } from "@/api/noteSheetApi";
-import NoteSheetList from "@/components/NoteSheetList.vue";
+import NoteSheetList from "@/components/SheetList/NoteSheetList.vue";
 import { getAllSetLists } from "@/api/setListApi";
 
 /* @type {Ref<UnwrapRef<NoteSheet[]>>} */

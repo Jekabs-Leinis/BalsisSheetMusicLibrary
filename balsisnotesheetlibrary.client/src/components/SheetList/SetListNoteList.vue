@@ -24,7 +24,7 @@ const props = defineProps({
               <h2 class="fw-bold pt-0">{{ setList.title }}</h2>
             </li>
             <li
-              v-for="sheet in setList.getNoteSheets(props.noteSheets)"
+              v-for="sheet in setList.getNoteSheets(props.sheets)"
               :key="sheet.id"
             >
               <a :href="`/api/download/${sheet.filename}`" class="text-decoration-none" target="_blank">

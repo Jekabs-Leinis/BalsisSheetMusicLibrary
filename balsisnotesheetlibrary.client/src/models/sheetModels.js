@@ -29,13 +29,17 @@ export class SetList {
   constructor(props = {}) {
     Object.assign(this, props);
 
-    this.items = props.items.map((item) => new SetListItem(item));
+    this.items = props.items ? props.items.map((item) => new SetListItem(item)) : [];
   }
 
+  /** @type {Number} */
+  id;
   /** @type {SetListItem[]} */
   items = [];
   /** @type {string} */
   title;
+  /** @type {Number} */
+  order;
 
   /**
    * @param allNoteSheets {NoteSheet[]}
@@ -55,7 +59,9 @@ export class SetListItem {
     Object.assign(this, props);
   }
 
-  /** @type {string} */
+  /** @type {Number} */
+  id;
+  /** @type {Number} */
   noteSheetId;
   /** @type {string} */
   setListId;

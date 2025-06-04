@@ -1,7 +1,6 @@
 <script setup>
 import { computed, toRefs } from "vue";
 import SheetSearchDropdown from "./SheetSearchDropdown.vue";
-import { useSetListStore } from "@/stores/setlistStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { VueDraggableNext } from "vue-draggable-next";
 import { moveSheetInSetList } from "@/services/setListServices";
@@ -27,7 +26,6 @@ const emit = defineEmits(["remove", "updated"]);
 
 const { setList, allSheets } = toRefs(props);
 
-const setListStore = useSetListStore();
 const noteSheetStore = useNoteSheetStore();
 
 // Create a computed prop that's reactive to changes made to the items
@@ -55,21 +53,22 @@ const addSheet = async (sheet) => {
   const item = new SetListItem({
     noteSheetId: sheet.id,
     setListId: setList.value.id,
-    order: itemsList.value.length // Place at the end of set
-  })
-  
-  itemsList.value.push(item);
+    order: itemsList.value.length, // Place at the end of set
+  });
+
+  // Have to use explicit assignment to trigger setter
+  itemsList.value = [...itemsList.value, item];
 };
 
 const removeSheet = async (noteSheetId) => {
   itemsList.value = itemsList.value.filter(
-    (item) => item.noteSheetId !== noteSheetId
+    (item) => item.noteSheetId !== noteSheetId,
   );
 };
 
 const moveSheet = async (noteSheetId, order) => {
   itemsList.value = moveSheetInSetList(setList.value, noteSheetId, order);
-}
+};
 </script>
 
 <template>
@@ -106,10 +105,12 @@ const moveSheet = async (noteSheetId, order) => {
                 {{ index + 1 }}. {{ getSongName(noteSheet.noteSheetId) }}
               </span>
             </div>
-            <button 
+            <button
               v-if="index > 0"
               class="btn btn-sm fs-6"
-              :class="[  index < itemsList.length - 1 ? 'pe-0' : 'no-down-arrow-padding']"
+              :class="[
+                index < itemsList.length - 1 ? 'pe-0' : 'no-down-arrow-padding',
+              ]"
               @click="moveSheet(noteSheet.noteSheetId, index - 1)"
             >
               <i class="bi bi-arrow-up movement-arrows" />
@@ -119,7 +120,7 @@ const moveSheet = async (noteSheetId, order) => {
               class="btn btn-sm fs-6"
               @click="moveSheet(noteSheet.noteSheetId, index + 1)"
             >
-              <i class="bi bi-arrow-down movement-arrows"/>
+              <i class="bi bi-arrow-down movement-arrows" />
             </button>
             <button
               class="btn btn-sm btn-close"

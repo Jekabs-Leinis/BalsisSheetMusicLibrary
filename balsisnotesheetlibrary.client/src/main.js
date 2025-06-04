@@ -6,7 +6,7 @@ import * as bootstrap from "bootstrap";
 
 import axios from "axios";
 
-// Redirect to login page if the user is not authenticated
+// Redirect to login page if the user is not authenticated for XHR requests
 axios.interceptors.response.use(
   (response) => response,
   (request) => {
@@ -72,8 +72,15 @@ router.beforeEach((to) => {
   return { name: "Login" };
 });
 
+router.afterEach(() => {
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+})
+
 app.use(router);
 
 app.directive("loading", vLoading);
 
 app.mount("#app");
+
+

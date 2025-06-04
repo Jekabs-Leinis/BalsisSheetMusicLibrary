@@ -8,5 +8,5 @@ public class SetList
     public string? Title { get; set; }
     public uint? Order { get; set; }
 
-    public IEnumerable<SetListItem>? Items { get; set; }
+    public IEnumerable<SetListItem> Items { get; set; } = new List<SetListItem>();
 }

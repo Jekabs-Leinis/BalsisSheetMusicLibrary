@@ -62,22 +62,22 @@ export const useSetListStore = defineStore('setlist', () => {
       isLoading.value = false;
     }
   }
-
-  // Update an existing setlist
+  
   async function saveSetList(updatedSetList) {
     isLoading.value = true;
     error.value = null;
     
     try {
+      const index = setLists.value.findIndex(list => list.id === updatedSetList.id);
+      const oldSetList = setLists.value[index];
+
+      setLists.value[index] = new SetList(updatedSetList);
+      
       const response = await updateSetList(updatedSetList);
       
-      if (response.success) {
-        const index = setLists.value.findIndex(list => list.id === updatedSetList.id);
-        if (index !== -1) {
-          setLists.value[index] = new SetList(updatedSetList);
-        }
-      } else {
+      if (!response.success) {
         error.value = response.error || 'Failed to update setlist';
+        setLists.value[index] = oldSetList;
       }
     } catch (err) {
       console.error('Error updating setlist:', err);
@@ -107,74 +107,24 @@ export const useSetListStore = defineStore('setlist', () => {
       isLoading.value = false;
     }
   }
-
-  // Add a song to a setlist
-  async function addSongToSetList(setListId, noteSheetId) {
-    const setList = setLists.value.find(list => list.id === setListId);
-    if (!setList) return;
-
-    // Calculate the max order and add 1 for the new item
-    const maxOrder = setList.items.length > 0 
-      ? Math.max(...setList.items.map(item => item.order))
-      : 0;
-    
-    // Create a new setlist item
-    const newItem = new SetListItem({
-      noteSheetId: noteSheetId,
-      setListId: setListId,
-      order: maxOrder + 1
-    });
-    
-    // Add to local setlist items
-    setList.items.push(newItem);
-    
-    // Update the setlist on the server
-    await saveSetList(setList);
-  }
-
-  // Remove a song from a setlist
-  async function removeSongFromSetList(setListId, noteSheetId) {
-    const setList = setLists.value.find(list => list.id === setListId);
-    if (!setList) return;
-
-    // Filter out the item to remove
-    setList.songs = setList.songs.filter(item => item.noteSheetId !== noteSheetId);
-    
-    // Update the setlist on the server
-    await saveSetList(setList);
-  }
-
-  // Reorder songs within a setlist
-  async function reorderSongsInSetList(setListId, newItemsOrder) {
-    const setList = setLists.value.find(list => list.id === setListId);
-    if (!setList) return;
-
-    // Update the order of items
-    newItemsOrder.forEach((noteSheetId, index) => {
-      const item = setList.items.find(item => item.noteSheetId === noteSheetId);
-      if (item) item.order = index;
-    });
-
-    // Sort the items by the new order
-    setList.items.sort((a, b) => a.order - b.order);
-    
-    // Update the setlist on the server
-    await saveSetList(setList);
-  }
-
-  // Reorder setlists
+  
   async function reorderSetLists(newOrder) {
+    const modifiedLists = [];
+    
     // Update the order of setlists
     newOrder.forEach((setListId, index) => {
       const setList = setLists.value.find(list => list.id === setListId);
-      if (setList) setList.order = index;
+      if (setList && setList.order !== index) {
+        setList.order = index;
+        modifiedLists.push(setList);
+      }
     });
 
     // Sort by the new order
     setLists.value.sort((a, b) => a.order - b.order);
 
-    // Update all setlists on the server
-    for (const setList of setLists.value) {
+    // Update modified setlists on the server
+    for (const setList of modifiedLists) {
       await saveSetList(setList);
     }
   }
@@ -187,9 +137,6 @@ export const useSetListStore = defineStore('setlist', () => {
     createSetList,
     saveSetList,
     removeSetList,
-    addSongToSetList,
-    removeSongFromSetList,
-    reorderSongsInSetList,
     reorderSetLists
   };
 });

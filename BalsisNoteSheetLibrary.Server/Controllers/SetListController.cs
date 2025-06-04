@@ -43,7 +43,9 @@ public class SetListController(AppDbContext context) : ControllerBase
     [HttpPost]
     public async Task<AppResponse<string>> Update(SetList setList)
     {
-        var existingSetList = await context.SetLists.FindAsync(setList.Id);
+        var existingSetList = await context.SetLists
+            .Include(sl => sl.Items)
+            .FirstOrDefaultAsync(sl => sl.Id == setList.Id);
 
         if (existingSetList is null)
         {
@@ -51,6 +53,29 @@ public class SetListController(AppDbContext context) : ControllerBase
         }
 
         context.Entry(existingSetList).CurrentValues.SetValues(setList);
+
+        // Update Items
+        // Remove items not present in the incoming setList
+        var incomingItemIds = setList.Items.Select(i => i.NoteSheetId).ToHashSet();
+        var itemsToRemove = existingSetList.Items.Where(i => !incomingItemIds.Contains(i.NoteSheetId)).ToList();
+        foreach (var item in itemsToRemove)
+        {
+            context.Remove(item);
+        }
+
+        // Update existing and add new items
+        foreach (var item in setList.Items)
+        {
+            var existingItem = existingSetList.Items.FirstOrDefault(i => i.NoteSheetId == item.NoteSheetId);
+            if (existingItem != null)
+            {
+                context.Entry(existingItem).CurrentValues.SetValues(item);
+            }
+            else
+            {
+                context.SetListItems.Add(item);
+            }
+        }
 
         await context.SaveChangesAsync();
 
@@ -73,4 +98,3 @@ public class SetListController(AppDbContext context) : ControllerBase
         return new AppResponse<string>("Set list deleted", true);
     }
 }
-

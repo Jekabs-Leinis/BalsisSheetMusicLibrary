@@ -1,34 +1,34 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import draggable from "vuedraggable";
 import { useSetListStore } from "@/stores/setlistStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import SetListItem from "@/components/EditSetLists/SetListItem.vue";
+import { VueDraggableNext } from "vue-draggable-next";
 
 // Initialize stores
 const setListStore = useSetListStore();
 const noteSheetStore = useNoteSheetStore();
 
-// Variables for creating new setlists
 const newSetListTitle = ref("");
 const isCreatingSetList = ref(false);
+const isInitializing = ref(true);
 
-// Load data on component mount
 onMounted(async () => {
-  // Load setlists and notesheets in parallel
   await Promise.all([
     setListStore.fetchSetLists(),
     noteSheetStore.fetchNoteSheets(),
-  ]);
+  ]).then(() => {
+    isInitializing.value = false;
+  }).catch((error) => {
+    console.error("Error initializing data:", error);
+  });
 });
 
-// Handle setlist drag-and-drop reordering
 const onSetListsReorder = async () => {
   const setListIds = setListStore.setLists.map((list) => list.id);
   await setListStore.reorderSetLists(setListIds);
 };
 
-// Create a new setlist
 const createSetList = async () => {
   if (!newSetListTitle.value.trim()) return;
 
@@ -37,14 +37,12 @@ const createSetList = async () => {
   isCreatingSetList.value = false;
 };
 
-// Remove a setlist
 const removeSetList = async (setListId) => {
   if (confirm("Are you sure you want to delete this setlist?")) {
     await setListStore.removeSetList(setListId);
   }
 };
 
-// Cancel setlist creation
 const cancelCreateSetList = () => {
   isCreatingSetList.value = false;
   newSetListTitle.value = "";
@@ -66,7 +64,7 @@ const cancelCreateSetList = () => {
 
       <!-- Loading state -->
       <div
-        v-if="setListStore.isLoading || noteSheetStore.isLoading"
+        v-if="isInitializing"
         class="row"
       >
         <div class="col-12 text-center py-5">
@@ -88,12 +86,12 @@ const cancelCreateSetList = () => {
 
       <!-- Setlists content -->
       <div
-        v-if="!setListStore.isLoading && !noteSheetStore.isLoading"
+        v-if="!isInitializing"
         class="row"
       >
         <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
           <!-- Draggable setlists container -->
-          <draggable
+          <vue-draggable-next
             v-model="setListStore.setLists"
             handle=".setlist-header"
             item-key="id"
@@ -101,16 +99,16 @@ const cancelCreateSetList = () => {
             @change="onSetListsReorder"
             class="setlists-container"
           >
-            <template #item="{ element: setList }">
-              <set-list-item
-                :set-list="setList"
-                :all-sheets="noteSheetStore.noteSheets"
-                :is-loading="noteSheetStore.isLoading"
-                @remove="removeSetList(setList.id)"
-                @updated="setListStore.saveSetList(setList)"
-              />
-            </template>
-          </draggable>
+            <set-list-item
+              v-for="setList in setListStore.setLists"
+              :key="setList.id"
+              :set-list="setList"
+              :all-sheets="noteSheetStore.noteSheets"
+              :is-loading="noteSheetStore.isLoading"
+              @remove="removeSetList(setList.id)"
+              @updated="setListStore.saveSetList(setList)"
+            />
+          </vue-draggable-next>
 
           <!-- Create new setlist form -->
           <div v-if="isCreatingSetList" class="card mb-3">

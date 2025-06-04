@@ -1,25 +1,13 @@
 <template>
   <div class="sheet-search-dropdown">
-    <div class="input-group">
-      <input
-        type="text"
-        class="form-control"
-        placeholder="Pievieno dziesmu..."
-        v-model="searchQuery"
-        @focus="showDropdown = true"
-        @click="showDropdown = true"
-      />
-      <div class="input-group-append">
-        <button
-          class="btn btn-outline-secondary"
-          type="button"
-          @click="toggleDropdown"
-        >
-          <i class="bi bi-caret-down-fill"></i>
-        </button>
-      </div>
-    </div>
-
+    <input
+      type="text"
+      class="form-control search-input"
+      placeholder="Pievieno dziesmu..."
+      v-model="searchQuery"
+      @focus="showDropdown = true"
+      @click="showDropdown = true"
+    />
     <div v-if="showDropdown" class="dropdown-menu show w-100">
       <div class="px-3 py-2">
         <div v-if="isLoading" class="text-center py-2">
@@ -111,6 +99,15 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .sheet-search-dropdown {
   position: relative;
+
+  .search-input {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    background-image: var(--bs-form-select-bg-img),
+      var(--bs-form-select-bg-icon, none);
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+  }
 
   .dropdown-menu {
     max-height: 300px;

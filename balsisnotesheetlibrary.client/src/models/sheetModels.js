@@ -51,10 +51,10 @@ export class SetList {
    * @returns {NoteSheet[]}
    */
   getNoteSheets(allNoteSheets) {
-    const noteSheetIds = this.items.map((item) => item.noteSheetId);
+    const noteSheetIds = new Set(this.items.map((item) => item.noteSheetId));
 
     return allNoteSheets.filter((noteSheet) =>
-      noteSheetIds.includes(noteSheet.id),
+      noteSheetIds.has(noteSheet.id),
     );
   }
   

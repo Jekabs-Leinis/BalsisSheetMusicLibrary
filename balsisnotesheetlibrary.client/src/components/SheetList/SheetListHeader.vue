@@ -13,7 +13,7 @@ const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
       <a class="navbar-brand" href="#">
         <img
           alt="Balsis Logo"
-          src="../assets/img/balsis_logo.png"
+          src="@/assets/img/balsis_logo.png"
           class="balsis-logo"
         />
         <span class="d-none d-lg-inline ps-3 fw-semibold">Nošu bibliotēka</span>
@@ -83,7 +83,6 @@ const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";
-@import "bootstrap-icons/font/bootstrap-icons.css";
 
 .search-box {
   span,

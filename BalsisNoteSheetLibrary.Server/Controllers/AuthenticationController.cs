@@ -1,6 +1,4 @@
 ﻿using BalsisNoteSheetLibrary.Server.Models;
-using BalsisNoteSheetLibrary.Server.Models.DtoModels;
-using BalsisNoteSheetLibrary.Server.Models.FormModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +12,9 @@ public class AuthenticationController(
     IHostEnvironment env
 ) : ControllerBase
 {
+    public record UserDto(string Id, string? Email, bool IsAdmin);
+    public record LoginForm(string Email, string Password);
+    
     [HttpPost]
     [AllowAnonymous]
     public async Task<AppResponse<UserDto>> Login(LoginForm input)
@@ -34,8 +35,9 @@ public class AuthenticationController(
 
         if (identityUser != null)
         {
-            var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, "Admin");
-            return new AppResponse<UserDto>(new UserDto(identityUser, isAdmin), true);
+            var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, Role.Admin);
+            
+            return new AppResponse<UserDto>(new UserDto(identityUser.Id, identityUser.Email, isAdmin), true);
         }
 
         return new AppResponse<UserDto>(null, false, "Invalid email or password");

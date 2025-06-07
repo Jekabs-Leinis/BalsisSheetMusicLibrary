@@ -1,13 +1,14 @@
 ﻿<script setup>
-import { login } from "@/services/authenticationService";
+import { login } from "@/api/authenticationApi";
 import { ref } from "vue";
 import router from "@/router/routes";
+import { useUserStore } from "@/stores/userStore";
 
-let userName = ref(""),
-  password = ref(""),
-  showError = ref(false),
-  errorMessage = ref(""),
-  loading = ref(false);
+let userName = ref("");
+let password = ref("");
+let errorMessage = ref("");
+let loading = ref(false);
+let userStore = useUserStore();
 
 async function attemptLogin() {
   if (loading.value) {
@@ -15,16 +16,19 @@ async function attemptLogin() {
   }
 
   loading.value = true;
-  showError.value = false;
+  errorMessage.value = "";
 
-  let response = await login(userName.value, password.value);
+  try {
+    let user = await login(userName.value, password.value);
 
-  loading.value = false;
-  showError.value = !response.success;
-  errorMessage.value = response.error;
-  
-  if (response.success) {
+    userStore.setUser(user);
+
     router.push({ name: "SheetList" });
+  } catch (error) {
+    console.error("Login error:", error);
+    errorMessage.value = "An error occurred while logging in: " + error.message;
+  } finally {
+    loading.value = false;
   }
 }
 </script>
@@ -56,7 +60,7 @@ async function attemptLogin() {
         v-model="password"
       />
 
-      <div class="info mt-3" v-if="showError">{{ errorMessage }}</div>
+      <div class="info mt-3 text-white" v-if="errorMessage">{{ errorMessage }}</div>
 
       <div class="w-100">
         <button
@@ -94,7 +98,7 @@ async function attemptLogin() {
 }
 
 #submit {
-  font-family: Courier New;
+  font-family: Courier New, sans-serif;
   color: black;
   background: white;
   text-decoration: none;

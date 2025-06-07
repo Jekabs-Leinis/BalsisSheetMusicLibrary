@@ -5,8 +5,7 @@ export async function getAllSetLists() {
   const response = await axios.get("/api/setList/getAll");
 
   if (!response.data.success) {
-    console.error("Failed to get all set lists", response.data.error);
-    return [];
+    throw Error(response.data.error || "Failed to get all set lists");
   }
 
   return response.data.model.map((setList) => new SetList(setList));
@@ -14,16 +13,30 @@ export async function getAllSetLists() {
 
 export async function addSetList(setList) {
   const response = await axios.post("/api/setList/add", setList);
+
+  if (!response.data.success) {
+    throw Error(response.data.error || "Failed to add set list");
+  }
+  
   return response.data;
 }
 
 export async function updateSetList(setList) {
   const response = await axios.post("/api/setList/update", setList);
+
+  if (!response.data.success) {
+    throw Error(response.data.error || "Failed to update set list");
+  }
+  
   return response.data;
 }
 
 export async function deleteSetList(setListId) {
   const response = await axios.delete(`/api/setList/delete/${setListId}`);
+
+  if (!response.data.success) {
+    throw Error(response.data.error || "Failed to delete set list");
+  }
+  
   return response.data;
 }
-

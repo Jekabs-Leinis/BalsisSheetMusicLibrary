@@ -1,10 +1,21 @@
 <script setup>
 import { useUserStore } from "@/stores/userStore";
-import { logout } from "@/services/authenticationService";
+import { logout } from "@/api/authenticationApi";
+import router from "@/router/routes";
 
 const userStore = useUserStore();
 
 const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
+
+async function attemptLogout() {
+  try {
+    await logout();
+    userStore.logout();
+    router.push({ name: "Login" });
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+}
 </script>
 
 <template>
@@ -70,7 +81,7 @@ const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
             </li>
             <li class="nav-item flex-grow-1" />
             <li class="m-0">
-              <a class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light" href="#" @click="logout">Iziet</a>
+              <a class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light" href="#" @click="attemptLogout">Iziet</a>
             </li>
           </ul>
         </div>

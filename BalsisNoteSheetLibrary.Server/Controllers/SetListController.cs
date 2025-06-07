@@ -14,7 +14,7 @@ public class SetListController(AppDbContext context) : ControllerBase
         var setLists = await context.SetLists
             .Include(list => list.Items)
             .OrderBy(list => list.Order)
-            .ToListAsync();
+            .ToArrayAsync();
 
         return new AppResponse<IEnumerable<SetList>>(setLists, true);
     }
@@ -93,6 +93,11 @@ public class SetListController(AppDbContext context) : ControllerBase
         }
 
         context.SetLists.Remove(setList);
+        
+        // Also remove associated items
+        var itemsToRemove = context.SetListItems.Where(item => item.SetListId == id);
+        context.SetListItems.RemoveRange(itemsToRemove);
+        
         await context.SaveChangesAsync();
 
         return new AppResponse<string>("Set list deleted", true);

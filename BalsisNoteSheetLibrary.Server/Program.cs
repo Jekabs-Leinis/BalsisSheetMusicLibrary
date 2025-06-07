@@ -106,6 +106,7 @@ app.UseStaticFiles();
 app.UseHttpsRedirection();
 
 await RoleSeeder.SeedRolesAsync(app.Services);
+await UserSeeder.SeedUsersAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

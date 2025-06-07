@@ -42,6 +42,7 @@ public static class UserSeeder
         else
         {
             // Ensure user has the role if they already exist
+            // This should never happen in production, but it's good to ensure consistency
             if (!await userManager.IsInRoleAsync(user, role))
             {
                 await userManager.AddToRoleAsync(user, role);

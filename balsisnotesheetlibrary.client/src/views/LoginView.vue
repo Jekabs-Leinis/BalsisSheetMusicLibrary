@@ -3,7 +3,7 @@ import { login } from "@/services/authenticationService";
 import { ref } from "vue";
 import router from "@/router/routes";
 
-let email = ref(""),
+let userName = ref(""),
   password = ref(""),
   showError = ref(false),
   errorMessage = ref(""),
@@ -17,7 +17,7 @@ async function attemptLogin() {
   loading.value = true;
   showError.value = false;
 
-  let response = await login(email.value, password.value);
+  let response = await login(userName.value, password.value);
 
   loading.value = false;
   showError.value = !response.success;
@@ -36,21 +36,14 @@ async function attemptLogin() {
     >
       <div class="info mb-3">Please log in to access this page.</div>
       <h1 class="fw-normal">Nošu arhīvs</h1>
-      <input
-        style="display: none"
-        id="csrf_token"
-        name="csrf_token"
-        type="hidden"
-        value="1706834653.65##84a26a04af581aaf35c490c040cbee4e5cb328a7"
-      />
-      <label for="email" class="mt-3">Email Address</label>
+      <label for="userName" class="mt-3">Username</label>
       <input
         class="form-control form-control-sm"
-        id="email"
-        name="email"
+        id="userName"
+        name="userName"
         type="text"
         value=""
-        v-model="email"
+        v-model="userName"
       />
 
       <label for="password" class="mt-3">Password</label>

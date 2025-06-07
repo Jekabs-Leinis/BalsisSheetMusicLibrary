@@ -1,5 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Helpers;
 using BalsisNoteSheetLibrary.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
+[Authorize(Roles = $"{Role.Admin},{Role.User}")]
 public class NoteSheetController(AppDbContext context) : ControllerBase
 {
     public async Task<AppResponse<IEnumerable<NoteSheet>>> GetAll()
@@ -31,6 +33,7 @@ public class NoteSheetController(AppDbContext context) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Role.Admin)]
     public async Task<AppResponse<string>> Add(NoteSheet noteSheet)
     {
         context.NoteSheets.Add(noteSheet);
@@ -40,6 +43,7 @@ public class NoteSheetController(AppDbContext context) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Role.Admin)]
     public async Task<AppResponse<string>> Update(NoteSheet noteSheet)
     {
         var sheet = await context.NoteSheets.FindAsync(noteSheet.Id);
@@ -56,6 +60,7 @@ public class NoteSheetController(AppDbContext context) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = Role.Admin)]
     public async Task<AppResponse<string>> Delete(uint id)
     {
         var sheet = await context.NoteSheets.FindAsync(id);

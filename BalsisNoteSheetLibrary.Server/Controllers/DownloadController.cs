@@ -1,10 +1,12 @@
 using BalsisNoteSheetLibrary.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = $"{Role.Admin},{Role.User}")]
 public class DownloadController(AppDbContext context, IWebHostEnvironment webHostEnvironment) : ControllerBase
 {
     [HttpGet("{filename}")]

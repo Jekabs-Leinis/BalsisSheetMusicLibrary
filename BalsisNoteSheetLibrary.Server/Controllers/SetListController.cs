@@ -1,4 +1,5 @@
 using BalsisNoteSheetLibrary.Server.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,7 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
+[Authorize(Roles = $"{Role.Admin},{Role.User}")]
 public class SetListController(AppDbContext context) : ControllerBase
 {
     [HttpGet(Name = "GetAll")]
@@ -32,6 +34,7 @@ public class SetListController(AppDbContext context) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Role.Admin)]
     public async Task<AppResponse<string>> Add(SetList setList)
     {
         context.SetLists.Add(setList);
@@ -41,6 +44,7 @@ public class SetListController(AppDbContext context) : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = Role.Admin)]
     public async Task<AppResponse<string>> Update(SetList setList)
     {
         var existingSetList = await context.SetLists
@@ -83,6 +87,7 @@ public class SetListController(AppDbContext context) : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = Role.Admin)]
     public async Task<AppResponse<string>> Delete(uint id)
     {
         var setList = await context.SetLists.FindAsync(id);

@@ -12,8 +12,8 @@ public class AuthenticationController(
     IHostEnvironment env
 ) : ControllerBase
 {
-    public record UserDto(string Id, string? Email, bool IsAdmin);
-    public record LoginForm(string Email, string Password);
+    public record UserDto(string Id, string? UserName, bool IsAdmin);
+    public record LoginForm(string UserName, string Password);
     
     [HttpPost]
     [AllowAnonymous]
@@ -23,49 +23,25 @@ public class AuthenticationController(
         {
             return new AppResponse<UserDto>(null, false, "Invalid email or password");
         }
+        
+        var identityUser = await signInManager.UserManager.FindByNameAsync(input.UserName);
 
-        var result = await signInManager.PasswordSignInAsync(input.Email, input.Password, true, lockoutOnFailure: false);
+        if (identityUser == null)
+        {
+            return new AppResponse<UserDto>(null, false, "Invalid email or password");
+        }
 
+        var result = await signInManager.PasswordSignInAsync(identityUser, input.Password, true, lockoutOnFailure: false);
+        
         if (!result.Succeeded)
         {
             return new AppResponse<UserDto>(null, false, "Invalid email or password");
         }
 
-        var identityUser = await signInManager.UserManager.FindByEmailAsync(input.Email);
-
-        if (identityUser != null)
-        {
-            var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, Role.Admin);
+        var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, Role.Admin);
             
-            return new AppResponse<UserDto>(new UserDto(identityUser.Id, identityUser.Email, isAdmin), true);
-        }
+        return new AppResponse<UserDto>(new UserDto(identityUser.Id, identityUser.Email, isAdmin), true);
 
-        return new AppResponse<UserDto>(null, false, "Invalid email or password");
-    }
-
-    [HttpPost]
-    [AllowAnonymous]
-    public async Task<IActionResult> Register(string email, string password)
-    {
-        if (!env.IsDevelopment())
-        {
-            return BadRequest(new { Message = "Registration is disabled in production environment" });
-        }
-
-        var result =
-            await signInManager.UserManager.CreateAsync(
-                new IdentityUser { UserName = email, Email = email },
-                password
-            );
-
-        if (result.Succeeded)
-        {
-            return Ok(new { Success = true, Message = "User registered successfully!" });
-        }
-
-        foreach (var error in result.Errors) ModelState.AddModelError(string.Empty, error.Description);
-
-        return BadRequest(ModelState);
     }
     
     [HttpPost]

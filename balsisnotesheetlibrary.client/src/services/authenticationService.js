@@ -2,10 +2,10 @@ import { useUserStore } from "@/stores/userStore";
 import { User } from "@/models/userModels";
 import axios from "axios";
 
-export async function login(email, password) {
+export async function login(userName, password) {
   const userStore = useUserStore();
   
-  const response = await axios.post("/api/authentication/login", { email, password });
+  const response = await axios.post("/api/authentication/login", { userName, password });
 
   if (response.data.success) {
     userStore.setUser(new User(response.data.model));

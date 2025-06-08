@@ -1,24 +1,16 @@
 <script setup>
 import SheetListHeader from "@/components/SheetList/SheetListHeader.vue";
-import { ref, computed } from "vue";
+import { ref, onMounted } from "vue";
 import SetListNoteList from "@/components/SheetList/SetListNoteList.vue";
-import { getAllNoteSheets } from "@/api/noteSheetApi";
 import NoteSheetList from "@/components/SheetList/NoteSheetList.vue";
 import { getAllSetLists } from "@/api/setListApi";
+import { useNoteSheetStore } from "@/stores/notesheetStore";
 
-/* @type {Ref<UnwrapRef<NoteSheet[]>>} */
-const noteSheets = ref([]);
+const noteSheetStore = useNoteSheetStore();
 
-getAllNoteSheets().then((sheets) => {
-  noteSheets.value = sheets;
+onMounted(async () => {
+  await noteSheetStore.fetchNoteSheets();
 });
-
-const latvianNoteSheets = computed(() =>
-  noteSheets.value.filter((sheet) => sheet.isLatvian),
-);
-const foreignNoteSheets = computed(() =>
-  noteSheets.value.filter((sheet) => !sheet.isLatvian),
-);
 
 /* @type {Ref<UnwrapRef<SetList[]>>} */
 const setLists = ref([]);
@@ -32,14 +24,14 @@ getAllSetLists().then((lists) => {
   <SheetListHeader />
   <SetListNoteList
     id="active-sheets"
-    :note-sheets="noteSheets"
+    :note-sheets="noteSheetStore.filteredNoteSheets"
     :set-lists="setLists"
   />
   <div class="invert" id="lv-sheets">
     <div class="container">
       <NoteSheetList
         title="Latviešu skaņdarbi"
-        :note-sheets="latvianNoteSheets"
+        :note-sheets="noteSheetStore.filteredLatvianNoteSheets"
       />
     </div>
   </div>
@@ -47,7 +39,7 @@ getAllSetLists().then((lists) => {
     <div class="container">
       <NoteSheetList
         title="Ārzemju skaņdarbi"
-        :note-sheets="foreignNoteSheets"
+        :note-sheets="noteSheetStore.filteredForeignNoteSheets"
       />
     </div>
   </div>
@@ -69,4 +61,3 @@ getAllSetLists().then((lists) => {
   scroll-margin-top: 80px
 }
 </style>
-

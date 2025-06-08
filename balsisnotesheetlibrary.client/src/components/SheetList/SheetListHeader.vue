@@ -1,11 +1,32 @@
 <script setup>
 import { useUserStore } from "@/stores/userStore";
+import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { logout } from "@/api/authenticationApi";
 import router from "@/router/routes";
+import { ref, watch } from "vue";
 
 const userStore = useUserStore();
+const noteSheetStore = useNoteSheetStore();
 
 const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
+const searchInput = ref("");
+
+// Update search query when user types
+function handleSearch() {
+  noteSheetStore.setSearchQuery(searchInput.value);
+}
+
+// Add debounce for performance
+let debounceTimeout;
+function debounceSearch() {
+  clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(handleSearch, 300);
+}
+
+// Clear search when component is destroyed
+watch(searchInput, () => {
+  debounceSearch();
+});
 
 async function attemptLogout() {
   try {
@@ -15,6 +36,12 @@ async function attemptLogout() {
   } catch (error) {
     console.error("Logout error:", error);
   }
+}
+
+// Clear search input
+function clearSearch() {
+  searchInput.value = "";
+  noteSheetStore.setSearchQuery("");
 }
 </script>
 
@@ -29,16 +56,23 @@ async function attemptLogout() {
         />
         <span class="d-none d-lg-inline ps-3 fw-semibold">Nošu bibliotēka</span>
       </a>
-      <form class="d-flex my-3 flex-grow-1" role="search">
+      <form class="d-flex my-3 flex-grow-1" role="search" @submit.prevent>
         <div class="input-group search-box">
               <span class="input-group-text pe-0" id="basic-addon1">
                 <i class="bi bi-search" />
               </span>
           <input
+            v-model="searchInput"
             class="form-control fw-semibold me-2"
             type="search"
             placeholder="Meklē dziesmu"
             aria-label="Meklē dziesmu"
+          />
+          <i 
+            v-if="searchInput"
+            class="bi bi-x-lg search-clear-btn" 
+            aria-label="Clear search"
+            @click="clearSearch"
           />
         </div>
       </form>
@@ -96,6 +130,8 @@ async function attemptLogout() {
 @import "bootstrap/scss/mixins";
 
 .search-box {
+  position: relative;
+  
   span,
   input {
     background-color: transparent;
@@ -112,6 +148,23 @@ async function attemptLogout() {
     &::placeholder {
       color: white;
       opacity: 0.75;
+    }
+  }
+  
+  .search-clear-btn {
+    position: absolute;
+    right: 10px;
+    top: 55%;
+    transform: translateY(-50%);
+    z-index: 10;
+    color: white;
+    cursor: pointer;
+    font-size: 1.25rem;
+    opacity: 0.75;
+    padding: 0.25rem;
+    
+    &:hover {
+      opacity: 1;
     }
   }
 }

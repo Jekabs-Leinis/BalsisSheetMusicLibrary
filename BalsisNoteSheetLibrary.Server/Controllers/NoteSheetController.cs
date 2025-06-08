@@ -15,7 +15,7 @@ public class NoteSheetController(AppDbContext context) : ControllerBase
     {
         var sheets = await context.NoteSheets.OrderBy(sheet =>
             EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
-            .ToListAsync();
+            .ToArrayAsync();
 
         return new AppResponse<IEnumerable<NoteSheet>>(sheets, true);
     }

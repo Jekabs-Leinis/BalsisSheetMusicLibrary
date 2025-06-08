@@ -18,7 +18,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
             return BadRequest(new AppResponse<object>(null, false, "Invalid filename."));
         }
         
-        // It's often better to use the actual filename part if the input could be a path.
+        // Additional check to ensure the filename is not a path traversal attempt.
         var sanitizedFilename = Path.GetFileName(filename);
 
         var sheet = context.NoteSheets.FirstOrDefault(s => s.Filename == sanitizedFilename);

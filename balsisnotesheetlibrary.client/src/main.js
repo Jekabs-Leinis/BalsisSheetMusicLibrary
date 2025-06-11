@@ -12,10 +12,9 @@ import axios from "axios";
 // eslint-disable-next-line no-unused-vars
 import * as bootstrap from "bootstrap";
 
-import "./assets/main.css";
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
-
+import "./assets/main.css";
 
 
 // Redirect to login page if the user is not authenticated for XHR requests

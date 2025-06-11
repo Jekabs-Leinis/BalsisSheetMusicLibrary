@@ -60,19 +60,20 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
 
   const filteredNoteSheets = computed(() => {
     let filtered = [];
+    let query = searchQuery.value.trim().toLowerCase();
 
     // First filter by search query
-    if (!searchQuery.value) {
+    if (!query) {
       // Copy to prevert sorting
       filtered = [...noteSheets.value];
     } else {
       filtered = noteSheets.value.filter(
         (sheet) =>
-          sheet.title.toLowerCase().includes(searchQuery.value) ||
+          sheet.title.toLowerCase().includes(query) ||
           sheet
             .getFormattedAdditionalData()
             .toLowerCase()
-            .includes(searchQuery.value),
+            .includes(query),
       );
     }
 

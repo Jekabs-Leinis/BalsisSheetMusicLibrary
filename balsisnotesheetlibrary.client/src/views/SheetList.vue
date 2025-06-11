@@ -61,3 +61,9 @@ getAllSetLists().then((lists) => {
   scroll-margin-top: 80px
 }
 </style>
+
+<style>
+body {
+  background-color: var(--color-dark);
+}
+</style>

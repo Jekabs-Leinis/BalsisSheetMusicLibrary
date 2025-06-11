@@ -3,7 +3,8 @@ import { useUserStore } from "@/stores/userStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { logout } from "@/api/authenticationApi";
 import router from "@/router/routes";
-import { ref, watch } from "vue";
+import { ref, watch, onBeforeUnmount } from "vue";
+import _debounce from "lodash.debounce";
 
 const userStore = useUserStore();
 const noteSheetStore = useNoteSheetStore();
@@ -11,21 +12,16 @@ const noteSheetStore = useNoteSheetStore();
 const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
 const searchInput = ref("");
 
-// Update search query when user types
-function handleSearch() {
-  noteSheetStore.setSearchQuery(searchInput.value);
+function handleSearch(query) {
+  noteSheetStore.setSearchQuery(query);
 }
 
-// Add debounce for performance
-let debounceTimeout;
-function debounceSearch() {
-  clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(handleSearch, 300);
-}
+const debouncedSearch = _debounce(handleSearch, 300);
 
-// Clear search when component is destroyed
-watch(searchInput, () => {
-  debounceSearch();
+watch(searchInput, (query) => debouncedSearch(query));
+
+onBeforeUnmount(() => {
+  noteSheetStore.setSearchQuery("");
 });
 
 async function attemptLogout() {
@@ -36,12 +32,6 @@ async function attemptLogout() {
   } catch (error) {
     console.error("Logout error:", error);
   }
-}
-
-// Clear search input
-function clearSearch() {
-  searchInput.value = "";
-  noteSheetStore.setSearchQuery("");
 }
 </script>
 
@@ -72,7 +62,7 @@ function clearSearch() {
             v-if="searchInput"
             class="bi bi-x-lg search-clear-btn"
             aria-label="Clear search"
-            @click="clearSearch"
+            @click="searchInput = ''"
           />
         </div>
       </form>

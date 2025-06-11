@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, onBeforeUnmount } from "vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { useRouter } from "vue-router";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSheet from "@/components/Admin/List/DeleteSheet.vue";
 import { SortDirection } from "@/models/utilModels";
+import _debounce from "lodash.debounce";
 
 const noteSheetStore = useNoteSheetStore();
 const router = useRouter();
@@ -16,6 +17,20 @@ onMounted(async () => {
 const editSheet = (sheetId) => {
   router.push(`/admin/sheets/edit/${sheetId}`);
 };
+
+const searchInput = ref("");
+
+function handleSearch(query) {
+  noteSheetStore.setSearchQuery(query);
+}
+
+const debouncedSearch = _debounce(handleSearch, 300);
+
+watch(searchInput, (query) => debouncedSearch(query));
+
+onBeforeUnmount(() => {
+  noteSheetStore.setSearchQuery("");
+});
 
 const showDeleteModal = ref(false);
 const sheetToDelete = ref(null);
@@ -73,7 +88,7 @@ const getSortIcon = () => {
             type="text"
             class="form-control"
             placeholder="Meklē notis..."
-            v-model="noteSheetStore.searchQuery"
+            v-model="searchInput"
           />
         </div>
       </div>

@@ -9,10 +9,8 @@
   --color-light-darker: #dcddd8
 }
 
-
 body {
   font-family: "Courier New", monospace;
-  background-color: var(--color-dark);
 }
 
 h2 {

@@ -1,12 +1,18 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { getAllNoteSheets } from "@/api/noteSheetApi";
+import { SortDirection } from "@/models/utilModels";
 
 export const useNoteSheetStore = defineStore("notesheet", () => {
   const noteSheets = ref([]);
   const isLoading = ref(true);
   const error = ref(null);
   const searchQuery = ref("");
+  const sortField = ref("title");
+  const sortDirection = ref(SortDirection.DESC);
+
+  // Latvian language collator for proper diacritic sorting
+  const latvianCollator = new Intl.Collator("lv-LV");
 
   async function fetchNoteSheets() {
     isLoading.value = true;
@@ -38,17 +44,67 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     searchQuery.value = query.toLowerCase().trim();
   }
 
-  const filteredNoteSheets = computed(() => {
-    if (!searchQuery.value) return noteSheets.value;
+  function setSortField(field) {
+    if (sortField.value === field) {
+      // Toggle sort direction if clicking the same field
+      sortDirection.value =
+        sortDirection.value === SortDirection.ASC
+          ? SortDirection.DESC
+          : SortDirection.ASC;
+    } else {
+      // Set new field and default to ascending
+      sortField.value = field;
+      sortDirection.value = SortDirection.ASC;
+    }
+  }
 
-    return noteSheets.value.filter(
-      (sheet) =>
-        sheet.title.toLowerCase().includes(searchQuery.value) ||
-        sheet
-          .getFormattedAdditionalData()
-          .toLowerCase()
-          .includes(searchQuery.value),
-    );
+  const filteredNoteSheets = computed(() => {
+    let filtered = [];
+
+    // First filter by search query
+    if (!searchQuery.value) {
+      // Copy to prevert sorting
+      filtered = [...noteSheets.value];
+    } else {
+      filtered = noteSheets.value.filter(
+        (sheet) =>
+          sheet.title.toLowerCase().includes(searchQuery.value) ||
+          sheet
+            .getFormattedAdditionalData()
+            .toLowerCase()
+            .includes(searchQuery.value),
+      );
+    }
+
+    // Then sort the filtered results
+    return filtered.sort((a, b) => {
+      let valA = a[sortField.value];
+      let valB = b[sortField.value];
+
+      const isEmptyA = valA === null || valA === undefined || valA === "";
+      const isEmptyB = valB === null || valB === undefined || valB === "";
+
+      // Always place empty values at the bottom regardless of sort direction
+      if (isEmptyA && !isEmptyB) return 1;
+      if (!isEmptyA && isEmptyB) return -1;
+      if (isEmptyA && isEmptyB) return 0;
+
+      // Both values are non-empty, proceed with normal comparison
+      if (typeof valA === "string" && typeof valB === "string") {
+        // Use Latvian collator for string comparison to properly handle diacritics
+        const comparisonResult = latvianCollator.compare(valA, valB);
+        return sortDirection.value === SortDirection.ASC
+          ? comparisonResult
+          : -comparisonResult;
+      }
+
+      // For non-string values, use standard comparison
+      if (sortDirection.value === SortDirection.ASC) {
+        return valA < valB ? -1 : valA > valB ? 1 : 0;
+      } else {
+        return valA > valB ? -1 : valA < valB ? 1 : 0;
+      }
+    });
   });
 
   const filteredLatvianNoteSheets = computed(() =>
@@ -64,11 +120,14 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     isLoading,
     error,
     searchQuery,
+    sortField,
+    sortDirection,
     filteredNoteSheets,
     filteredLatvianNoteSheets,
     filteredForeignNoteSheets,
     fetchNoteSheets,
     getAvailableNoteSheets,
     setSearchQuery,
+    setSortField,
   };
 });

@@ -14,7 +14,12 @@ const router = createRouter({
             component: () => import('@/views/LoginView.vue')
         },
         {
-            path: '/admin/edit',
+          path: '/admin/sheets',
+          name: 'Admin',
+          component: () => import('@/views/AdminSheetListView.vue')
+        },
+        {
+            path: '/admin/edit-set-lists',
             name: 'EditSetLists',
             component: () => import('@/views/EditSetListsView.vue')
         },

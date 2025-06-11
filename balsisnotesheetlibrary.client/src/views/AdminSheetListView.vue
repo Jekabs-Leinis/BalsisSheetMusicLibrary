@@ -1,0 +1,198 @@
+<script setup>
+import { onMounted, ref, watch } from "vue";
+import { useNoteSheetStore } from "@/stores/notesheetStore";
+import { useRouter } from "vue-router";
+import AdminHeader from "@/components/Admin/AdminHeader.vue";
+import { SortDirection } from "@/models/utilModels";
+
+const noteSheetStore = useNoteSheetStore();
+const router = useRouter();
+
+// Load note sheets when component mounts
+onMounted(async () => {
+  await noteSheetStore.fetchNoteSheets();
+});
+
+const editSheet = (sheetId) => {
+  router.push(`/admin/sheets/edit/${sheetId}`);
+};
+
+// Function to handle sheet deletion
+const deleteSheet = async (sheetId) => {
+  if (confirm("Vai tiešām vēlaties dzēst šo noti?")) {
+    try {
+      // Replace with your actual delete API call
+      // await deleteNoteSheet(sheetId);
+      console.log("Dzēšot noti", sheetId);
+      // Refresh the list after deletion
+      await noteSheetStore.fetchNoteSheets();
+    } catch (error) {
+      console.error("Kļūda dzēšot noti:", error);
+    }
+  }
+};
+
+const sortField = ref("title");
+
+watch(sortField, (field) => noteSheetStore.setSortField(field), {
+  immediate: true,
+});
+
+const getSortIcon = () => {
+  return noteSheetStore.sortDirection === SortDirection.ASC
+    ? "bi-sort-up"
+    : "bi-sort-down";
+};
+</script>
+
+<template>
+  <AdminHeader />
+  <div class="container mt-4">
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Meklē notis..."
+            v-model="noteSheetStore.searchQuery"
+          />
+        </div>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <button class="btn btn-primary">
+          <i class="bi bi-plus-circle me-2" /> Pievienot jaunas notis
+        </button>
+      </div>
+    </div>
+
+    <!-- Sheets table -->
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th @click="sortField = 'title'" class="sort-header">
+              Nosaukums
+              <i
+                v-if="sortField === 'title'"
+                :class="['bi', getSortIcon(), 'ms-1']"
+              ></i>
+            </th>
+            <th @click="sortField = 'author'" class="sort-header">
+              Mūzikas autors
+              <i
+                v-if="sortField === 'author'"
+                :class="['bi', getSortIcon(), 'ms-1']"
+              ></i>
+            </th>
+            <th @click="sortField = 'lyricist'" class="sort-header">
+              Vārdu autors
+              <i
+                v-if="sortField === 'lyricist'"
+                :class="['bi', getSortIcon(), 'ms-1']"
+              ></i>
+            </th>
+            <th @click="sortField = 'year'" class="sort-header">
+              Gads
+              <i
+                v-if="sortField === 'year'"
+                :class="['bi', getSortIcon(), 'ms-1']"
+              ></i>
+            </th>
+            <th
+              @click="sortField = 'isLatvian'"
+              class="sort-header text-center"
+            >
+              Valoda
+              <i
+                v-if="sortField === 'isLatvian'"
+                :class="['bi', getSortIcon(), 'ms-1']"
+              ></i>
+            </th>
+            <th @click="handleSort('filename')" class="sort-header">
+              Faila nosaukums
+              <i
+                v-if="sortField === 'filename'"
+                :class="['bi', getSortIcon(), 'ms-1']"
+              ></i>
+            </th>
+            <th>Darbības</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="sheet in noteSheetStore.filteredNoteSheets"
+            :key="sheet.id"
+          >
+            <td>{{ sheet.title }}</td>
+            <td>{{ sheet.author || "-" }}</td>
+            <td>{{ sheet.lyricist || "-" }}</td>
+            <td>{{ sheet.year || "-" }}</td>
+            <td
+              class="text-center"
+              :title="sheet.isLatvian ? 'Latviešu' : 'Ārzemju'"
+            >
+              {{ sheet.isLatvian ? "🇱🇻" : "🌍" }}
+            </td>
+            <td>
+              <a
+                :href="`/api/download/${sheet.filename}`"
+                target="_blank"
+                class="text-decoration-none text-break"
+              >
+                {{ sheet.filename }}
+              </a>
+            </td>
+            <td>
+              <div class="btn-group">
+                <button
+                  class="btn btn-sm btn-primary me-1"
+                  @click="editSheet(sheet.id)"
+                >
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  @click="deleteSheet(sheet.id)"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="noteSheetStore.filteredNoteSheets.length === 0">
+            <td colspan="7" class="text-center py-3">Notis nav atrastas</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.table {
+  vertical-align: middle;
+}
+
+.btn-group {
+  white-space: nowrap;
+}
+
+.sort-header {
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--bs-table-hover-bg);
+  }
+}
+</style>
+
+<style>
+body {
+  background-color: #f8f9fa;
+}
+</style>

@@ -4,6 +4,7 @@ import { useSetListStore } from "@/stores/setlistStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import SetListItem from "@/components/EditSetLists/SetListItem.vue";
 import { VueDraggableNext } from "vue-draggable-next";
+import AdminHeader from "@/components/Admin/AdminHeader.vue";
 
 // Initialize stores
 const setListStore = useSetListStore();
@@ -17,11 +18,13 @@ onMounted(async () => {
   await Promise.all([
     setListStore.fetchSetLists(),
     noteSheetStore.fetchNoteSheets(),
-  ]).then(() => {
-    isInitializing.value = false;
-  }).catch((error) => {
-    console.error("Error initializing data:", error);
-  });
+  ])
+    .then(() => {
+      isInitializing.value = false;
+    })
+    .catch((error) => {
+      console.error("Error initializing data:", error);
+    });
 });
 
 const onSetListsReorder = async () => {
@@ -50,6 +53,7 @@ const cancelCreateSetList = () => {
 </script>
 
 <template>
+  <AdminHeader />
   <div class="bg-secondary-subtle">
     <div class="container container-fluid py-4">
       <div class="row">
@@ -63,10 +67,7 @@ const cancelCreateSetList = () => {
       </div>
 
       <!-- Loading state -->
-      <div
-        v-if="isInitializing"
-        class="row"
-      >
+      <div v-if="isInitializing" class="row">
         <div class="col-12 text-center py-5">
           <div class="spinner-border" role="status">
             <span class="visually-hidden">Loading...</span>
@@ -85,10 +86,7 @@ const cancelCreateSetList = () => {
       </div>
 
       <!-- Setlists content -->
-      <div
-        v-if="!isInitializing"
-        class="row"
-      >
+      <div v-if="!isInitializing" class="row">
         <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
           <!-- Draggable setlists container -->
           <vue-draggable-next

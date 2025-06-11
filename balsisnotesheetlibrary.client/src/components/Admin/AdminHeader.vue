@@ -1,81 +1,16 @@
-<script setup>
-import { useUserStore } from "@/stores/userStore";
-import { useNoteSheetStore } from "@/stores/notesheetStore";
-import { logout } from "@/api/authenticationApi";
-import router from "@/router/routes";
-import { ref, watch } from "vue";
-
-const userStore = useUserStore();
-const noteSheetStore = useNoteSheetStore();
-
-const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
-const searchInput = ref("");
-
-// Update search query when user types
-function handleSearch() {
-  noteSheetStore.setSearchQuery(searchInput.value);
-}
-
-// Add debounce for performance
-let debounceTimeout;
-function debounceSearch() {
-  clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(handleSearch, 300);
-}
-
-// Clear search when component is destroyed
-watch(searchInput, () => {
-  debounceSearch();
-});
-
-async function attemptLogout() {
-  try {
-    await logout();
-    userStore.logout();
-    router.push({ name: "Login" });
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-}
-
-// Clear search input
-function clearSearch() {
-  searchInput.value = "";
-  noteSheetStore.setSearchQuery("");
-}
-</script>
+<script setup></script>
 
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
     <div class="container-fluid d-flex flex-nowrap">
-      <a class="navbar-brand" href="#">
+      <a class="navbar-brand" href="/">
         <img
           alt="Balsis Logo"
           src="@/static/img/balsis_logo.png"
           class="balsis-logo"
         />
-        <span class="d-none d-lg-inline ps-3 fw-semibold">Nošu bibliotēka</span>
+        <span class="d-none d-lg-inline ps-3 fw-semibold">Administrācija</span>
       </a>
-      <form class="d-flex my-3 flex-grow-1" role="search" @submit.prevent>
-        <div class="input-group search-box">
-          <span class="input-group-text pe-0" id="basic-addon1">
-            <i class="bi bi-search" />
-          </span>
-          <input
-            v-model="searchInput"
-            class="form-control fw-semibold me-2"
-            type="search"
-            placeholder="Meklē dziesmu"
-            aria-label="Meklē dziesmu"
-          />
-          <i
-            v-if="searchInput"
-            class="bi bi-x-lg search-clear-btn"
-            aria-label="Clear search"
-            @click="clearSearch"
-          />
-        </div>
-      </form>
       <button
         class="navbar-toggler"
         type="button"
@@ -95,7 +30,7 @@ function clearSearch() {
       >
         <div class="offcanvas-header">
           <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
-            Nošu bibliotēka
+            Administrācija
           </h5>
           <button
             type="button"
@@ -109,31 +44,30 @@ function clearSearch() {
             <li class="nav-item">
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
-                href="#lv-sheets"
-                >Latviešu skaņdarbi</a
+                href="/admin/sheets"
+                >Rediģēt Notis</a
               >
             </li>
             <li class="nav-item">
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
-                href="#foreign-sheets"
-                >Ārzemju skaņdarbi</a
+                href="/admin/edit-set-lists"
+                >Dziesmu saraksti</a
               >
             </li>
-            <li class="nav-item text-end" v-if="isAdmin">
-              <a
-                class="nav-link text-nowrap pe-2 pe-lg-0 text-light"
-                href="/admin/sheets"
-                >Admin</a
-              >
-            </li>
-            <li class="nav-item flex-grow-1" />
-            <li class="m-0">
+            <li class="nav-item">
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
-                href="#"
-                @click="attemptLogout"
-                >Iziet</a
+                href="/admin/set-lists-archive"
+                >Arhīvs</a
+              >
+            </li>
+            <li class="nav-item flex-grow-1 ms-0" />
+            <li class="nav-item">
+              <a
+                class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
+                href="/"
+                >Uz vietni</a
               >
             </li>
           </ul>
@@ -198,7 +132,7 @@ a {
 }
 
 .navbar {
-  background-color: var(--balsis-red);
+  background-color: #343a40; // Darker background for admin area to distinguish it
 }
 
 .nav-link:hover {

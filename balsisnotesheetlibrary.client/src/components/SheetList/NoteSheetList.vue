@@ -1,6 +1,4 @@
 <script setup>
-import { NoteSheet } from "@/models/sheetModels";
-
 defineProps({
   /** @type {NoteSheet[]} */
   noteSheets: {

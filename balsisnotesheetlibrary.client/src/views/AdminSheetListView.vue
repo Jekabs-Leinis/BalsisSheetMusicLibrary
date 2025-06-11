@@ -34,14 +34,19 @@ const deleteSheet = async (sheetId) => {
 
 const sortField = ref("title");
 
+const handleSort = (field) => {
+  sortField.value = field;
+  noteSheetStore.setSortField(field);
+};
+
 watch(sortField, (field) => noteSheetStore.setSortField(field), {
   immediate: true,
 });
 
 const getSortIcon = () => {
   return noteSheetStore.sortDirection === SortDirection.ASC
-    ? "bi-sort-up"
-    : "bi-sort-down";
+    ? "bi-sort-down"
+    : "bi-sort-down-alt";
 };
 </script>
 
@@ -74,28 +79,28 @@ const getSortIcon = () => {
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th @click="sortField = 'title'" class="sort-header">
+            <th @click="handleSort('title')" class="sort-header">
               Nosaukums
               <i
                 v-if="sortField === 'title'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="sortField = 'author'" class="sort-header">
+            <th @click="handleSort('author')" class="sort-header">
               Mūzikas autors
               <i
                 v-if="sortField === 'author'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="sortField = 'lyricist'" class="sort-header">
+            <th @click="handleSort('lyricist')" class="sort-header">
               Vārdu autors
               <i
                 v-if="sortField === 'lyricist'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="sortField = 'year'" class="sort-header">
+            <th @click="handleSort('year')" class="sort-header">
               Gads
               <i
                 v-if="sortField === 'year'"
@@ -103,7 +108,7 @@ const getSortIcon = () => {
               ></i>
             </th>
             <th
-              @click="sortField = 'isLatvian'"
+              @click="handleSort('isLatvian')"
               class="sort-header text-center"
             >
               Valoda
@@ -184,6 +189,7 @@ const getSortIcon = () => {
 .sort-header {
   cursor: pointer;
   user-select: none;
+  white-space: nowrap;
 
   &:hover {
     background-color: var(--bs-table-hover-bg);

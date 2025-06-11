@@ -3,6 +3,7 @@ import { onMounted, ref, watch } from "vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { useRouter } from "vue-router";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
+import DeleteSheet from "@/components/Admin/List/DeleteSheet.vue";
 import { SortDirection } from "@/models/utilModels";
 
 const noteSheetStore = useNoteSheetStore();
@@ -17,19 +18,33 @@ const editSheet = (sheetId) => {
   router.push(`/admin/sheets/edit/${sheetId}`);
 };
 
+// State for delete modal
+const showDeleteModal = ref(false);
+const sheetToDelete = ref(null);
+
+// Function to open delete confirmation modal
+const openDeleteModal = (sheet) => {
+  sheetToDelete.value = sheet;
+  showDeleteModal.value = true;
+};
+
 // Function to handle sheet deletion
 const deleteSheet = async (sheetId) => {
-  if (confirm("Vai tiešām vēlaties dzēst šo noti?")) {
-    try {
-      // Replace with your actual delete API call
-      // await deleteNoteSheet(sheetId);
-      console.log("Dzēšot noti", sheetId);
-      // Refresh the list after deletion
-      await noteSheetStore.fetchNoteSheets();
-    } catch (error) {
-      console.error("Kļūda dzēšot noti:", error);
-    }
+  try {
+    // Replace with your actual delete API call
+    // await deleteNoteSheet(sheetId);
+    console.log("Dzēšot noti", sheetId);
+    // Refresh the list after deletion
+    await noteSheetStore.fetchNoteSheets();
+  } catch (error) {
+    console.error("Kļūda dzēšot noti:", error);
   }
+};
+
+// Handle close of delete modal
+const handleCloseDeleteModal = () => {
+  showDeleteModal.value = false;
+  sheetToDelete.value = null;
 };
 
 const sortField = ref("title");
@@ -161,7 +176,7 @@ const getSortIcon = () => {
                 </button>
                 <button
                   class="btn btn-sm btn-danger"
-                  @click="deleteSheet(sheet.id)"
+                  @click="openDeleteModal(sheet)"
                 >
                   <i class="bi bi-trash"></i>
                 </button>
@@ -175,6 +190,14 @@ const getSortIcon = () => {
       </table>
     </div>
   </div>
+
+  <!-- Delete confirmation modal -->
+  <DeleteSheet 
+    :sheet="sheetToDelete" 
+    :show="showDeleteModal"
+    @close="handleCloseDeleteModal"
+    @confirm="deleteSheet"
+  />
 </template>
 
 <style scoped lang="scss">

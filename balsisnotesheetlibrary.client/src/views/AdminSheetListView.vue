@@ -9,7 +9,6 @@ import { SortDirection } from "@/models/utilModels";
 const noteSheetStore = useNoteSheetStore();
 const router = useRouter();
 
-// Load note sheets when component mounts
 onMounted(async () => {
   await noteSheetStore.fetchNoteSheets();
 });
@@ -18,17 +17,14 @@ const editSheet = (sheetId) => {
   router.push(`/admin/sheets/edit/${sheetId}`);
 };
 
-// State for delete modal
 const showDeleteModal = ref(false);
 const sheetToDelete = ref(null);
 
-// Function to open delete confirmation modal
 const openDeleteModal = (sheet) => {
   sheetToDelete.value = sheet;
   showDeleteModal.value = true;
 };
 
-// Function to handle sheet deletion
 const deleteSheet = async (sheetId) => {
   try {
     // Replace with your actual delete API call
@@ -41,7 +37,6 @@ const deleteSheet = async (sheetId) => {
   }
 };
 
-// Handle close of delete modal
 const handleCloseDeleteModal = () => {
   showDeleteModal.value = false;
   sheetToDelete.value = null;
@@ -67,9 +62,9 @@ const getSortIcon = () => {
 
 <template>
   <AdminHeader />
-  <div class="container mt-4">
+  <div class="mt-4 mx-3">
     <div class="row mb-4">
-      <div class="col-md-6">
+      <div class="col-6 col-md-6 col-lg-4 col-xl-3">
         <div class="input-group">
           <span class="input-group-text">
             <i class="bi bi-search"></i>
@@ -82,7 +77,7 @@ const getSortIcon = () => {
           />
         </div>
       </div>
-      <div class="col-md-6 text-md-end">
+      <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 text-end">
         <button class="btn btn-primary">
           <i class="bi bi-plus-circle me-2" /> Pievienot jaunas notis
         </button>
@@ -194,7 +189,7 @@ const getSortIcon = () => {
   <!-- Delete confirmation modal -->
   <DeleteSheet 
     :sheet="sheetToDelete" 
-    :show="showDeleteModal"
+    v-model:show="showDeleteModal"
     @close="handleCloseDeleteModal"
     @confirm="deleteSheet"
   />

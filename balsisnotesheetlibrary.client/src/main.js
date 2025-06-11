@@ -1,10 +1,22 @@
-import "./assets/main.css";
+import { createApp } from "vue";
+import { createPinia } from "pinia";
+import { createBootstrap } from 'bootstrap-vue-next'
+
+import App from "@/App.vue";
+import router from "@/router/routes";
+import { useUserStore } from "@/stores/userStore";
+import vLoading from "@/directives/vLoading";
+import axios from "axios";
 
 // Mandatory import to initialize bs components
 // eslint-disable-next-line no-unused-vars
 import * as bootstrap from "bootstrap";
 
-import axios from "axios";
+import "./assets/main.css";
+import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
+
+
 
 // Redirect to login page if the user is not authenticated for XHR requests
 axios.interceptors.response.use(
@@ -46,16 +58,7 @@ if (getCsrfToken()) {
     });
 }
 
-import { createApp } from "vue";
-import { createPinia } from "pinia";
 
-import router from "@/router/routes";
-
-import { useUserStore } from "@/stores/userStore";
-
-import vLoading from "@/directives/vLoading";
-
-import App from "@/App.vue";
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -72,12 +75,8 @@ router.beforeEach((to) => {
   return { name: "Login" };
 });
 
-router.afterEach(() => {
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-})
-
 app.use(router);
+app.use(createBootstrap());
 
 app.directive("loading", vLoading);
 

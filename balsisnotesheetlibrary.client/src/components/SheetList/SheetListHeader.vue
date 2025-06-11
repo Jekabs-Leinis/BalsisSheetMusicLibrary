@@ -51,7 +51,7 @@ function clearSearch() {
       <a class="navbar-brand" href="#">
         <img
           alt="Balsis Logo"
-          src="@/assets/img/balsis_logo.png"
+          src="@/static/img/balsis_logo.png"
           class="balsis-logo"
         />
         <span class="d-none d-lg-inline ps-3 fw-semibold">Nošu bibliotēka</span>

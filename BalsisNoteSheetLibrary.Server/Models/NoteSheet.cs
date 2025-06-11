@@ -16,4 +16,11 @@ public class NoteSheet
     
     [JsonIgnore]
     public IEnumerable<SetListItem>? SetListItems { get; set; }
+    
+    // We want to serve user-friendly filenames, but we also need to ensure that the filename is unique
+    // Thus on the disk we store the filename as `${Id}_${Filename}`, but we expose it as just `Filename` in the API.
+    public string GetSystemFileName()
+    {
+        return $"{Id}_{Filename}";
+    }
 }

@@ -10,3 +10,29 @@ export async function getAllNoteSheets() {
 
   return response.data.model.map((noteSheet) => new NoteSheet(noteSheet));
 }
+
+export async function updateNoteSheet(noteSheet, file) {
+  const formData = new FormData();
+
+  for (const key in noteSheet) {
+    if (Object.prototype.hasOwnProperty.call(noteSheet, key)) {
+      formData.append(key, noteSheet[key]);
+    }
+  }
+
+  if (file) {
+    formData.append("file", file);
+  }
+
+  const response = await axios.post("/api/noteSheet/update", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  if (!response.data.success) {
+    throw Error(response.data.error || "Failed to update note sheet");
+  }
+
+  return new NoteSheet(response.data.model);
+}

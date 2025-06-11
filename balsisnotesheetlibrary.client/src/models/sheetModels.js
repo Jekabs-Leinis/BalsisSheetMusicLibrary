@@ -6,17 +6,17 @@ export class NoteSheet {
   /** @type {Number} */
   id;
   /** @type {string} */
-  title;
+  title= "";
   /** @type {?string} */
-  author;
+  author= "";
   /** @type {?string} */
-  lyricist;
+  lyricist= "";
   /** @type {?Number} */
-  year;
+  year= null;
   /** @type {string} */
-  filename;
+  filename= "";
   /** @type {boolean} */
-  isLatvian;
+  isLatvian= false;
 
   getFormattedAdditionalData() {
     const dataParts = [this.author, this.lyricist, this.year].filter(Boolean);

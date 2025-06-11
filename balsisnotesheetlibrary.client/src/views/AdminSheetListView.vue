@@ -1,22 +1,18 @@
 <script setup>
 import { onMounted, ref, watch, onBeforeUnmount } from "vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
-import { useRouter } from "vue-router";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSheet from "@/components/Admin/List/DeleteSheet.vue";
+import EditSheet from "@/components/Admin/List/EditSheet.vue";
 import { SortDirection } from "@/models/utilModels";
 import _debounce from "lodash.debounce";
+import { NoteSheet } from "@/models/sheetModels";
 
 const noteSheetStore = useNoteSheetStore();
-const router = useRouter();
 
 onMounted(async () => {
   await noteSheetStore.fetchNoteSheets();
 });
-
-const editSheet = (sheetId) => {
-  router.push(`/admin/sheets/edit/${sheetId}`);
-};
 
 const searchInput = ref("");
 
@@ -73,6 +69,34 @@ const getSortIcon = () => {
     ? "bi-sort-down"
     : "bi-sort-down-alt";
 };
+
+
+const showEditModal = ref(false);
+const sheetToEdit = ref(null);
+
+const openEditModal = (sheetId) => {
+  const sheet = noteSheetStore.noteSheets.find(s => s.id === sheetId);
+  sheetToEdit.value = new NoteSheet(sheet);
+  showEditModal.value = true;
+};
+
+const handleCloseEditModal = () => {
+  showEditModal.value = false;
+  sheetToEdit.value = null;
+};
+
+const saveSheet = (sheet) => {
+  if (sheet.id) {
+    const index = noteSheetStore.noteSheets.findIndex(s => s.id === sheet.id);
+    
+    noteSheetStore.noteSheets[index] = sheet;
+  } else {
+    // Create new sheet
+    noteSheetStore.noteSheets.push(sheet);
+  }
+  showEditModal.value = false;
+  sheetToEdit.value = null;
+};
 </script>
 
 <template>
@@ -93,7 +117,7 @@ const getSortIcon = () => {
         </div>
       </div>
       <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 text-end">
-        <button class="btn btn-primary">
+        <button class="btn btn-primary" @click="openEditModal()">
           <i class="bi bi-plus-circle me-2" /> Pievienot jaunas notis
         </button>
       </div>
@@ -180,7 +204,7 @@ const getSortIcon = () => {
               <div class="btn-group">
                 <button
                   class="btn btn-sm btn-primary me-1"
-                  @click="editSheet(sheet.id)"
+                  @click="openEditModal(sheet.id)"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
@@ -207,6 +231,14 @@ const getSortIcon = () => {
     v-model:show="showDeleteModal"
     @close="handleCloseDeleteModal"
     @confirm="deleteSheet"
+  />
+
+  <!-- Edit sheet modal -->
+  <EditSheet 
+    :sheet="sheetToEdit" 
+    v-model:show="showEditModal"
+    @close="handleCloseEditModal"
+    @save="saveSheet"
   />
 </template>
 

@@ -35,12 +35,31 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<AppResponse<string>> Add(NoteSheet noteSheet)
+    public async Task<AppResponse<NoteSheet>> Add([FromForm] NoteSheet noteSheet, IFormFile file)
     {
+        if (file.Length == 0)
+        {
+            return new AppResponse<NoteSheet>(null, false, "PDF file is required");
+        }
+
+        if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            return new AppResponse<NoteSheet>(null, false, "Only PDF files are allowed");
+        }
+        
+        // Add the sheet to get an ID assigned
         context.NoteSheets.Add(noteSheet);
         await context.SaveChangesAsync();
+        
+        var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
+        Directory.CreateDirectory(sheetsFolder);
+        
+        var fileName = SaveSheetFile(noteSheet, file, sheetsFolder);
+        noteSheet.Filename = fileName;
+        
+        await context.SaveChangesAsync();
 
-        return new AppResponse<string>("Note sheet added", true);
+        return new AppResponse<NoteSheet>(noteSheet, true);
     }
 
     [HttpPost]
@@ -62,18 +81,8 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
             }
             
             var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
-
-            // Generate a filename based on sheet metadata
-            var fileName = $"{GenerateFileName(noteSheet)}.pdf";
-            var systemFileName = $"{noteSheet.Id}_{fileName}";
             
-            var filePath = Path.Combine(sheetsFolder, systemFileName);
-            
-            await using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(fileStream);
-            }
-            
+            // Delete the old file if it exists
             if (!string.IsNullOrEmpty(sheet.Filename))
             {
                 var oldFilePath = Path.Combine(sheetsFolder, sheet.GetSystemFileName());
@@ -85,13 +94,12 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
                     }
                     catch (Exception ex)
                     {
-                        // New file was saved, but old file could not be deleted
-                        // This is kind of okay, but we should log the error
                         Console.WriteLine($"Error deleting old file: {ex.Message}");
                     }
                 }
             }
             
+            var fileName = SaveSheetFile(noteSheet, file, sheetsFolder);
             noteSheet.Filename = fileName;
         }
 
@@ -101,10 +109,21 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
         return new AppResponse<NoteSheet>(sheet, true);
     }
 
-    // Helper method to generate a clean filename based on sheet metadata
+    private string SaveSheetFile(NoteSheet noteSheet, IFormFile file, string targetFolder)
+    {
+        var fileName = GenerateFileName(noteSheet) + ".pdf";
+        var systemFileName = $"{noteSheet.Id}_{fileName}";
+        var filePath = Path.Combine(targetFolder, systemFileName);
+
+        using var fileStream = new FileStream(filePath, FileMode.Create);
+
+        file.CopyTo(fileStream);
+
+        return fileName;
+    }
+
     private static string GenerateFileName(NoteSheet sheet)
     {
-        // Title is mandatory
         var nameParts = new List<string> { CleanFileName(sheet.Title ?? "MISSING_TITLE") };
         
         if (!string.IsNullOrWhiteSpace(sheet.Author))
@@ -124,7 +143,8 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
         
         var fileName = string.Join(", ", nameParts);
         
-        // Ensure the filename isn't too long (Windows max path is 260, but we'll limit filename to 200)
+        // Windows paths have a maximum length of 260 characters,
+        // but filenames should be shorter to account for folder paths
         if (fileName.Length > 200)
         {
             fileName = fileName[..200];
@@ -139,7 +159,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
             return string.Empty;
         
         var invalidChars = Regex.Escape(new string(Path.GetInvalidFileNameChars()));
-        invalidChars += "#"; // Block # as it is used in browser URLs as anchor and is not sent to server
+        invalidChars += "#"; 
         var invalidRegex = string.Format(@"([{0}]*\.+$)|([{0}]+)", invalidChars);
         
         return Regex.Replace(input, invalidRegex, "").Trim();

@@ -4,6 +4,7 @@ import { useNoteSheetStore } from "@/stores/notesheetStore";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSheet from "@/components/Admin/List/DeleteSheet.vue";
 import EditSheet from "@/components/Admin/List/EditSheet.vue";
+import CreateNewSheet from "@/components/Admin/List/CreateNewSheet.vue";
 import { SortDirection } from "@/models/utilModels";
 import _debounce from "lodash.debounce";
 import { NoteSheet } from "@/models/sheetModels";
@@ -85,15 +86,15 @@ const handleCloseEditModal = () => {
   sheetToEdit.value = null;
 };
 
-const saveSheet = (sheet) => {
-  if (sheet.id) {
-    const index = noteSheetStore.noteSheets.findIndex(s => s.id === sheet.id);
-    
-    noteSheetStore.noteSheets[index] = sheet;
-  } else {
-    // Create new sheet
+const saveSheet = async (sheet) => {
+  const index = noteSheetStore.noteSheets.findIndex(s => s.id === sheet.id);
+  if (index === -1) {
+    // New sheet, new ID, add it
     noteSheetStore.noteSheets.push(sheet);
+  } else {
+    noteSheetStore.noteSheets[index] = sheet;
   }
+
   showEditModal.value = false;
   sheetToEdit.value = null;
 };
@@ -117,9 +118,7 @@ const saveSheet = (sheet) => {
         </div>
       </div>
       <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 text-end">
-        <button class="btn btn-primary" @click="openEditModal()">
-          <i class="bi bi-plus-circle me-2" /> Pievienot jaunas notis
-        </button>
+        <CreateNewSheet @sheet-created="saveSheet" />
       </div>
     </div>
 
@@ -193,7 +192,7 @@ const saveSheet = (sheet) => {
             </td>
             <td>
               <a
-                :href="`/api/download/${sheet.filename}`"
+                :href="`/api/download/${sheet.id}/${sheet.filename}`"
                 target="_blank"
                 class="text-decoration-none text-break"
               >

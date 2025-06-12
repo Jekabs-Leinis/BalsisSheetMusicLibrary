@@ -9,19 +9,12 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
 public class DownloadController(AppDbContext context, IWebHostEnvironment webHostEnvironment) : ControllerBase
 {
-    [HttpGet("{filename}")]
-    public IActionResult Index(string filename)
+    [HttpGet("{id:int}/{filename}")]
+    public async Task<IActionResult> Index(uint id, string filename)
     {
-        // Basic sanitization: ensure filename doesn't contain path traversal characters.
-        if (string.IsNullOrEmpty(filename) || filename.Contains("..") || filename.Contains("/") || filename.Contains("\\"))
-        {
-            return BadRequest(new AppResponse<object>(null, false, "Invalid filename."));
-        }
+        // We don't really care about the filename, but we accept it to ensure readability of the URL.
         
-        // Additional check to ensure the filename is not a path traversal attempt.
-        var sanitizedFilename = Path.GetFileName(filename);
-
-        var sheet = context.NoteSheets.FirstOrDefault(s => s.Filename == sanitizedFilename);
+        var sheet = await context.NoteSheets.FindAsync(id);
 
         if (sheet is null)
         {
@@ -32,18 +25,18 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
 
         if (System.IO.File.Exists(path))
         {
-            return PhysicalFile(path, "application/octet-stream", sanitizedFilename);
+            return PhysicalFile(path, "application/octet-stream", sheet.Filename);
         }
 
         // TODO: eventually remove this fallback
-        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sanitizedFilename);
+        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.Filename);
             
         if (!System.IO.File.Exists(path))
         {
             return NotFound(new AppResponse<object>(null, false, "File not found on server."));
         }
 
-        return PhysicalFile(path, "application/octet-stream", sanitizedFilename);
+        return PhysicalFile(path, "application/octet-stream", sheet.Filename);
     }
 }
 

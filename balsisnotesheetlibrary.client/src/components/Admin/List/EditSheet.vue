@@ -10,7 +10,7 @@ import {
   BAlert,
 } from "bootstrap-vue-next";
 import { NoteSheet } from "@/models/sheetModels";
-import { updateNoteSheet } from "@/api/noteSheetApi";
+import { updateNoteSheet, createNoteSheet } from "@/api/noteSheetApi";
 
 const props = defineProps({
   sheet: {
@@ -37,13 +37,18 @@ const fileError = ref("");
 const isValid = ref(true);
 const validationMessage = ref("");
 
-// Reset form when sheet changes
+const isCreateMode = computed(() => !formData.value.id);
+
 watch(
   () => props.sheet,
   (newSheet) => {
     if (newSheet) {
       formData.value = new NoteSheet(newSheet);
+    } else {
+      formData.value = new NoteSheet();
     }
+    selectedFile.value = null;
+    fileError.value = "";
   },
   { immediate: true, deep: true },
 );
@@ -51,7 +56,6 @@ watch(
 function handleFileChange(event) {
   const file = event.target?.files?.[0];
   if (file) {
-    // Validate file type
     if (file.type !== 'application/pdf') {
       fileError.value = "Tikai PDF faili ir atbalstīti.";
       selectedFile.value = null;
@@ -72,14 +76,12 @@ function validateForm() {
   isValid.value = true;
   validationMessage.value = "";
 
-  // Validate title (required)
   if (!formData.value.title.trim()) {
     isValid.value = false;
     validationMessage.value = "Nosaukums ir obligāts.";
     return false;
   }
 
-  // Validate year if provided (must be a number)
   if (formData.value.year !== null && formData.value.year !== "") {
     const yearNum = Number(formData.value.year);
     if (isNaN(yearNum)) {
@@ -87,13 +89,18 @@ function validateForm() {
       validationMessage.value = "Gadam jābūt skaitlim.";
       return false;
     }
-    formData.value.year = yearNum; // Convert to number
+    if (yearNum <= 0) {
+      isValid.value = false;
+      validationMessage.value = "Gadam jābūt lielākam par 0.";
+      return false;
+    }
+    
+    formData.value.year = yearNum;
   } else {
     formData.value.year = null;
   }
   
-  // Validate file for new sheets
-  if (!formData.value.id && !selectedFile.value) {
+  if (isCreateMode.value && !selectedFile.value) {
     isValid.value = false;
     validationMessage.value = "Nepieciešams pievienot failu.";
     return false;
@@ -102,18 +109,30 @@ function validateForm() {
   return true;
 }
 
+const loading = ref(false);
 async function handleSave() {
   if (!validateForm()) {
     return;
   }
     
-  const updatedSheet = await updateNoteSheet(formData.value, selectedFile.value);
+  let savedSheet;
   
+  loading.value = true;
+  if (isCreateMode.value) {
+    savedSheet = await createNoteSheet(formData.value, selectedFile.value);
+  } else {
+    savedSheet = await updateNoteSheet(formData.value, selectedFile.value);
+  }
+  loading.value = false;
   showModal.value = false;
-  emit("save", updatedSheet);
+  emit("save", savedSheet);
+  
+  clearFileSelection();
 }
 
 function handleClose() {
+  isValid.value = true;
+  
   emit("close");
 }
 
@@ -132,10 +151,11 @@ function handleInputBlur(field) {
   <BModal
     :model-value="showModal"
     @update:model-value="showModal = $event"
-    :title="sheet && sheet.id ? 'Rediģēt notis' : 'Pievienot notis'"
+    :title="isCreateMode ? 'Pievienot notis' : 'Rediģēt notis'"
     centered
     size="lg"
     @hidden="handleClose"
+    :content-class="{ 'state-loading': loading }"
   >
     <BForm @submit.prevent="handleSave">
       <BAlert v-if="!isValid" variant="danger" show>
@@ -173,7 +193,8 @@ function handleInputBlur(field) {
         <BFormInput
           id="year-input"
           v-model="formData.year"
-          type="number"
+          type="text"
+          inputmode="numeric"
           placeholder="Ievadiet gadu"
         />
       </BFormGroup>
@@ -186,13 +207,13 @@ function handleInputBlur(field) {
 
       <BFormGroup 
         class="pt-2" 
-        label="PDF fails" 
+        :label="`PDF fails${isCreateMode ? ' *' : ''}`"
         label-for="file-input"
       >
         <div v-if="formData.filename && !selectedFile" class="d-flex align-items-center mb-2">
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
           <span>{{ formData.filename }}</span>
-          <a :href="`/api/download/${formData.filename}`" target="_blank" class="ms-2 text-decoration-none">
+          <a :href="`/api/download/${formData.id}/${formData.filename}`" target="_blank" class="ms-2 text-decoration-none">
             <i class="bi bi-download"></i>
           </a>
         </div>
@@ -227,7 +248,7 @@ function handleInputBlur(field) {
         <BButton variant="secondary" @click="showModal = false">
           Atcelt
         </BButton>
-        <BButton variant="primary" @click="handleSave" :disabled="!isValid">
+        <BButton variant="primary" @click="handleSave">
           Saglabāt
         </BButton>
       </div>

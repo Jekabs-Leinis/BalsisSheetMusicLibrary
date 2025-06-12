@@ -21,6 +21,8 @@ export async function addSetList(setList) {
   return response.data;
 }
 
+// Do not use this function directly, use the setListStore.saveSetList() instead
+// as it handles potential errors.
 export async function updateSetList(setList) {
   const response = await axios.post("/api/setList/update", setList);
 

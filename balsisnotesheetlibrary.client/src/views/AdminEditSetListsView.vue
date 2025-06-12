@@ -2,8 +2,8 @@
 import { ref, onMounted } from "vue";
 import { useSetListStore } from "@/stores/setlistStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
-import SetListItem from "@/components/EditSetLists/SetListItem.vue";
-import { VueDraggableNext } from "vue-draggable-next";
+import EditSetList from "@/components/Admin/EditSetLists/EditSetList.vue";
+import draggable from "vuedraggable";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 
 // Initialize stores
@@ -27,11 +27,6 @@ onMounted(async () => {
     });
 });
 
-const onSetListsReorder = async () => {
-  const setListIds = setListStore.setLists.map((list) => list.id);
-  await setListStore.reorderSetLists(setListIds);
-};
-
 const createSetList = async () => {
   if (!newSetListTitle.value.trim()) return;
 
@@ -49,6 +44,10 @@ const removeSetList = async (setListId) => {
 const cancelCreateSetList = () => {
   isCreatingSetList.value = false;
   newSetListTitle.value = "";
+};
+
+const handleSetListMove = ({setListId, newIndex}) => {
+  setListStore.moveSetList(setListId, newIndex);
 };
 </script>
 
@@ -89,24 +88,25 @@ const cancelCreateSetList = () => {
       <div v-if="!isInitializing" class="row">
         <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
           <!-- Draggable setlists container -->
-          <vue-draggable-next
+          <draggable
             v-model="setListStore.setLists"
             handle=".setlist-header"
             item-key="id"
             group="setlists"
-            @change="onSetListsReorder"
             class="setlists-container"
           >
-            <set-list-item
-              v-for="setList in setListStore.setLists"
-              :key="setList.id"
-              :set-list="setList"
-              :all-sheets="noteSheetStore.noteSheets"
-              :is-loading="noteSheetStore.isLoading"
-              @remove="removeSetList(setList.id)"
-              @updated="setListStore.saveSetList(setList)"
-            />
-          </vue-draggable-next>
+            <template #item="{ element: setList }">
+              <edit-set-list
+                :set-list="setList"
+                :all-sheets="noteSheetStore.noteSheets"
+                :is-loading="noteSheetStore.isLoading"
+                :set-list-count="setListStore.setLists.length"
+                @remove="removeSetList(setList.id)"
+                @updated="setListStore.saveSetList(setList)"
+                @move="handleSetListMove"
+              />
+            </template>
+          </draggable>
 
           <!-- Create new setlist form -->
           <div v-if="isCreatingSetList" class="card mb-3">

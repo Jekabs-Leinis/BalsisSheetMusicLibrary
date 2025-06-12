@@ -1,8 +1,8 @@
 <script setup>
-import { computed, toRefs } from "vue";
+import { computed, toRefs, defineProps, defineEmits } from "vue";
 import SheetSearchDropdown from "./SheetSearchDropdown.vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
-import { VueDraggableNext } from "vue-draggable-next";
+import draggable from "vuedraggable";
 import { moveSheetInSetList } from "@/services/setListServices";
 import { SetListItem } from "@/models/sheetModels";
 
@@ -10,6 +10,10 @@ const props = defineProps({
   /** @type {SetList} */
   setList: {
     type: Object,
+    required: true,
+  },
+  setListCount: {
+    type: Number,
     required: true,
   },
   allSheets: {
@@ -69,6 +73,11 @@ const removeSheet = async (noteSheetId) => {
 const moveSheet = async (noteSheetId, order) => {
   itemsList.value = moveSheetInSetList(setList.value, noteSheetId, order);
 };
+
+const moveSetList = (setListId, newIndex) => {
+  emit("move", { setListId, newIndex });
+};
+
 </script>
 
 <template>
@@ -76,7 +85,24 @@ const moveSheet = async (noteSheetId, order) => {
     <div
       class="card-header d-flex justify-content-between align-items-center setlist-header"
     >
-      <h5 class="mb-0">{{ setList.title }}</h5>
+      <h5 class="mb-0 flex-grow-1">{{ setList.title }}</h5>
+      <button
+        v-if="setList.order > 0"
+        class="btn btn-sm fs-6"
+        :class="[
+                setList.order < setListCount - 1 ? 'pe-0' : 'no-down-arrow-padding',
+              ]"
+        @click="moveSetList(setList.id, setList.order - 1)"
+      >
+        <i class="bi bi-arrow-up movement-arrows" />
+      </button>
+      <button
+        v-if="setList.order < setListCount - 1"
+        class="btn btn-sm fs-6"
+        @click="moveSetList(setList.id, setList.order + 1)"
+      >
+        <i class="bi bi-arrow-down movement-arrows" />
+      </button>
       <div>
         <button class="btn btn-sm" @click="$emit('remove')">
           <i class="bi bi-trash" />
@@ -84,17 +110,15 @@ const moveSheet = async (noteSheetId, order) => {
       </div>
     </div>
     <div class="card-body">
-      <vue-draggable-next
+      <draggable
         v-model="itemsList"
         :group="`sheets-${setList.id}`"
-        item-key="id"
+        item-key="noteSheetId"
         handle=".sheet-drag-handle"
         class="list-group sheets-list mb-3"
       >
-        <transition-group>
+        <template #item="{ element: noteSheet }">
           <div
-            v-for="(noteSheet, index) in itemsList"
-            :key="`${noteSheet.setListId}_${noteSheet.noteSheetId}`"
             class="list-group-item d-flex justify-content-between align-items-center"
           >
             <div class="d-flex align-items-center flex-grow-1">
@@ -102,23 +126,23 @@ const moveSheet = async (noteSheetId, order) => {
                 <i class="bi bi-grip-vertical text-muted"></i>
               </span>
               <span>
-                {{ index + 1 }}. {{ getSongName(noteSheet.noteSheetId) }}
+                {{ noteSheet.order + 1 }}. {{ getSongName(noteSheet.noteSheetId) }}
               </span>
             </div>
             <button
-              v-if="index > 0"
+              v-if="noteSheet.order > 0"
               class="btn btn-sm fs-6"
               :class="[
-                index < itemsList.length - 1 ? 'pe-0' : 'no-down-arrow-padding',
+                noteSheet.order < itemsList.length - 1 ? 'pe-0' : 'no-down-arrow-padding',
               ]"
-              @click="moveSheet(noteSheet.noteSheetId, index - 1)"
+              @click="moveSheet(noteSheet.noteSheetId, noteSheet.order - 1)"
             >
               <i class="bi bi-arrow-up movement-arrows" />
             </button>
             <button
-              v-if="index < itemsList.length - 1"
+              v-if="noteSheet.order < itemsList.length - 1"
               class="btn btn-sm fs-6"
-              @click="moveSheet(noteSheet.noteSheetId, index + 1)"
+              @click="moveSheet(noteSheet.noteSheetId, noteSheet.order + 1)"
             >
               <i class="bi bi-arrow-down movement-arrows" />
             </button>
@@ -127,8 +151,8 @@ const moveSheet = async (noteSheetId, order) => {
               @click="removeSheet(noteSheet.noteSheetId)"
             />
           </div>
-        </transition-group>
-      </vue-draggable-next>
+        </template>
+      </draggable>
 
       <div class="add-sheet-wrapper">
         <sheet-search-dropdown

@@ -21,7 +21,7 @@ const router = createRouter({
         {
             path: '/admin/edit-set-lists',
             name: 'EditSetLists',
-            component: () => import('@/views/EditSetListsView.vue')
+            component: () => import('@/views/AdminEditSetListsView.vue')
         },
         {
             // Catch-all redirect for 404, this has to stay last in array

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getAllSetLists, addSetList, updateSetList, deleteSetList } from '@/api/setListApi';
-import { SetList, SetListItem } from '@/models/sheetModels';
+import { SetList } from '@/models/sheetModels';
 
 export const useSetListStore = defineStore('setlist', () => {
   const setLists = ref([]);
@@ -108,25 +108,25 @@ export const useSetListStore = defineStore('setlist', () => {
     }
   }
   
-  async function reorderSetLists(newOrder) {
-    const modifiedLists = [];
-    
-    // Update the order of setlists
-    newOrder.forEach((setListId, index) => {
-      const setList = setLists.value.find(list => list.id === setListId);
-      if (setList && setList.order !== index) {
-        setList.order = index;
-        modifiedLists.push(setList);
-      }
-    });
+  async function moveSetList(setListId, newIndex) {
+    const firstSetList = setLists.value.find((list) => list.id === setListId);
+    const secondSetList = setLists.value[newIndex];
 
-    // Sort by the new order
-    setLists.value.sort((a, b) => a.order - b.order);
-
-    // Update modified setlists on the server
-    for (const setList of modifiedLists) {
-      await saveSetList(setList);
+    if (!firstSetList || !secondSetList) {
+      throw new Error("Invalid setlists for moving");
     }
+
+    setLists.value[newIndex] = firstSetList;
+    setLists.value[firstSetList.order] = secondSetList;
+    
+    setLists.value.forEach((list, index) => {
+      list.order = index;
+    });
+    setLists.value.sort((a, b) => a.order - b.order);
+    
+    await saveSetList(firstSetList);
+    await saveSetList(secondSetList);
+    
   }
 
   return {
@@ -137,6 +137,6 @@ export const useSetListStore = defineStore('setlist', () => {
     createSetList,
     saveSetList,
     removeSetList,
-    reorderSetLists
+    moveSetList
   };
 });

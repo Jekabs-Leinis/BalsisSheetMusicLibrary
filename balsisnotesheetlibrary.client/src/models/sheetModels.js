@@ -23,6 +23,10 @@ export class NoteSheet {
 
     return dataParts.length > 0 ? ", " + dataParts.join(", ") : "";
   }
+  
+  getFormattedTitle() {
+    return this.title + this.getFormattedAdditionalData();
+  }
 }
 
 export class SetList {

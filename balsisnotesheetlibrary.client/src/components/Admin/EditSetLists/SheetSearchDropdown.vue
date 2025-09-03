@@ -1,3 +1,64 @@
+<script setup>
+import {
+  ref,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  defineProps,
+  defineEmits,
+} from "vue";
+
+const props = defineProps({
+  /** @type {Array<NoteSheet>} */
+  sheets: {
+    type: Array,
+    required: true,
+  },
+  isLoading: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits(["select"]);
+
+const searchQuery = ref("");
+const showDropdown = ref(false);
+
+/** @type {Array<NoteSheet>} */
+const filteredSheets = computed(() => {
+  if (!searchQuery.value.trim()) return props.sheets;
+
+  // Fuzzy search
+  const query = new RegExp(
+    searchQuery.value.toLowerCase().replace(/\s+/g, ".*"),
+  );
+  return props.sheets.filter((sheet) =>
+    sheet.getFormattedTitle().toLowerCase().match(query),
+  );
+});
+
+const selectItem = (item) => {
+  emit("select", item);
+  searchQuery.value = "";
+  showDropdown.value = false;
+};
+
+const handleClickOutside = (event) => {
+  if (!event.target.closest(".sheet-search-dropdown")) {
+    showDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", handleClickOutside);
+});
+</script>
+
 <template>
   <div class="sheet-search-dropdown">
     <input
@@ -26,75 +87,13 @@
             class="list-group-item list-group-item-action"
             @click="selectItem(sheet)"
           >
-            {{ sheet.title }}{{ sheet.getFormattedAdditionalData() }}
+            {{ sheet.getFormattedTitle() }}
           </button>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
-
-const props = defineProps({
-  /** @type {Array<NoteSheet>} */
-  sheets: {
-    type: Array,
-    required: true,
-  },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(["select"]);
-
-const searchQuery = ref("");
-const showDropdown = ref(false);
-
-// Filter items based on search query
-/** @type {Array<NoteSheet>} */
-const filteredSheets = computed(() => {
-  if (!searchQuery.value) return props.sheets;
-
-  const query = searchQuery.value.toLowerCase();
-  return props.sheets.filter(
-    (sheet) =>
-      sheet.title.toLowerCase().includes(query) ||
-      (sheet.author && sheet.author.toLowerCase().includes(query)),
-  );
-});
-
-// Select an item from the dropdown
-const selectItem = (item) => {
-  emit("select", item);
-  searchQuery.value = "";
-  showDropdown.value = false;
-};
-
-// Toggle dropdown visibility
-const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
-};
-
-// Handle clicks outside the component to close dropdown
-const handleClickOutside = (event) => {
-  if (!event.target.closest(".sheet-search-dropdown")) {
-    showDropdown.value = false;
-  }
-};
-
-// Setup and teardown event listener for clicks outside
-onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
-});
-
-onBeforeUnmount(() => {
-  document.removeEventListener("click", handleClickOutside);
-});
-</script>
 
 <style scoped lang="scss">
 .sheet-search-dropdown {

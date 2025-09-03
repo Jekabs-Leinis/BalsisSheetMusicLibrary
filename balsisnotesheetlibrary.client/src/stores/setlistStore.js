@@ -86,8 +86,7 @@ export const useSetListStore = defineStore('setlist', () => {
       isLoading.value = false;
     }
   }
-
-  // Remove a setlist
+  
   async function removeSetList(setListId) {
     isLoading.value = true;
     error.value = null;
@@ -137,6 +136,6 @@ export const useSetListStore = defineStore('setlist', () => {
     createSetList,
     saveSetList,
     removeSetList,
-    moveSetList
+    moveSetList,
   };
 });

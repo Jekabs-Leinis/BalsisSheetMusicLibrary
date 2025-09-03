@@ -53,7 +53,7 @@ async function attemptLogout() {
           </span>
           <input
             v-model="searchInput"
-            class="form-control fw-semibold me-2"
+            class="form-control me-2"
             type="search"
             placeholder="Meklē dziesmu"
             aria-label="Meklē dziesmu"

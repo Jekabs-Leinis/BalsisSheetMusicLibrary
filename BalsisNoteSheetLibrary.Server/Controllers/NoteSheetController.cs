@@ -138,7 +138,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env) 
         
         if (sheet.Year is not null)
         {
-            nameParts.Add(sheet.Year.ToString());
+            nameParts.Add(sheet.Year.ToString() ?? string.Empty);
         }
         
         var fileName = string.Join(", ", nameParts);

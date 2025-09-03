@@ -6,7 +6,7 @@ const router = createRouter({
         {
             path: '/',
             name: 'SheetList',
-            component: () => import('@/views/SheetList.vue')
+            component: () => import('@/views/SheetListView.vue')
         },
         {
             path: '/login',

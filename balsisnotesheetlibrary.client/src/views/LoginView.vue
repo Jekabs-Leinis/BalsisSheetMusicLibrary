@@ -58,6 +58,7 @@ async function attemptLogin() {
         type="password"
         value=""
         v-model="password"
+        @keydown.enter="attemptLogin"
       />
 
       <div class="info mt-3 text-white" v-if="errorMessage">{{ errorMessage }}</div>
@@ -70,6 +71,7 @@ async function attemptLogin() {
           name="submit"
           value="Login"
           @click="attemptLogin"
+          @keydown.enter="attemptLogin"
         >
           Submit
         </button>

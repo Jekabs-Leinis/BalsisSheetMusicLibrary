@@ -21,7 +21,7 @@ const props = defineProps({
         >
           <ul>
             <li>
-              <h2 class="fw-bold pt-0">{{ setList.title }}</h2>
+              <h2 class="pt-0">{{ setList.title }}</h2>
             </li>
             <li
               v-for="sheet in setList.getNoteSheets(props.noteSheets)"

@@ -67,13 +67,8 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
       // Copy to prevert sorting
       filtered = [...noteSheets.value];
     } else {
-      filtered = noteSheets.value.filter(
-        (sheet) =>
-          sheet.title.toLowerCase().includes(query) ||
-          sheet
-            .getFormattedAdditionalData()
-            .toLowerCase()
-            .includes(query),
+      filtered = noteSheets.value.filter((sheet) =>
+        sheet.getFormattedTitle().toLowerCase().includes(query),
       );
     }
 

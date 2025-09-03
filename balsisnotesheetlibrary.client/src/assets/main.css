@@ -1,16 +1,19 @@
-﻿@import "bootstrap/scss/bootstrap.scss";
+﻿@import "base.css";
+@import "bootstrap/scss/bootstrap.scss";
 @import "loading.css";
+
 
 :root{
   --color-dark: rgba(55, 55, 55, 1);
   --color-darker: rgba(44, 44, 44, 1);
   --balsis-red: #c0392b;
   --color-light: #f0f0f0;
-  --color-light-darker: #dcddd8
+  --color-light-darker: #dcddd8;
+  --color-bluegray: #343a40;
 }
 
 body {
-  font-family: "Courier New", monospace;
+  font-family: "Nimbus Mono", "Courier New", monospace;
 }
 
 h2 {

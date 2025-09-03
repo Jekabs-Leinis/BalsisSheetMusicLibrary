@@ -13,7 +13,6 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
     public async Task<IActionResult> Index(uint id, string filename)
     {
         // We don't really care about the filename, but we accept it to ensure readability of the URL.
-        
         var sheet = await context.NoteSheets.FindAsync(id);
 
         if (sheet is null)
@@ -29,7 +28,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
         }
 
         // TODO: eventually remove this fallback
-        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.Filename);
+        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.Filename ?? string.Empty);
             
         if (!System.IO.File.Exists(path))
         {

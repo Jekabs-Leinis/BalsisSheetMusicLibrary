@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Nimbus Mono';
+    src: url('@/static/fonts/NimbusMono-Regular.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'Nimbus Mono';
+    src: url('@/static/fonts/NimbusMono-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Nimbus Mono';
+    src: url('@/static/fonts/NimbusMono-Oblique.otf') format('opentype');
+    font-style: oblique;
+}
+
+@font-face {
+    font-family: 'Nimbus Mono';
+    src: url('@/static/fonts/NimbusMono-BoldOblique.otf') format('opentype');
+    font-weight: bold;
+    font-style: oblique;
+}

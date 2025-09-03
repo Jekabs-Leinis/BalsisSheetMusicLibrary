@@ -132,7 +132,7 @@ a {
 }
 
 .navbar {
-  background-color: #343a40; // Darker background for admin area to distinguish it
+  background-color: var(--color-bluegray);
 }
 
 .nav-link:hover {

@@ -5,11 +5,16 @@ import SetListNoteList from "@/components/SheetList/SetListNoteList.vue";
 import NoteSheetList from "@/components/SheetList/NoteSheetList.vue";
 import { getAllSetLists } from "@/api/setListApi";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
+import { SortDirection } from "@/models/utilModels";
 
 const noteSheetStore = useNoteSheetStore();
 
 onMounted(async () => {
   await noteSheetStore.fetchNoteSheets();
+
+  // Reset sorting to default as user might navigate here from admin view with different sorting
+  noteSheetStore.setSortField("title", false);
+  noteSheetStore.setSortDirection(SortDirection.ASC);
 });
 
 /* @type {Ref<UnwrapRef<SetList[]>>} */

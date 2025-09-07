@@ -9,7 +9,7 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
   const error = ref(null);
   const searchQuery = ref("");
   const sortField = ref("title");
-  const sortDirection = ref(SortDirection.DESC);
+  const sortDirection = ref(SortDirection.ASC);
 
   // Latvian language collator for proper diacritic sorting
   const latvianCollator = new Intl.Collator("lv-LV");
@@ -44,8 +44,8 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     searchQuery.value = query.toLowerCase().trim();
   }
 
-  function setSortField(field) {
-    if (sortField.value === field) {
+  function setSortField(field, toggleIfSame = true) {
+    if (sortField.value === field && toggleIfSame) {
       // Toggle sort direction if clicking the same field
       sortDirection.value =
         sortDirection.value === SortDirection.ASC
@@ -56,6 +56,14 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
       sortField.value = field;
       sortDirection.value = SortDirection.ASC;
     }
+  }
+  
+  function setSortDirection(direction) {
+    if (direction !== SortDirection.ASC && direction !== SortDirection.DESC) {
+      throw new Error("Invalid sort direction");
+    }
+    
+    sortDirection.value = direction;
   }
 
   const filteredNoteSheets = computed(() => {
@@ -125,5 +133,6 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     getAvailableNoteSheets,
     setSearchQuery,
     setSortField,
+    setSortDirection,
   };
 });

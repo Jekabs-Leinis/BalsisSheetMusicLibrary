@@ -61,10 +61,6 @@ const handleSort = (field) => {
   noteSheetStore.setSortField(field);
 };
 
-watch(sortField, (field) => noteSheetStore.setSortField(field), {
-  immediate: true,
-});
-
 const getSortIcon = () => {
   return noteSheetStore.sortDirection === SortDirection.ASC
     ? "bi-sort-down"

@@ -45,7 +45,7 @@ const deleteSheet = async (sheetId) => {
     // Refresh the list after deletion
     await noteSheetStore.fetchNoteSheets();
   } catch (error) {
-    console.error("Kļūda dzēšot noti:", error);
+    console.error("Kļūda dzēšot notis:", error);
   }
 };
 
@@ -117,8 +117,8 @@ const saveSheet = async (sheet) => {
           />
         </div>
       </div>
-      <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 text-end">
-        <CreateNewSheet @sheet-created="saveSheet" />
+      <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 text-end d-flex justify-content-end gap-2">
+          <CreateNewSheet @sheet-created="saveSheet" />
       </div>
     </div>
 
@@ -172,7 +172,7 @@ const saveSheet = async (sheet) => {
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th>Darbības</th>
+            <th class="fw-normal">Darbības</th>
           </tr>
         </thead>
         <tbody>
@@ -244,6 +244,10 @@ const saveSheet = async (sheet) => {
 <style scoped lang="scss">
 .table {
   vertical-align: middle;
+  
+  th {
+    --bs-table-bg: var(--color-bluegray);
+  }
 }
 
 .btn-group {
@@ -254,6 +258,7 @@ const saveSheet = async (sheet) => {
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+  font-weight: normal;
 
   &:hover {
     background-color: var(--bs-table-hover-bg);

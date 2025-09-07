@@ -16,18 +16,21 @@ function handleCancel() {
 }
 
 const toast = useToast();
+// For info messages we want to update the toast contents with progress
+// instead of creating new toasts
+const infoToastId = ref(null);
+
 async function handleConfirm() {
   toast.clear();
-  toastId.value = null;
-  lastType.value = null;
-  
+  infoToastId.value = null;
+
   showModal.value = false;
   try {
     await axios.post("/api/NoteSheet/RenameAllFilenames");
   } catch (err) {
     const message = err?.response?.data?.error || err.message;
     //TODO: log error to somewhere
-    
+
     showToastMessage(`Kļūda, nevar sākt pārsaukšanu: ${message}`, TYPE.ERROR);
   }
 }
@@ -37,6 +40,8 @@ onMounted(() => StatusHubService.onStatus(handleStatus));
 /**
  * The renaming process will first send a "start" status, then multiple "info" updates,
  * and finally either "complete" or "error".
+ * There might be an "error" in the middle of "info", if a specific file rename fails,
+ * but the overall process should continue
  */
 function handleStatus(data) {
   const variantMap = {
@@ -49,32 +54,29 @@ function handleStatus(data) {
   showToastMessage(data.message, variantMap[data.status] ?? TYPE.INFO);
 }
 
-const toastId = ref(null);
-const lastType = ref(null);
-
 async function showToastMessage(content, type) {
-  // If type changes, create a new toast as type updates are not supported
-  if (toastId.value && lastType.value !== type) {
-    await toast.clear();
-    toastId.value = null;
-  }
-  if (!toastId.value) {
-    toastId.value = toast(content, {
+  if (type === TYPE.INFO) {
+    if (!infoToastId.value) {
+      infoToastId.value = toast(content, {
+        timeout: false,
+        type,
+      });
+    } else {
+      toast.update(
+        infoToastId.value,
+        {
+          content,
+          type,
+          timeout: false,
+        },
+        true, // Required, user might have closed the update toast before the next update
+      );
+    }
+  } else {
+    toast(content, {
       timeout: type === TYPE.SUCCESS ? 5000 : false,
       type,
     });
-    lastType.value = type;
-  } else {
-    toast.update(
-      toastId.value,
-      {
-        content,
-        type,
-        timeout: type === TYPE.SUCCESS ? 5000 : false,
-      },
-      true,
-    );
-    lastType.value = type;
   }
 }
 

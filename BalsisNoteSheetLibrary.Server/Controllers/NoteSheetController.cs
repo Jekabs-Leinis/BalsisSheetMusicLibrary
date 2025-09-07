@@ -51,16 +51,24 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             return new AppResponse<NoteSheet>(null, false, "Only PDF files are allowed");
         }
 
-        // Add the sheet to get an ID assigned
+        // Add the sheet here to get an ID assigned, for filename
         context.NoteSheets.Add(noteSheet);
         await context.SaveChangesAsync();
 
         var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
         Directory.CreateDirectory(sheetsFolder);
 
-        var fileName = SaveSheetFile(noteSheet, file, sheetsFolder);
-        noteSheet.Filename = fileName;
+        var fileName = GenerateFileName(noteSheet) + ".pdf";
+        var systemFileName = $"{noteSheet.Id}_{fileName}";
+        var filePath = Path.Combine(sheetsFolder, systemFileName);
 
+        await using (var fileStream = new FileStream(filePath, FileMode.Create))
+        {
+            await file.CopyToAsync(fileStream);
+        }
+
+        noteSheet.Filename = fileName;
+        noteSheet.SystemFileName = systemFileName;
         await context.SaveChangesAsync();
 
         return new AppResponse<NoteSheet>(noteSheet, true);
@@ -78,7 +86,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
         }
 
         var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
-        var oldFilePath = Path.Combine(sheetsFolder, sheet.GetSystemFileName());
+        var oldFilePath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
 
         if (file is { Length: > 0 })
         {
@@ -100,49 +108,56 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                     Console.WriteLine($"Error deleting old file: {ex.Message}");
                 }
             }
-            else
+            
+            var newFileName = GenerateFileName(noteSheet) + ".pdf";
+            var newSystemFileName = $"{sheet.Id}_{newFileName}";
+            var newFilePath = Path.Combine(sheetsFolder, newSystemFileName);
+
+            await using (var fileStream = new FileStream(newFilePath, FileMode.Create))
             {
-                // TODO: Log file somehow missing
+                await file.CopyToAsync(fileStream);
             }
 
-            noteSheet.Filename = SaveSheetFile(noteSheet, file, sheetsFolder);
+            noteSheet.Filename = newFileName;
+            noteSheet.SystemFileName = newSystemFileName;
         }
         else
         {
-            // Rename the existing file, if data has changed
+            // Rename the existing file, with the expectation that data (from which filename is generated) has changed
             if (System.IO.File.Exists(oldFilePath))
             {
                 try
                 {
-                    var newFilePath = Path.Combine(sheetsFolder, $"{sheet.Id}_{GenerateFileName(noteSheet)}");
+                    // The previous version allowed any file extension, so we need to preserve it
+                    // A future update could standardize all files to .pdf
+                    var extension = Path.GetExtension(oldFilePath);
+                    var newFileName = GenerateFileName(noteSheet) + extension;
+                    var newSystemFileName = $"{sheet.Id}_{newFileName}";
+                    var newFilePath = Path.Combine(sheetsFolder, newSystemFileName);
                     System.IO.File.Move(oldFilePath, newFilePath, overwrite: true);
+                    noteSheet.SystemFileName = newSystemFileName;
+                    noteSheet.Filename = newFileName;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error renaming file: {ex.Message}");
+                    return new AppResponse<NoteSheet>(null, false, $"Error renaming file: {ex.Message}");
                 }
             }
-
-            noteSheet.Filename = GenerateFileName(noteSheet);
+            else
+            {
+                // TODO: file missing - what to do?
+                // For now, just clear the filename fields as they are no longer valid
+                // and to prevent user provided data from being saved
+                noteSheet.SystemFileName = string.Empty;
+                noteSheet.Filename = string.Empty;
+            }
         }
 
         context.Entry(sheet).CurrentValues.SetValues(noteSheet);
         await context.SaveChangesAsync();
 
         return new AppResponse<NoteSheet>(sheet, true);
-    }
-
-    private string SaveSheetFile(NoteSheet noteSheet, IFormFile file, string targetFolder)
-    {
-        var fileName = GenerateFileName(noteSheet);
-        var systemFileName = $"{noteSheet.Id}_{fileName}";
-        var filePath = Path.Combine(targetFolder, systemFileName);
-
-        using var fileStream = new FileStream(filePath, FileMode.Create);
-
-        file.CopyTo(fileStream);
-
-        return fileName;
     }
 
     private static string GenerateFileName(NoteSheet sheet)
@@ -173,7 +188,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             fileName = fileName[..200];
         }
 
-        return fileName + ".pdf";
+        return fileName;
     }
 
     private static string CleanFileName(string input)
@@ -182,7 +197,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             return string.Empty;
 
         var invalidChars = Regex.Escape(new string(Path.GetInvalidFileNameChars()));
-        invalidChars += "#";
+        invalidChars += "#"; // Also remove '#' to avoid URL encoding issues
         var invalidRegex = string.Format(@"([{0}]*\.+$)|([{0}]+)", invalidChars);
 
         return Regex.Replace(input, invalidRegex, "").Trim();
@@ -197,6 +212,21 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
         if (sheet is null)
         {
             return new AppResponse<string>(null, false, "Note sheet not found");
+        }
+
+        var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
+        var filePath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
+
+        if (System.IO.File.Exists(filePath))
+        {
+            try
+            {
+                System.IO.File.Delete(filePath);
+            }
+            catch
+            {
+                // TODO: figure out what to do if file deletion fails
+            }
         }
 
         context.NoteSheets.Remove(sheet);
@@ -235,18 +265,19 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                     foreach (var sheet in sheets)
                     {
                         current++;
-                        var newFileName = GenerateFileName(sheet);
+                        // The previous version allowed any file extension, so we need to preserve it
+                        // A future update could standardize all files to .pdf
+                        var extension = Path.GetExtension(sheet.SystemFileName) ?? ".pdf";
+                        var newFileName = GenerateFileName(sheet) + extension;
                         var newSystemFileName = $"{sheet.Id}_{newFileName}";
-                        var oldSystemFileName = sheet.GetSystemFileName();
-                        var oldPath = Path.Combine(sheetsFolder, oldSystemFileName);
-                        // Old path fallback for files that were imported from the old system without the ID prefix
+                        var oldPath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
+                        // Path fallback for files that were imported from the old system without the ID prefix
+                        // A future update could remove this fallback
                         var altPath = Path.Combine(sheetsFolder, sheet.Filename ?? string.Empty);
                         var newPath = Path.Combine(sheetsFolder, newSystemFileName);
                         bool renamed = false;
-
-                        var fileToMove = System.IO.File.Exists(oldPath) ? oldPath
-                            : System.IO.File.Exists(altPath) ? altPath
-                            : null;
+                        var fileToMove = System.IO.File.Exists(oldPath) ? oldPath :
+                            System.IO.File.Exists(altPath) ? altPath : null;
 
                         if (fileToMove != null)
                         {
@@ -269,6 +300,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                         if (renamed)
                         {
                             sheet.Filename = newFileName;
+                            sheet.SystemFileName = newSystemFileName;
                             scopedContext.Update(sheet);
                             await scopedContext.SaveChangesAsync();
                         }

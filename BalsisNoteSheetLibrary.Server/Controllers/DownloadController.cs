@@ -19,9 +19,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
         {
             return NotFound(new AppResponse<object>(null, false, "Note sheet not found."));
         }
-        
-        var path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.GetSystemFileName());
-
+        var path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.SystemFileName ?? string.Empty);
         if (System.IO.File.Exists(path))
         {
             return PhysicalFile(path, "application/octet-stream", sheet.Filename);
@@ -29,7 +27,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
 
         // TODO: eventually remove this fallback
         path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.Filename ?? string.Empty);
-            
+
         if (!System.IO.File.Exists(path))
         {
             return NotFound(new AppResponse<object>(null, false, "File not found on server."));
@@ -38,4 +36,3 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
         return PhysicalFile(path, "application/octet-stream", sheet.Filename);
     }
 }
-

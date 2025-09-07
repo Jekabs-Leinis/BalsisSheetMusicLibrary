@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { createBootstrap } from 'bootstrap-vue-next'
+import Toast, { POSITION } from "vue-toastification";
 
 import App from "@/App.vue";
 import router from "@/router/routes";
@@ -14,6 +15,7 @@ import * as bootstrap from "bootstrap";
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue-next/dist/bootstrap-vue-next.css'
+import "vue-toastification/dist/index.css";
 import "./assets/main.css";
 
 
@@ -21,6 +23,7 @@ import "./assets/main.css";
 axios.interceptors.response.use(
   (response) => response,
   (request) => {
+      //TODO: remove
       console.log(request);
     if (request.response.status === 401 && request.response.headers.location.includes("login")) {
       window.location.href = "/login";
@@ -76,9 +79,14 @@ router.beforeEach((to) => {
 
 app.use(router);
 app.use(createBootstrap());
+app.use(Toast, {
+  position: POSITION.TOP_RIGHT,
+  timeout: 5000,
+  closeOnClick: true,
+  pauseOnHover: true,
+  draggable: true,
+});
 
 app.directive("loading", vLoading);
 
 app.mount("#app");
-
-

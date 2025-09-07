@@ -1,4 +1,5 @@
 using System.Net;
+using BalsisNoteSheetLibrary.Server.Controllers;
 using BalsisNoteSheetLibrary.Server.Helpers;
 using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -99,11 +100,14 @@ builder.Services.AddCors(options =>
         });
 });
 
+builder.Services.AddSignalR();
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
 app.UseHttpsRedirection();
+
 
 await RoleSeeder.SeedRolesAsync(app.Services);
 await UserSeeder.SeedUsersAsync(app.Services);
@@ -124,6 +128,7 @@ else
 }
 
 app.MapControllers();
+app.MapHub<StatusHub>("/api/statusHub");
 
 //Fallback to 404
 app.MapFallback((context =>
@@ -132,7 +137,5 @@ app.MapFallback((context =>
 
     return context.Response.CompleteAsync();
 }));
-
-
 
 app.Run();

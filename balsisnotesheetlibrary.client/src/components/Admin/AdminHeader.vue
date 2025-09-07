@@ -44,8 +44,15 @@
             <li class="nav-item">
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
+                href="/admin"
+                >Funkcijas</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/sheets"
-                >Rediģēt Notis</a
+                >Notis</a
               >
             </li>
             <li class="nav-item">

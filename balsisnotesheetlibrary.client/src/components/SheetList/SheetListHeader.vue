@@ -113,7 +113,7 @@ async function attemptLogout() {
             <li class="nav-item text-end" v-if="isAdmin">
               <a
                 class="nav-link text-nowrap pe-2 pe-lg-0 text-light"
-                href="/admin/sheets"
+                href="/admin"
                 >Admin</a
               >
             </li>

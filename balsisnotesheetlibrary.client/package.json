@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@microsoft/signalr": "^9.0.6",
     "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "bootstrap-icons": "^1.11.3",
@@ -19,6 +20,7 @@
     "sass": "^1.70.0",
     "vue": "^3.5.16",
     "vue-router": "^4.2.5",
+    "vue-toastification": "^2.0.0-rc.5",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

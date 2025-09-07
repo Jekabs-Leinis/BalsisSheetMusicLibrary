@@ -50,6 +50,7 @@ export default defineConfig({
             '/api': {
                 target: 'https://localhost:7171/',
                 secure: false,
+                ws: true, // This is needed for signalR notifications to work
             }
         },
         port: 5173,

@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { BModal, BButton, BAlert } from "bootstrap-vue-next";
+import VModal from "@/components/Common/VModal.vue";
 import { useToast, TYPE } from "vue-toastification";
 import StatusHubService from "@/services/statusHubService";
 import axios from "axios";
@@ -41,7 +41,7 @@ onMounted(() => StatusHubService.onStatus(handleStatus));
  * The renaming process will first send a "start" status, then multiple "info" updates,
  * and finally either "complete" or "error".
  * There might be an "error" in the middle of "info", if a specific file rename fails,
- * but the overall process should continue
+ * but the rename process in that case should continue
  */
 function handleStatus(data) {
   const variantMap = {
@@ -73,10 +73,7 @@ async function showToastMessage(content, type) {
       );
     }
   } else {
-    toast(content, {
-      timeout: type === TYPE.SUCCESS ? 5000 : false,
-      type,
-    });
+    toast(content, { type });
   }
 }
 
@@ -91,27 +88,23 @@ onUnmounted(() => {
       <i class="bi bi-pencil-square me-2"></i>
       Pārsaukt failus
     </button>
-    <BModal
-      :model-value="showModal"
-      @update:model-value="showModal = $event"
+    <VModal
+      v-model:show="showModal"
       title="Apstiprināt pārsaukšanu"
       centered
-      size="md"
       @hidden="handleCancel"
     >
-      <BAlert variant="warning" show>
+      <div class="alert alert-warning" role="alert">
         Šī darbība pārsauks visus failus, lai tie atbilstu shēmai
         <code>[nosaukums], [mūzikas_autors], [vārdu_autors], [gads]</code>. Šī
         darbība ir neatgriezeniska.
-      </BAlert>
+      </div>
       <template #footer>
         <div class="w-100 d-flex justify-content-between">
-          <BButton variant="secondary" @click="handleCancel"> Atcelt </BButton>
-          <BButton variant="danger" @click="handleConfirm"> Pārsaukt </BButton>
+          <button type="button" class="btn btn-secondary" @click="handleCancel">Atcelt</button>
+          <button type="button" class="btn btn-danger" @click="handleConfirm">Pārsaukt</button>
         </div>
       </template>
-    </BModal>
+    </VModal>
   </div>
 </template>
-
-<style scoped lang="scss"></style>

@@ -1,14 +1,6 @@
 <script setup>
 import { computed, ref, watch, defineProps, defineEmits } from "vue";
-import {
-  BModal,
-  BButton,
-  BForm,
-  BFormGroup,
-  BFormInput,
-  BFormCheckbox,
-  BAlert,
-} from "bootstrap-vue-next";
+import VModal from "@/components/Common/VModal.vue";
 import { NoteSheet } from "@/models/sheetModels";
 import { updateNoteSheet, createNoteSheet } from "@/api/noteSheetApi";
 
@@ -61,7 +53,7 @@ function handleFileChange(event) {
       selectedFile.value = null;
       return;
     }
-    
+
     fileError.value = "";
     selectedFile.value = file;
   }
@@ -94,12 +86,12 @@ function validateForm() {
       validationMessage.value = "Gadam jābūt lielākam par 0.";
       return false;
     }
-    
+
     formData.value.year = yearNum;
   } else {
     formData.value.year = null;
   }
-  
+
   if (isCreateMode.value && !selectedFile.value) {
     isValid.value = false;
     validationMessage.value = "Nepieciešams pievienot failu.";
@@ -114,9 +106,9 @@ async function handleSave() {
   if (!validateForm()) {
     return;
   }
-    
+
   let savedSheet;
-  
+
   loading.value = true;
   if (isCreateMode.value) {
     savedSheet = await createNoteSheet(formData.value, selectedFile.value);
@@ -126,13 +118,12 @@ async function handleSave() {
   loading.value = false;
   showModal.value = false;
   emit("save", savedSheet);
-  
+
   clearFileSelection();
 }
 
 function handleClose() {
   isValid.value = true;
-  
   emit("close");
 }
 
@@ -148,68 +139,82 @@ function handleInputBlur(field) {
 </script>
 
 <template>
-  <BModal
-    :model-value="showModal"
-    @update:model-value="showModal = $event"
+  <VModal
+    v-model:show="showModal"
     :title="isCreateMode ? 'Pievienot notis' : 'Rediģēt notis'"
     centered
     size="lg"
     @hidden="handleClose"
-    :content-class="{ 'state-loading': loading }"
   >
-    <BForm @submit.prevent="handleSave">
-      <BAlert v-if="!isValid" variant="danger" show>
+    <form @submit.prevent="handleSave">
+      <div v-if="!isValid" class="alert alert-danger" role="alert">
         {{ validationMessage }}
-      </BAlert>
+      </div>
 
-      <BFormGroup label="Nosaukums *" label-for="title-input">
-        <BFormInput
+      <div class="mb-3">
+        <label for="title-input" class="form-label">Nosaukums *</label>
+        <input
           id="title-input"
           v-model="formData.title"
+          type="text"
+          class="form-control"
           placeholder="Ievadiet dziesmas nosaukumu"
           required
           @blur="handleInputBlur('title')"
-          :state="formData.title.trim() ? null : false"
+          :class="{ 'is-invalid': !formData.title.trim() }"
         />
-      </BFormGroup>
+      </div>
 
-      <BFormGroup class="pt-2" label="Mūzikas autors" label-for="author-input">
-        <BFormInput
+      <div class="mb-3 pt-2">
+        <label for="author-input" class="form-label">Mūzikas autors</label>
+        <input
           id="author-input"
           v-model="formData.author"
+          type="text"
+          class="form-control"
           placeholder="Ievadiet mūzikas autoru"
         />
-      </BFormGroup>
+      </div>
 
-      <BFormGroup class="pt-2" label="Vārdu autors" label-for="lyricist-input">
-        <BFormInput
+      <div class="mb-3 pt-2">
+        <label for="lyricist-input" class="form-label">Vārdu autors</label>
+        <input
           id="lyricist-input"
           v-model="formData.lyricist"
+          type="text"
+          class="form-control"
           placeholder="Ievadiet vārdu autoru"
         />
-      </BFormGroup>
+      </div>
 
-      <BFormGroup class="pt-2" label="Gads" label-for="year-input">
-        <BFormInput
+      <div class="mb-3 pt-2">
+        <label for="year-input" class="form-label">Gads</label>
+        <input
           id="year-input"
           v-model="formData.year"
           type="text"
           inputmode="numeric"
+          class="form-control"
           placeholder="Ievadiet gadu"
         />
-      </BFormGroup>
+      </div>
 
-      <BFormGroup class="py-2">
-        <BFormCheckbox v-model="formData.isLatvian" id="latvian-checkbox">
+      <div class="form-check py-2 mb-3">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="latvian-checkbox"
+          v-model="formData.isLatvian"
+        />
+        <label class="form-check-label" for="latvian-checkbox">
           Latviešu dziesma
-        </BFormCheckbox>
-      </BFormGroup>
+        </label>
+      </div>
 
-      <BFormGroup 
-        class="pt-2" 
-        :label="`PDF fails${isCreateMode ? ' *' : ''}`"
-        label-for="file-input"
-      >
+      <div class="mb-3 pt-2">
+        <label for="file-input" class="form-label">
+          PDF fails{{ isCreateMode ? " *" : "" }}
+        </label>
         <div v-if="formData.filename && !selectedFile" class="d-flex align-items-center mb-2">
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
           <span>{{ formData.filename }}</span>
@@ -236,24 +241,24 @@ function handleInputBlur(field) {
             :class="{ 'is-invalid': fileError }"
           />
         </div>
-        
+
         <div v-if="fileError" class="invalid-feedback d-block">
           {{ fileError }}
         </div>
-      </BFormGroup>
-    </BForm>
+      </div>
+    </form>
 
     <template #footer>
       <div class="w-100 d-flex justify-content-between">
-        <BButton variant="secondary" @click="showModal = false">
+        <button type="button" class="btn btn-secondary" @click="showModal = false">
           Atcelt
-        </BButton>
-        <BButton variant="primary" @click="handleSave">
+        </button>
+        <button type="button" class="btn btn-primary" @click="handleSave">
           Saglabāt
-        </BButton>
+        </button>
       </div>
     </template>
-  </BModal>
+  </VModal>
 </template>
 
 <style scoped lang="scss">

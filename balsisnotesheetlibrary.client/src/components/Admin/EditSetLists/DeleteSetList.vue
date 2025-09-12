@@ -1,6 +1,6 @@
 <script setup>
 import { computed, defineProps, defineEmits } from "vue";
-import { BModal, BButton } from "bootstrap-vue-next";
+import VModal from "@/components/Common/VModal.vue";
 
 const props = defineProps({
   setList: {
@@ -33,9 +33,8 @@ function handleClose() {
 </script>
 
 <template>
-  <BModal
-    :model-value="showModal"
-    @update:model-value="showModal = $event"
+  <VModal
+    v-model:show="showModal"
     title="Dzēst nošu sarakstu"
     centered
     @hidden="handleClose"
@@ -49,13 +48,13 @@ function handleClose() {
 
     <template #footer>
       <div class="w-100 d-flex justify-content-between">
-        <BButton variant="secondary" @click="showModal = false">
+        <button type="button" class="btn btn-secondary" @click="showModal = false">
           Atcelt
-        </BButton>
-        <BButton variant="danger" @click="handleConfirmDelete">
+        </button>
+        <button type="button" class="btn btn-danger" @click="handleConfirmDelete">
           Dzēst
-        </BButton>
+        </button>
       </div>
     </template>
-  </BModal>
+  </VModal>
 </template>

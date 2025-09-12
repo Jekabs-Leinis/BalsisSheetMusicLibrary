@@ -1,6 +1,6 @@
 <script setup>
 import { computed, defineProps, defineEmits } from "vue";
-import { BModal, BButton } from "bootstrap-vue-next";
+import VModal from "@/components/Common/VModal.vue";
 
 const props = defineProps({
   sheet: {
@@ -15,7 +15,6 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "confirm", "update:show"]);
 
-// Computed property for two-way binding
 const showModal = computed({
   get: () => props.show,
   set: (value) => emit("update:show", value)
@@ -24,7 +23,7 @@ const showModal = computed({
 function handleConfirmDelete() {
   if (props.sheet) {
     emit("confirm", props.sheet.id);
-    showModal.value = false; // Close modal after confirmation
+    showModal.value = false; 
   }
 }
 
@@ -34,9 +33,8 @@ function handleClose() {
 </script>
 
 <template>
-  <BModal
-    :model-value="showModal"
-    @update:model-value="showModal = $event"
+  <VModal
+    v-model:show="showModal"
     title="Dzēst notis"
     centered
     @hidden="handleClose"
@@ -50,13 +48,13 @@ function handleClose() {
     
     <template #footer>
       <div class="w-100 d-flex justify-content-between">
-        <BButton variant="secondary" @click="showModal = false">
+        <button type="button" class="btn btn-secondary" @click="showModal = false">
           Atcelt
-        </BButton>
-        <BButton variant="danger" @click="handleConfirmDelete">
+        </button>
+        <button type="button" class="btn btn-danger" @click="handleConfirmDelete">
           Dzēst
-        </BButton>
+        </button>
       </div>
     </template>
-  </BModal>
+  </VModal>
 </template>

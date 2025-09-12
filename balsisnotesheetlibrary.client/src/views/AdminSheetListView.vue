@@ -113,7 +113,7 @@ const saveSheet = async (sheet) => {
           />
         </div>
       </div>
-      <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 text-end d-flex justify-content-end gap-2">
+      <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 d-flex justify-content-end gap-2">
           <CreateNewSheet @sheet-created="saveSheet" />
       </div>
     </div>

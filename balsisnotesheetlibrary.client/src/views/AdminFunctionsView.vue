@@ -1,6 +1,6 @@
 <script setup>
 
-import RenameFilenames from "@/components/Admin/List/RenameFilenames.vue";
+import RenameFilenames from "@/components/Admin/Functions/RenameFilenames.vue";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 </script>
 

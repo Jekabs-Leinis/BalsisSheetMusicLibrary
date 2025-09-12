@@ -2,7 +2,7 @@
 import { computed, toRefs, defineProps, defineEmits } from "vue";
 import SheetSearchDropdown from "./SheetSearchDropdown.vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
-import draggable from "vuedraggable";
+import { VueDraggable } from 'vue-draggable-plus'
 import { moveSheetInSetList } from "@/services/setListServices";
 import { SetListItem } from "@/models/sheetModels";
 
@@ -110,15 +110,16 @@ const moveSetList = (setListId, newIndex) => {
       </div>
     </div>
     <div class="card-body">
-      <draggable
+      <VueDraggable
         v-model="itemsList"
         :group="`sheets-${setList.id}`"
         item-key="noteSheetId"
         handle=".sheet-drag-handle"
         class="list-group sheets-list mb-3"
       >
-        <template #item="{ element: noteSheet }">
           <div
+            v-for="noteSheet in itemsList"
+            :key="`${setList.id}-${noteSheet.noteSheetId}`"
             class="list-group-item d-flex justify-content-between align-items-center"
           >
             <div class="d-flex align-items-center flex-grow-1">
@@ -151,8 +152,7 @@ const moveSetList = (setListId, newIndex) => {
               @click="removeSheet(noteSheet.noteSheetId)"
             />
           </div>
-        </template>
-      </draggable>
+      </VueDraggable>
 
       <div class="add-sheet-wrapper">
         <sheet-search-dropdown

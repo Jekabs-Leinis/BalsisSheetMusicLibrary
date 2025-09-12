@@ -3,7 +3,7 @@ import { ref, onMounted } from "vue";
 import { useSetListStore } from "@/stores/setlistStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import EditSetList from "@/components/Admin/EditSetLists/EditSetList.vue";
-import draggable from "vuedraggable";
+import { VueDraggable } from "vue-draggable-plus";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSetList from "@/components/Admin/EditSetLists/DeleteSetList.vue";
 
@@ -49,12 +49,10 @@ const handleSetListMove = ({ setListId, newIndex }) => {
   setListStore.moveSetList(setListId, newIndex);
 };
 
-const handleDraggableMove = ({ moved: {newIndex, oldIndex} }) => {
+const handleDraggableMove = ({newIndex, oldIndex}) => {
   // The draggable component will update the array position automatically,
   // but it will not update the order field in each set list item.
-  setListStore.setLists.forEach((list, index) => {
-    list.order = index;
-  });
+  setListStore.reorderLists();
   setListStore.saveSetList(setListStore.setLists[newIndex]);
   setListStore.saveSetList(setListStore.setLists[oldIndex]);
 };
@@ -97,26 +95,26 @@ const handleSetListDelete = (setList) => {
           as dragging might not always work on mobile devices.
           However this requires us to implement manual array order update 
           in handleSetListMove() -->
-          <draggable
+          <VueDraggable
             v-model="setListStore.setLists"
             handle=".setlist-header"
             item-key="id"
             group="setlists"
             class="setlists-container"
-            @change="handleDraggableMove"
+            @sort="handleDraggableMove"
           >
-            <template #item="{ element: setList }">
-              <edit-set-list
-                :set-list="setList"
-                :all-sheets="noteSheetStore.noteSheets"
-                :is-loading="noteSheetStore.isLoading"
-                :set-list-count="setListStore.setLists.length"
-                @updated="setListStore.saveSetList(setList)"
-                @move="handleSetListMove"
-                @remove="handleSetListDelete(setList)"
-              />
-            </template>
-          </draggable>
+            <EditSetList
+              v-for="setList in setListStore.setLists"
+              :key="setList.id"
+              :set-list="setList"
+              :all-sheets="noteSheetStore.noteSheets"
+              :is-loading="noteSheetStore.isLoading"
+              :set-list-count="setListStore.setLists.length"
+              @updated="setListStore.saveSetList(setList)"
+              @move="handleSetListMove"
+              @remove="handleSetListDelete(setList)"
+            />
+          </VueDraggable>
 
           <!-- Create new setlist form -->
           <div

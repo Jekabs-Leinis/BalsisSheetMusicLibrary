@@ -118,14 +118,18 @@ export const useSetListStore = defineStore('setlist', () => {
     setLists.value[newIndex] = firstSetList;
     setLists.value[firstSetList.order] = secondSetList;
     
-    setLists.value.forEach((list, index) => {
-      list.order = index;
-    });
-    setLists.value.sort((a, b) => a.order - b.order);
+    this.reorderLists();
     
     await saveSetList(firstSetList);
     await saveSetList(secondSetList);
     
+  }
+  
+  function reorderLists() {
+    setLists.value.forEach((list, index) => {
+      list.order = index;
+    });
+    setLists.value.sort((a, b) => a.order - b.order);
   }
 
   return {
@@ -137,5 +141,6 @@ export const useSetListStore = defineStore('setlist', () => {
     saveSetList,
     removeSetList,
     moveSetList,
+    reorderLists,
   };
 });

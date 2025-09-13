@@ -107,4 +107,38 @@ public class SetListController(AppDbContext context) : ControllerBase
 
         return new AppResponse<string>("Set list deleted", true);
     }
+
+    [HttpPost("{id:int}")]
+    [Authorize(Roles = Role.Admin)]
+    public async Task<AppResponse<string>> Archive(uint id)
+    {
+        var setList = await context.SetLists.FindAsync(id);
+
+        if (setList is null)
+        {
+            return new AppResponse<string>(null, false, "Set list not found");
+        }
+
+        setList.ArchivedAt = DateTime.UtcNow;
+        await context.SaveChangesAsync();
+
+        return new AppResponse<string>("Set list archived", true);
+    }
+
+    [HttpPost("{id:int}")]
+    [Authorize(Roles = Role.Admin)]
+    public async Task<AppResponse<string>> Unarchive(uint id)
+    {
+        var setList = await context.SetLists.FindAsync(id);
+
+        if (setList is null)
+        {
+            return new AppResponse<string>(null, false, "Set list not found");
+        }
+
+        setList.ArchivedAt = null;
+        await context.SaveChangesAsync();
+
+        return new AppResponse<string>("Set list unarchived", true);
+    }
 }

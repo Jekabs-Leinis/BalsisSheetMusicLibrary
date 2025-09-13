@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref } from 'vue';
 import EditSheet from './EditSheet.vue';
 import { NoteSheet } from "@/models/sheetModels";
 

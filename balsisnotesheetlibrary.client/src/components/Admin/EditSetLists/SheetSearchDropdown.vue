@@ -4,8 +4,6 @@ import {
   computed,
   onMounted,
   onBeforeUnmount,
-  defineProps,
-  defineEmits,
 } from "vue";
 
 const props = defineProps({

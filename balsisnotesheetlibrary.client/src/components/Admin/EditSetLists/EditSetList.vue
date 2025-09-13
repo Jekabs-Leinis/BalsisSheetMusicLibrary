@@ -1,8 +1,8 @@
 <script setup>
-import { computed, toRefs, defineProps, defineEmits } from "vue";
+import { computed, toRefs } from "vue";
 import SheetSearchDropdown from "./SheetSearchDropdown.vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
-import { VueDraggable } from 'vue-draggable-plus'
+import { VueDraggable } from "vue-draggable-plus";
 import { moveSheetInSetList } from "@/services/setListServices";
 import { SetListItem } from "@/models/sheetModels";
 
@@ -77,7 +77,6 @@ const moveSheet = async (noteSheetId, order) => {
 const moveSetList = (setListId, newIndex) => {
   emit("move", { setListId, newIndex });
 };
-
 </script>
 
 <template>
@@ -90,8 +89,8 @@ const moveSetList = (setListId, newIndex) => {
         v-if="setList.order > 0"
         class="btn btn-sm fs-6"
         :class="[
-                setList.order < setListCount - 1 ? 'pe-0' : 'no-down-arrow-padding',
-              ]"
+          setList.order < setListCount - 1 ? 'pe-0' : 'no-down-arrow-padding',
+        ]"
         @click="moveSetList(setList.id, setList.order - 1)"
       >
         <i class="bi bi-arrow-up movement-arrows" />
@@ -117,41 +116,44 @@ const moveSetList = (setListId, newIndex) => {
         handle=".sheet-drag-handle"
         class="list-group sheets-list mb-3"
       >
-          <div
-            v-for="noteSheet in itemsList"
-            :key="`${setList.id}-${noteSheet.noteSheetId}`"
-            class="list-group-item d-flex justify-content-between align-items-center"
-          >
-            <div class="d-flex align-items-center flex-grow-1">
-              <span class="sheet-drag-handle me-2">
-                <i class="bi bi-grip-vertical text-muted"></i>
-              </span>
-              <span>
-                {{ noteSheet.order + 1 }}. {{ getSongName(noteSheet.noteSheetId) }}
-              </span>
-            </div>
-            <button
-              v-if="noteSheet.order > 0"
-              class="btn btn-sm fs-6"
-              :class="[
-                noteSheet.order < itemsList.length - 1 ? 'pe-0' : 'no-down-arrow-padding',
-              ]"
-              @click="moveSheet(noteSheet.noteSheetId, noteSheet.order - 1)"
-            >
-              <i class="bi bi-arrow-up movement-arrows" />
-            </button>
-            <button
-              v-if="noteSheet.order < itemsList.length - 1"
-              class="btn btn-sm fs-6"
-              @click="moveSheet(noteSheet.noteSheetId, noteSheet.order + 1)"
-            >
-              <i class="bi bi-arrow-down movement-arrows" />
-            </button>
-            <button
-              class="btn btn-sm btn-close"
-              @click="removeSheet(noteSheet.noteSheetId)"
-            />
+        <div
+          v-for="noteSheet in itemsList"
+          :key="`${setList.id}-${noteSheet.noteSheetId}`"
+          class="list-group-item d-flex justify-content-between align-items-center"
+        >
+          <div class="d-flex align-items-center flex-grow-1">
+            <span class="sheet-drag-handle me-2">
+              <i class="bi bi-grip-vertical text-muted"></i>
+            </span>
+            <span>
+              {{ noteSheet.order + 1 }}.
+              {{ getSongName(noteSheet.noteSheetId) }}
+            </span>
           </div>
+          <button
+            v-if="noteSheet.order > 0"
+            class="btn btn-sm fs-6"
+            :class="[
+              noteSheet.order < itemsList.length - 1
+                ? 'pe-0'
+                : 'no-down-arrow-padding',
+            ]"
+            @click="moveSheet(noteSheet.noteSheetId, noteSheet.order - 1)"
+          >
+            <i class="bi bi-arrow-up movement-arrows" />
+          </button>
+          <button
+            v-if="noteSheet.order < itemsList.length - 1"
+            class="btn btn-sm fs-6"
+            @click="moveSheet(noteSheet.noteSheetId, noteSheet.order + 1)"
+          >
+            <i class="bi bi-arrow-down movement-arrows" />
+          </button>
+          <button
+            class="btn btn-sm btn-close"
+            @click="removeSheet(noteSheet.noteSheetId)"
+          />
+        </div>
       </VueDraggable>
 
       <div class="add-sheet-wrapper">

@@ -4,8 +4,6 @@ import {
   watch,
   onMounted,
   onBeforeUnmount,
-  defineEmits,
-  defineProps,
   nextTick,
   computed,
 } from "vue";

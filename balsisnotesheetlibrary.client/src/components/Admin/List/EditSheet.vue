@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch, defineProps, defineEmits } from "vue";
+import { computed, ref, watch } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 import { NoteSheet } from "@/models/sheetModels";
 import { updateNoteSheet, createNoteSheet } from "@/api/noteSheetApi";

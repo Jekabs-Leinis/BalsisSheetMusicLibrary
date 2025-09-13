@@ -49,7 +49,7 @@ const handleSetListMove = ({ setListId, newIndex }) => {
   setListStore.moveSetList(setListId, newIndex);
 };
 
-const handleDraggableMove = ({newIndex, oldIndex}) => {
+const handleDraggableMove = ({ newIndex, oldIndex }) => {
   // The draggable component will update the array position automatically,
   // but it will not update the order field in each set list item.
   setListStore.reorderLists();
@@ -66,8 +66,8 @@ const handleSetListDelete = (setList) => {
 </script>
 
 <template>
-  <AdminHeader />
-  <div class="bg-secondary-subtle">
+  <div class="bg-secondary-subtle min-vh-100">
+    <AdminHeader />
     <div class="container container-fluid py-4">
       <!-- Loading state -->
       <div v-if="isInitializing" class="row">

@@ -65,7 +65,7 @@
             <li class="nav-item">
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
-                href="/admin/set-lists-archive"
+                href="/admin/archive"
                 >Arhīvs</a
               >
             </li>

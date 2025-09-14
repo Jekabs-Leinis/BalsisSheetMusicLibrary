@@ -1,8 +1,13 @@
 import axios from "axios";
 import { SetList } from "@/models/sheetModels";
 
-export async function getAllSetLists(withSheets = false) {
-  const response = await axios.get(`/api/setList/getAll?withSheets=${withSheets}`);
+export async function getAllSetLists(withSheets = false, withArchived = false) {
+  const response = await axios.get(`/api/setList/getAll`, {
+    params: {
+      withSheets,
+      withArchived,
+    },
+  });
 
   if (!response.data.success) {
     throw Error(response.data.message || "Failed to get all set lists");
@@ -17,7 +22,7 @@ export async function addSetList(setList) {
   if (!response.data.success) {
     throw Error(response.data.message || "Failed to add set list");
   }
-  
+
   return response.data;
 }
 
@@ -29,7 +34,7 @@ export async function updateSetList(setList) {
   if (!response.data.success) {
     throw Error(response.data.message || "Failed to update set list");
   }
-  
+
   return response.data;
 }
 
@@ -39,7 +44,7 @@ export async function deleteSetList(setListId) {
   if (!response.data.success) {
     throw Error(response.data.message || "Failed to delete set list");
   }
-  
+
   return response.data;
 }
 
@@ -49,7 +54,7 @@ export async function archiveSetList(setListId) {
   if (!response.data.success) {
     throw Error(response.data.message || "Failed to archive set list");
   }
-  
+
   return response.data;
 }
 
@@ -59,6 +64,6 @@ export async function unarchiveSetList(setListId) {
   if (!response.data.success) {
     throw Error(response.data.message || "Failed to unarchive set list");
   }
-  
+
   return response.data;
 }

@@ -49,6 +49,7 @@ const addSheet = async (sheet) => {
     noteSheetId: sheet.id,
     setListId: setList.value.id,
     order: setListItems.value.length, // Place at the end of set
+    noteSheet: sheet,
   });
 
   // Have to use explicit assignment to trigger setter

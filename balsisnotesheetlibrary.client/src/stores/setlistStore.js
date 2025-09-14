@@ -19,12 +19,12 @@ export const useSetListStore = defineStore('setlist', () => {
   const isLoading = ref(false);
   const error = ref(null);
   
-  async function fetchSetLists(withSheets = false) {
+  async function fetchSetLists(withSheets = false, withArchived = false) {
     isLoading.value = true;
     error.value = null;
     
     try {
-      const lists = await getAllSetLists(withSheets);
+      const lists = await getAllSetLists(withSheets, withArchived);
       setLists.value = lists.sort((a, b) => a.order - b.order);
     } catch (err) {
       console.error('Error fetching setlists:', err);

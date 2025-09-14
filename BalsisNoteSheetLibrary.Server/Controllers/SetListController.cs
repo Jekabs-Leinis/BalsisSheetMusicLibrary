@@ -1,4 +1,5 @@
 using BalsisNoteSheetLibrary.Server.DTOs;
+using BalsisNoteSheetLibrary.Server.Helpers;
 using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,12 +13,14 @@ namespace BalsisNoteSheetLibrary.Server.Controllers;
 public class SetListController(AppDbContext context) : ControllerBase
 {
     [HttpGet(Name = "GetAll")]
-    public async Task<BaseResponseDto<IEnumerable<SetListDto>>> GetAll(bool withSheets = false)
+    public async Task<BaseResponseDto<IEnumerable<SetListDto>>> GetAll(bool withSheets = false,
+        bool withArchived = false)
     {
         var query = context.SetLists
-            .OrderBy(list => list.Order)
+            .If(!withArchived, q => q.Where(sl => sl.ArchivedAt == null))
             .Include(list => list.Items)
-            .ThenInclude(item => item.NoteSheet);
+            .ThenInclude(item => item.NoteSheet)
+            .OrderBy(list => list.Order);
 
         var setLists = await query.ToListAsync();
         var result = setLists.Select(sl => SetListDto.FromEntity(sl, withSheets)).ToList();
@@ -44,7 +47,7 @@ public class SetListController(AppDbContext context) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto<string>> Add(SetListDto setListDto)
+    public async Task<BaseResponseDto<string>> Add([FromForm] SetListDto setListDto)
     {
         var setList = new SetList
         {
@@ -73,9 +76,9 @@ public class SetListController(AppDbContext context) : ControllerBase
         return new BaseResponseDto<string>("Set list added");
     }
 
-    [HttpPost("update")]
+    [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto> Update(SetListDto setListDto)
+    public async Task<BaseResponseDto> Update([FromBody] SetListDto setListDto)
     {
         var existingSetList = await context.SetLists
             .Include(sl => sl.Items)
@@ -83,7 +86,7 @@ public class SetListController(AppDbContext context) : ControllerBase
 
         if (existingSetList is null)
         {
-            return new BaseResponseDto( "Set list not found", false);
+            return new BaseResponseDto("Set list not found", false);
         }
 
         // Update main properties
@@ -126,7 +129,24 @@ public class SetListController(AppDbContext context) : ControllerBase
 
         await context.SaveChangesAsync();
 
-        return new BaseResponseDto( "Set list updated");
+        return new BaseResponseDto("Set list updated");
+    }
+
+    public async Task<BaseResponseDto> UpdateOrder([FromForm] SetListDto setListDto)
+    {
+        var existingSetList = await context.SetLists
+            .FirstOrDefaultAsync(sl => sl.Id == setListDto.Id);
+
+        if (existingSetList is null)
+        {
+            return new BaseResponseDto("Set list not found", false);
+        }
+        
+        existingSetList.Order = setListDto.Order;
+        
+        await context.SaveChangesAsync();
+
+        return new BaseResponseDto("Set list order updated");
     }
 
     [HttpDelete("{id:int}")]
@@ -139,6 +159,10 @@ public class SetListController(AppDbContext context) : ControllerBase
         {
             return new BaseResponseDto("Set list not found", false);
         }
+        
+        if (setList.Order.HasValue)
+            await context.SetLists.Where(sl => sl.Order > setList.Order)
+                .ForEachAsync(sl => sl.Order -= 1);
 
         context.SetLists.Remove(setList);
 
@@ -163,6 +187,11 @@ public class SetListController(AppDbContext context) : ControllerBase
         }
 
         setList.ArchivedAt = DateTime.UtcNow;
+        setList.Order = null;
+        
+        await context.SetLists.Where(sl => sl.Order > setList.Order)
+            .ForEachAsync(sl => sl.Order -= 1);
+        
         await context.SaveChangesAsync();
 
         return new BaseResponseDto("Set list archived");
@@ -180,6 +209,8 @@ public class SetListController(AppDbContext context) : ControllerBase
         }
 
         setList.ArchivedAt = null;
+        setList.Order = (uint?)context.SetLists.Count(sl => sl.Order.HasValue);
+        
         await context.SaveChangesAsync();
 
         return new BaseResponseDto("Set list unarchived");

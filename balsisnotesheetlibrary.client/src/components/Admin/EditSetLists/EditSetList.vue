@@ -26,7 +26,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["remove", "updated"]);
+const emit = defineEmits(["remove", "updated", "archive"]);
 
 const { setList, allSheets } = toRefs(props);
 
@@ -102,8 +102,19 @@ const moveSetList = (setListId, newIndex) => {
       >
         <i class="bi bi-arrow-down movement-arrows" />
       </button>
-      <div>
-        <button class="btn btn-sm" @click="$emit('remove')">
+      <div class="d-flex gap-2">
+        <button 
+          class="btn btn-sm btn-outline-secondary" 
+          @click.stop="$emit('archive')"
+          title="Archive setlist"
+        >
+          <i class="bi bi-archive" />
+        </button>
+        <button 
+          class="btn btn-sm btn-outline-danger" 
+          @click.stop="$emit('remove')"
+          title="Delete setlist"
+        >
           <i class="bi bi-trash" />
         </button>
       </div>

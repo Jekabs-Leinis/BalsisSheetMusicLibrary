@@ -6,6 +6,8 @@ import EditSetList from "@/components/Admin/EditSetLists/EditSetList.vue";
 import { VueDraggable } from "vue-draggable-plus";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSetList from "@/components/Admin/EditSetLists/DeleteSetList.vue";
+import { useRouter } from "vue-router";
+import { useToast } from "vue-toastification";
 
 // Initialize stores
 const setListStore = useSetListStore();
@@ -51,7 +53,7 @@ const handleSetListMove = ({ setListId, newIndex }) => {
 
 const handleDraggableMove = ({ newIndex, oldIndex }) => {
   // The draggable component will update the array position automatically,
-  // but it will not update the order field in each set list item.
+  // but we still need to update the order field in each set list item.
   setListStore.reorderLists();
   setListStore.saveSetList(setListStore.setLists[newIndex]);
   setListStore.saveSetList(setListStore.setLists[oldIndex]);
@@ -59,9 +61,24 @@ const handleDraggableMove = ({ newIndex, oldIndex }) => {
 
 const showDeleteModal = ref(false);
 const setListToDelete = ref(null);
+const router = useRouter();
+const toast = useToast();
 const handleSetListDelete = (setList) => {
   setListToDelete.value = setList;
   showDeleteModal.value = true;
+};
+
+const handleSetListArchive = async (setList) => {
+  if (confirm(`Are you sure you want to archive "${setList.title}"?`)) {
+    try {
+      await setListStore.archiveSetList(setList.id);
+      toast.success(`"${setList.title}" has been archived`);
+      router.push('/admin/archive');
+    } catch (error) {
+      console.error('Error archiving setlist:', error);
+      toast.error('Failed to archive setlist');
+    }
+  }
 };
 </script>
 
@@ -107,12 +124,14 @@ const handleSetListDelete = (setList) => {
               v-for="setList in setListStore.setLists"
               :key="setList.id"
               :set-list="setList"
-              :all-sheets="noteSheetStore.noteSheets"
-              :is-loading="noteSheetStore.isLoading"
               :set-list-count="setListStore.setLists.length"
-              @updated="setListStore.saveSetList(setList)"
-              @move="handleSetListMove"
+              :all-sheets="noteSheetStore.noteSheets"
+              :is-loading="setListStore.isLoading"
               @remove="handleSetListDelete(setList)"
+              @archive="handleSetListArchive(setList)"
+              @updated="setListStore.saveSetList"
+              @move="handleSetListMove"
+              class="mb-3"
             />
           </VueDraggable>
 

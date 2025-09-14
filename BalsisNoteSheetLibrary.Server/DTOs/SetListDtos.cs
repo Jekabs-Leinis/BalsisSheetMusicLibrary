@@ -7,6 +7,9 @@ public class SetListDto
     public uint Id { get; set; }
     public string? Title { get; set; } = string.Empty;
     public uint? Order { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public DateTime? ArchivedAt { get; set; }
+    
     public List<SetListItemDto> Items { get; set; } = [];
 
     public static SetListDto FromEntity(SetList entity, bool includeNoteSheets = false)
@@ -19,7 +22,9 @@ public class SetListDto
             Items = entity.Items
                 .OrderBy(i => i.Order)
                 .Select(i => SetListItemDto.FromEntity(i, includeNoteSheets))
-                .ToList()
+                .ToList(),
+            CreatedAt = entity.CreatedAt,
+            ArchivedAt = entity.ArchivedAt
         };
 
         return dto;

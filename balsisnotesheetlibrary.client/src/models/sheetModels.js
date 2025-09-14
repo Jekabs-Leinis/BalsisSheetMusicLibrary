@@ -35,6 +35,14 @@ export class SetList {
 
     this.items = props.items ? props.items.map((item) => new SetListItem(item)) : [];
     
+    if (props.createdAt) {
+      this.createdAt = new Date(props.createdAt);
+    }
+    
+    if (props.archivedAt) {
+      this.archivedAt = new Date(props.archivedAt);
+    }
+    
     // Items are retrieved by insertion order, so we need to sort them by order.
     this.sortItems();
     // In some cases, the order might have a gap, so we regenerate order values.
@@ -49,6 +57,10 @@ export class SetList {
   title;
   /** @type {Number} */
   order;
+  /** @type {Date} */
+  createdAt;
+  /** @type {Date} */
+  archivedAt;
 
   /**
    * @param allNoteSheets {NoteSheet[]}
@@ -75,6 +87,10 @@ export class SetList {
 export class SetListItem {
   constructor(props = {}) {
     Object.assign(this, props);
+    
+    if (props.noteSheet) {
+      this.noteSheet = new NoteSheet(props.noteSheet);
+    }
   }
   
   /** @type {Number} */
@@ -83,4 +99,6 @@ export class SetListItem {
   setListId;
   /** @type {Number} */
   order;
+  /** @type {NoteSheet} */
+  noteSheet;
 }

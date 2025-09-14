@@ -1,21 +1,30 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { getAllSetLists, addSetList, updateSetList, deleteSetList } from '@/api/setListApi';
+import { ref, computed } from 'vue';
+import { 
+  getAllSetLists, 
+  addSetList, 
+  updateSetList, 
+  deleteSetList, 
+  archiveSetList as archiveSetListApi,
+  unarchiveSetList as unarchiveSetListApi,
+} from '@/api/setListApi';
 import { SetList } from '@/models/sheetModels';
 
 export const useSetListStore = defineStore('setlist', () => {
   const setLists = ref([]);
+  const archivedSetLists = computed(() =>
+    setLists.value.filter(list => list.archivedAt)
+      .sort((a, b) => b.archivedAt - a.archivedAt)
+  );
   const isLoading = ref(false);
   const error = ref(null);
-
-  // Get all setlists
-  async function fetchSetLists() {
+  
+  async function fetchSetLists(withSheets = false) {
     isLoading.value = true;
     error.value = null;
     
     try {
-      const lists = await getAllSetLists();
-      // Sort by order property
+      const lists = await getAllSetLists(withSheets);
       setLists.value = lists.sort((a, b) => a.order - b.order);
     } catch (err) {
       console.error('Error fetching setlists:', err);
@@ -25,13 +34,18 @@ export const useSetListStore = defineStore('setlist', () => {
     }
   }
 
-  // Add a new setlist
+  function reorderLists() {
+    setLists.value.forEach((list, index) => {
+      list.order = index;
+    });
+    setLists.value.sort((a, b) => a.order - b.order);
+  }
+  
   async function createSetList(title) {
     isLoading.value = true;
     error.value = null;
     
     try {
-      // Calculate the max order and add 1 for the new setlist
       const maxOrder = setLists.value.length > 0 
         ? Math.max(...setLists.value.map(list => list.order))
         : 0;
@@ -45,7 +59,6 @@ export const useSetListStore = defineStore('setlist', () => {
       const response = await addSetList(newSetList);
       
       if (response.success) {
-        // Add the newly created setlist with server-generated ID to our state
         const createdSetList = new SetList({
           ...newSetList,
           id: response.model.id
@@ -118,22 +131,51 @@ export const useSetListStore = defineStore('setlist', () => {
     setLists.value[newIndex] = firstSetList;
     setLists.value[firstSetList.order] = secondSetList;
     
-    this.reorderLists();
+    reorderLists();
     
     await saveSetList(firstSetList);
     await saveSetList(secondSetList);
     
   }
   
-  function reorderLists() {
-    setLists.value.forEach((list, index) => {
-      list.order = index;
-    });
-    setLists.value.sort((a, b) => a.order - b.order);
+  async function archiveSetList(setListId) {
+    try {
+      await archiveSetListApi(setListId);
+      const index = setLists.value.findIndex(sl => sl.id === setListId);
+      if (index !== -1) {
+        const [archived] = setLists.value.splice(index, 1);
+        archived.archivedAt = new Date().toISOString();
+        archivedSetLists.value.unshift(archived);
+      }
+      return true;
+    } catch (err) {
+      console.error('Error archiving setlist:', err);
+      error.value = 'Failed to archive setlist';
+      throw err;
+    }
+  }
+  
+  async function unarchiveSetList(setListId) {
+    try {
+      await unarchiveSetListApi(setListId);
+      const index = archivedSetLists.value.findIndex(sl => sl.id === setListId);
+      if (index !== -1) {
+        const [unarchived] = archivedSetLists.value.splice(index, 1);
+        unarchived.archivedAt = null;
+        setLists.value.push(unarchived);
+        reorderLists();
+      }
+      return true;
+    } catch (err) {
+      console.error('Error unarchiving setlist:', err);
+      error.value = 'Failed to unarchive setlist';
+      throw err;
+    }
   }
 
   return {
     setLists,
+    archivedSetLists,
     isLoading,
     error,
     fetchSetLists,
@@ -142,5 +184,7 @@ export const useSetListStore = defineStore('setlist', () => {
     removeSetList,
     moveSetList,
     reorderLists,
+    archiveSetList,
+    unarchiveSetList,
   };
 });

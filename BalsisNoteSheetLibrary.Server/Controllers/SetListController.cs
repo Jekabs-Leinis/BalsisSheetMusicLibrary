@@ -47,7 +47,7 @@ public class SetListController(AppDbContext context) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto<string>> Add([FromForm] SetListDto setListDto)
+    public async Task<BaseResponseDto<string>> Add([FromBody] SetListDto setListDto)
     {
         var setList = new SetList
         {
@@ -132,7 +132,7 @@ public class SetListController(AppDbContext context) : ControllerBase
         return new BaseResponseDto("Set list updated");
     }
 
-    public async Task<BaseResponseDto> UpdateOrder([FromForm] SetListDto setListDto)
+    public async Task<BaseResponseDto> UpdateOrder([FromBody] SetListDto setListDto)
     {
         var existingSetList = await context.SetLists
             .FirstOrDefaultAsync(sl => sl.Id == setListDto.Id);

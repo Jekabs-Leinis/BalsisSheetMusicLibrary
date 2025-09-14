@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineProps } from "vue";
+import { computed } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 
 const props = defineProps({

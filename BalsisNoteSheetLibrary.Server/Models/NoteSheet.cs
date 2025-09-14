@@ -6,7 +6,7 @@ namespace BalsisNoteSheetLibrary.Server.Models;
 
 public class NoteSheet
 {
-    public uint? Id { get; set; }
+    public uint Id { get; set; }
     public string? Title { get; set; }
     public string? Author { get; set; }
     public string? Lyricist { get; set; }
@@ -15,7 +15,7 @@ public class NoteSheet
 
     public string? SystemFileName { get; set; }
 
-    public bool? IsLatvian { get; set; } = false;
+    public bool IsLatvian { get; set; } = false;
     
     [JsonIgnore]
     public IEnumerable<SetListItem>? SetListItems { get; set; }

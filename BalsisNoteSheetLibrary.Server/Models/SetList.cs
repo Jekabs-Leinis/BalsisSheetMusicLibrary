@@ -4,7 +4,7 @@ namespace BalsisNoteSheetLibrary.Server.Models;
 
 public class SetList
 {
-    public uint? Id { get; set; }
+    public uint Id { get; set; }
     public string? Title { get; set; }
     public uint? Order { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

@@ -11,7 +11,9 @@ public class SetListItem
     public uint? SetListId { get; set; }
     public uint? NoteSheetId { get; set; }
     public uint? Order { get; set; }
-
-    [JsonIgnore] public SetList? SetList { get; set; }
-    [JsonIgnore] public NoteSheet? NoteSheet { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public SetList? SetList { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public NoteSheet? NoteSheet { get; set; }
 }

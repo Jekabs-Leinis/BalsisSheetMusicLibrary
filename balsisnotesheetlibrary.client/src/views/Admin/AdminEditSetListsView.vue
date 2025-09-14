@@ -17,7 +17,7 @@ const isInitializing = ref(true);
 
 onMounted(async () => {
   await Promise.all([
-    setListStore.fetchSetLists(),
+    setListStore.fetchSetLists(true),
     noteSheetStore.fetchNoteSheets(),
   ])
     .then(() => {
@@ -125,7 +125,6 @@ const handleSetListArchive = async (setList) => {
               :key="setList.id"
               :set-list="setList"
               :set-list-count="setListStore.setLists.length"
-              :all-sheets="noteSheetStore.noteSheets"
               :is-loading="setListStore.isLoading"
               @remove="handleSetListDelete(setList)"
               @archive="handleSetListArchive(setList)"

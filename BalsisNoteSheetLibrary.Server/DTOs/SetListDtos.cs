@@ -4,7 +4,7 @@ namespace BalsisNoteSheetLibrary.Server.DTOs;
 
 public class SetListDto
 {
-    public uint Id { get; set; }
+    public uint? Id { get; set; }
     public string? Title { get; set; } = string.Empty;
     public uint? Order { get; set; }
     public DateTime? CreatedAt { get; set; }
@@ -58,7 +58,7 @@ public class SetListItemDto
 
 public class NoteSheetDto
 {
-    public uint Id { get; set; }
+    public uint? Id { get; set; }
     public string? Title { get; set; } = string.Empty;
     public string? Author { get; set; } = string.Empty;
     public string? Lyricist { get; set; } = string.Empty;

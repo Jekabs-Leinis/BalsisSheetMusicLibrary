@@ -16,10 +16,6 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  allSheets: {
-    type: Array,
-    required: true,
-  },
   isLoading: {
     type: Boolean,
     default: false,
@@ -28,16 +24,16 @@ const props = defineProps({
 
 const emit = defineEmits(["remove", "updated", "archive"]);
 
-const { setList, allSheets } = toRefs(props);
+const { setList } = toRefs(props);
 
 const noteSheetStore = useNoteSheetStore();
 
 // Create a computed prop that's reactive to changes made to the items
 /** @type {SetListItem[]} */
-const itemsList = computed({
+const setListItems = computed({
   get: () => setList.value.items,
   set: (value) => {
-    // itemsList can be modified by draggable or moving
+    // setListItems can be modified by draggable or moving
     setList.value.items = value;
     setList.value.reorderItems();
     emit("updated", setList.value);
@@ -48,30 +44,25 @@ const availableSheets = computed(() => {
   return noteSheetStore.getAvailableNoteSheets(setList.value);
 });
 
-const getSongName = (noteSheetId) => {
-  const sheet = allSheets.value.find((sheet) => sheet.id === noteSheetId);
-  return sheet ? sheet.title : "Unknown Song";
-};
-
 const addSheet = async (sheet) => {
   const item = new SetListItem({
     noteSheetId: sheet.id,
     setListId: setList.value.id,
-    order: itemsList.value.length, // Place at the end of set
+    order: setListItems.value.length, // Place at the end of set
   });
 
   // Have to use explicit assignment to trigger setter
-  itemsList.value = [...itemsList.value, item];
+  setListItems.value = [...setListItems.value, item];
 };
 
 const removeSheet = async (noteSheetId) => {
-  itemsList.value = itemsList.value.filter(
+  setListItems.value = setListItems.value.filter(
     (item) => item.noteSheetId !== noteSheetId,
   );
 };
 
 const moveSheet = async (noteSheetId, order) => {
-  itemsList.value = moveSheetInSetList(setList.value, noteSheetId, order);
+  setListItems.value = moveSheetInSetList(setList.value, noteSheetId, order);
 };
 
 const moveSetList = (setListId, newIndex) => {
@@ -121,15 +112,15 @@ const moveSetList = (setListId, newIndex) => {
     </div>
     <div class="card-body">
       <VueDraggable
-        v-model="itemsList"
+        v-model="setListItems"
         :group="`sheets-${setList.id}`"
         item-key="noteSheetId"
         handle=".sheet-drag-handle"
         class="list-group sheets-list mb-3"
       >
         <div
-          v-for="noteSheet in itemsList"
-          :key="`${setList.id}-${noteSheet.noteSheetId}`"
+          v-for="item in setListItems"
+          :key="`${setList.id}-${item.noteSheetId}`"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
           <div class="d-flex align-items-center flex-grow-1">
@@ -137,32 +128,32 @@ const moveSetList = (setListId, newIndex) => {
               <i class="bi bi-grip-vertical text-muted"></i>
             </span>
             <span>
-              {{ noteSheet.order + 1 }}.
-              {{ getSongName(noteSheet.noteSheetId) }}
+              {{ item.order + 1 }}.
+              {{ item.noteSheet?.getFormattedTitle() || "Nosaukums nav pieejams" }}
             </span>
           </div>
           <button
-            v-if="noteSheet.order > 0"
+            v-if="item.order > 0"
             class="btn btn-sm fs-6"
             :class="[
-              noteSheet.order < itemsList.length - 1
+              item.order < setListItems.length - 1
                 ? 'pe-0'
                 : 'no-down-arrow-padding',
             ]"
-            @click="moveSheet(noteSheet.noteSheetId, noteSheet.order - 1)"
+            @click="moveSheet(item.noteSheetId, item.order - 1)"
           >
             <i class="bi bi-arrow-up movement-arrows" />
           </button>
           <button
-            v-if="noteSheet.order < itemsList.length - 1"
+            v-if="item.order < setListItems.length - 1"
             class="btn btn-sm fs-6"
-            @click="moveSheet(noteSheet.noteSheetId, noteSheet.order + 1)"
+            @click="moveSheet(item.noteSheetId, item.order + 1)"
           >
             <i class="bi bi-arrow-down movement-arrows" />
           </button>
           <button
             class="btn btn-sm btn-close"
-            @click="removeSheet(noteSheet.noteSheetId)"
+            @click="removeSheet(item.noteSheetId)"
           />
         </div>
       </VueDraggable>

@@ -56,22 +56,20 @@ public class SetListController(AppDbContext context) : ControllerBase
         };
 
         context.SetLists.Add(setList);
+
+        // Save set list to get ID for items
         await context.SaveChangesAsync();
 
-        if (setListDto.Items.Any())
-        {
-            foreach (var itemDto in setListDto.Items)
+        foreach (var itemDto in setListDto.Items)
+            context.SetListItems.Add(new SetListItem
             {
-                context.SetListItems.Add(new SetListItem
-                {
-                    SetListId = setList.Id,
-                    NoteSheetId = itemDto.NoteSheetId,
-                    Order = itemDto.Order
-                });
-            }
+                SetListId = setList.Id,
+                NoteSheetId = itemDto.NoteSheetId,
+                Order = itemDto.Order
+            });
 
-            await context.SaveChangesAsync();
-        }
+        await context.SaveChangesAsync();
+
 
         return new BaseResponseDto<string>("Set list added");
     }
@@ -101,10 +99,7 @@ public class SetListController(AppDbContext context) : ControllerBase
             .Where(i => i.NoteSheetId.HasValue && !incomingItemIds.Contains(i.NoteSheetId.Value))
             .ToList();
 
-        foreach (var item in itemsToRemove)
-        {
-            context.SetListItems.Remove(item);
-        }
+        foreach (var item in itemsToRemove) context.SetListItems.Remove(item);
 
         // Update existing and add new items
         foreach (var itemDto in setListDto.Items)
@@ -134,16 +129,58 @@ public class SetListController(AppDbContext context) : ControllerBase
 
     public async Task<BaseResponseDto> UpdateOrder([FromBody] SetListDto setListDto)
     {
-        var existingSetList = await context.SetLists
+        var firstSetList = await context.SetLists
             .FirstOrDefaultAsync(sl => sl.Id == setListDto.Id);
 
-        if (existingSetList is null)
+        if (firstSetList is null)
         {
             return new BaseResponseDto("Set list not found", false);
         }
-        
-        existingSetList.Order = setListDto.Order;
-        
+
+        var secondSetList = await context.SetLists
+            .FirstOrDefaultAsync(sl => sl.Order == setListDto.Order);
+
+        if (secondSetList is not null)
+        {
+            secondSetList.Order = firstSetList.Order;
+        }
+        else
+        {
+            // Something has broken the ordering, fix it
+            // This can happen in situation where multiple clients update the setlist at the same time 
+            // An option would be to send a signal to "other" clients to refresh their state upon an update
+            // but that would still leave room for race conditions, so we just fix it here
+
+            var setLists = await context.SetLists
+                .Where(sl => sl.Order.HasValue)
+                .OrderBy(sl => sl.Order)
+                .ToListAsync();
+
+            for (var i = 0; i < setLists.Count; i++)
+            {
+                setLists[i].Order = (uint?)i;
+            }
+
+            await context.SaveChangesAsync();
+
+            // Try to find the swap target again
+            secondSetList = await context.SetLists
+                .FirstOrDefaultAsync(sl => sl.Order == setListDto.Order);
+
+            if (secondSetList is not null)
+            {
+                secondSetList.Order = firstSetList.Order;
+            }
+            else
+            {
+                // Trying to fix ordering failed, just return
+                // Might be because of a race condition
+                return new BaseResponseDto("Set list order update failed", false);
+            }
+        }
+
+        firstSetList.Order = setListDto.Order;
+
         await context.SaveChangesAsync();
 
         return new BaseResponseDto("Set list order updated");
@@ -159,10 +196,13 @@ public class SetListController(AppDbContext context) : ControllerBase
         {
             return new BaseResponseDto("Set list not found", false);
         }
-        
+
+        // Archived setlists have no order, but can be deleted
         if (setList.Order.HasValue)
+        {
             await context.SetLists.Where(sl => sl.Order > setList.Order)
                 .ForEachAsync(sl => sl.Order -= 1);
+        }
 
         context.SetLists.Remove(setList);
 
@@ -188,10 +228,10 @@ public class SetListController(AppDbContext context) : ControllerBase
 
         setList.ArchivedAt = DateTime.UtcNow;
         setList.Order = null;
-        
+
         await context.SetLists.Where(sl => sl.Order > setList.Order)
             .ForEachAsync(sl => sl.Order -= 1);
-        
+
         await context.SaveChangesAsync();
 
         return new BaseResponseDto("Set list archived");
@@ -210,7 +250,7 @@ public class SetListController(AppDbContext context) : ControllerBase
 
         setList.ArchivedAt = null;
         setList.Order = (uint?)context.SetLists.Count(sl => sl.Order.HasValue);
-        
+
         await context.SaveChangesAsync();
 
         return new BaseResponseDto("Set list unarchived");

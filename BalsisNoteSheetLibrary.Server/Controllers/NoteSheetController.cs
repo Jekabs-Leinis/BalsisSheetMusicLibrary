@@ -1,3 +1,4 @@
+using BalsisNoteSheetLibrary.Server.DTOs;
 using BalsisNoteSheetLibrary.Server.Helpers;
 using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -16,22 +17,23 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
 {
     private static readonly SemaphoreSlim RenameLock = new(1, 1);
 
-    public async Task<AppResponse<IEnumerable<NoteSheet>>> GetAll()
+    public async Task<BaseResponseDto<IEnumerable<NoteSheetDto>>> GetAll()
     {
-        var sheets = await context.NoteSheets.OrderBy(sheet =>
-                EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
-            .ToArrayAsync();
+        var sheets = await context.NoteSheets
+            .OrderBy(sheet => EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
+            .Select(sheet => NoteSheetDto.FromEntity(sheet))
+            .ToListAsync();
 
-        return new AppResponse<IEnumerable<NoteSheet>>(sheets, true);
+        return new BaseResponseDto<IEnumerable<NoteSheetDto>>(sheets);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<AppResponse<NoteSheet?>> Get(uint id)
+    public async Task<BaseResponseDto<NoteSheetDto?>> Get(uint id)
     {
         var sheet = await context.NoteSheets.FindAsync(id);
 
-        return new AppResponse<NoteSheet?>(
-            sheet,
+        return new BaseResponseDto<NoteSheetDto?>(
+            sheet is not null ? NoteSheetDto.FromEntity(sheet) : null,
             sheet is not null,
             sheet is null ? "Note sheet not found" : string.Empty
         );
@@ -39,18 +41,31 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<AppResponse<NoteSheet>> Add([FromForm] NoteSheet noteSheet, IFormFile file)
+    public async Task<BaseResponseDto<NoteSheetDto>> Add([FromForm] CreateNoteSheetDto createDto, IFormFile file)
     {
         if (file.Length == 0)
         {
-            return new AppResponse<NoteSheet>(null, false, "PDF file is required");
+            return new BaseResponseDto<NoteSheetDto>(null, false, "PDF file is required");
         }
 
+        //TODO: check if this can be bypassed. We never want to serve a html file
+        //Old version allowed images. Should we?
         if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
         {
-            return new AppResponse<NoteSheet>(null, false, "Only PDF files are allowed");
+            return new BaseResponseDto<NoteSheetDto>(null, false, "Only PDF files are allowed");
         }
 
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            return new BaseResponseDto<NoteSheetDto>(null, false, string.Join(", ", errors));
+        }
+
+        var noteSheet = createDto.ToEntity();
+        
         // Add the sheet here to get an ID assigned, for filename
         context.NoteSheets.Add(noteSheet);
         await context.SaveChangesAsync();
@@ -71,18 +86,27 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
         noteSheet.SystemFileName = systemFileName;
         await context.SaveChangesAsync();
 
-        return new AppResponse<NoteSheet>(noteSheet, true);
+        return new BaseResponseDto<NoteSheetDto>(NoteSheetDto.FromEntity(noteSheet));
     }
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<AppResponse<NoteSheet>> Update([FromForm] NoteSheet noteSheet, IFormFile? file)
+    public async Task<BaseResponseDto<NoteSheetDto>> Update([FromForm] UpdateNoteSheetDto updateDto, IFormFile? file)
     {
-        var sheet = await context.NoteSheets.FindAsync(noteSheet.Id);
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage)
+                .ToList();
+            return new BaseResponseDto<NoteSheetDto>(null, false, string.Join(", ", errors));
+        }
+
+        var sheet = await context.NoteSheets.FindAsync(updateDto.Id);
 
         if (sheet is null)
         {
-            return new AppResponse<NoteSheet>(null, false, "Note sheet not found");
+            return new BaseResponseDto<NoteSheetDto>(null, false, "Note sheet not found");
         }
 
         var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
@@ -92,9 +116,8 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
         {
             if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
             {
-                return new AppResponse<NoteSheet>(null, false, "Only PDF files are allowed");
+                return new BaseResponseDto<NoteSheetDto>(null, false, "Only PDF files are allowed");
             }
-
 
             // Delete the old file if it exists
             if (System.IO.File.Exists(oldFilePath))
@@ -105,11 +128,13 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                 }
                 catch (Exception ex)
                 {
+                    //TODO: propper logging
+                    //Old file missing? How?
                     Console.WriteLine($"Error deleting old file: {ex.Message}");
                 }
             }
             
-            var newFileName = GenerateFileName(noteSheet) + ".pdf";
+            var newFileName = GenerateFileName(sheet) + ".pdf";
             var newSystemFileName = $"{sheet.Id}_{newFileName}";
             var newFilePath = Path.Combine(sheetsFolder, newSystemFileName);
 
@@ -118,8 +143,8 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                 await file.CopyToAsync(fileStream);
             }
 
-            noteSheet.Filename = newFileName;
-            noteSheet.SystemFileName = newSystemFileName;
+            sheet.Filename = newFileName;
+            sheet.SystemFileName = newSystemFileName;
         }
         else
         {
@@ -131,38 +156,38 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                     // The previous version allowed any file extension, so we need to preserve it
                     // A future update could standardize all files to .pdf
                     var extension = Path.GetExtension(oldFilePath);
-                    var newFileName = GenerateFileName(noteSheet) + extension;
+                    var newFileName = GenerateFileName(sheet) + extension;
                     var newSystemFileName = $"{sheet.Id}_{newFileName}";
                     var newFilePath = Path.Combine(sheetsFolder, newSystemFileName);
                     System.IO.File.Move(oldFilePath, newFilePath, overwrite: true);
-                    noteSheet.SystemFileName = newSystemFileName;
-                    noteSheet.Filename = newFileName;
+                    sheet.SystemFileName = newSystemFileName;
+                    sheet.Filename = newFileName;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error renaming file: {ex.Message}");
-                    return new AppResponse<NoteSheet>(null, false, $"Error renaming file: {ex.Message}");
+                    return new BaseResponseDto<NoteSheetDto>(null, false, $"Error renaming file: {ex.Message}");
                 }
             }
             else
             {
-                // TODO: file missing - what to do?
+                // TODO: no new file provided, but old file missing - what to do?
                 // For now, just clear the filename fields as they are no longer valid
                 // and to prevent user provided data from being saved
-                noteSheet.SystemFileName = string.Empty;
-                noteSheet.Filename = string.Empty;
+                sheet.SystemFileName = string.Empty;
+                sheet.Filename = string.Empty;
             }
         }
 
-        context.Entry(sheet).CurrentValues.SetValues(noteSheet);
+        updateDto.UpdateEntity(sheet);
         await context.SaveChangesAsync();
 
-        return new AppResponse<NoteSheet>(sheet, true);
+        return new BaseResponseDto<NoteSheetDto>(NoteSheetDto.FromEntity(sheet));
     }
 
     private static string GenerateFileName(NoteSheet sheet)
     {
-        var nameParts = new List<string> { CleanFileName(sheet.Title ?? "MISSING_TITLE") };
+        var nameParts = new List<string> { CleanFileName(sheet.Title ?? "MISSING TITLE") };
 
         if (!string.IsNullOrWhiteSpace(sheet.Author))
         {
@@ -188,7 +213,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             fileName = fileName[..200];
         }
 
-        return fileName;
+        return CleanFileName(fileName);
     }
 
     private static string CleanFileName(string input)
@@ -205,13 +230,13 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = Role.Admin)]
-    public async Task<AppResponse<string>> Delete(uint id)
+    public async Task<BaseResponseDto> Delete(uint id)
     {
         var sheet = await context.NoteSheets.FindAsync(id);
 
         if (sheet is null)
         {
-            return new AppResponse<string>(null, false, "Note sheet not found");
+            return new BaseResponseDto("Note sheet not found", false);
         }
 
         var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
@@ -223,16 +248,18 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             {
                 System.IO.File.Delete(filePath);
             }
-            catch
+            catch (Exception ex)
             {
-                // TODO: figure out what to do if file deletion fails
+                Console.WriteLine($"Error deleting file: {ex.Message}");
+                //TODO: do not report db exceptions
+                return new BaseResponseDto($"Error deleting file: {ex.Message}", false);
             }
         }
 
         context.NoteSheets.Remove(sheet);
         await context.SaveChangesAsync();
 
-        return new AppResponse<string>("Note sheet deleted", true);
+        return new BaseResponseDto("Note sheet deleted successfully");
     }
 
     [HttpPost]
@@ -241,7 +268,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
     {
         if (!await RenameLock.WaitAsync(0))
         {
-            return Conflict(new AppResponse<string>(null, false, "A rename process is already running."));
+            return Conflict(new BaseResponseDto("A rename process is already running.", false));
         }
 
         _ = Task.Run(async () =>
@@ -275,7 +302,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                         // A future update could remove this fallback
                         var altPath = Path.Combine(sheetsFolder, sheet.Filename ?? string.Empty);
                         var newPath = Path.Combine(sheetsFolder, newSystemFileName);
-                        bool renamed = false;
+                        var isFileRenamed = false;
                         var fileToMove = System.IO.File.Exists(oldPath) ? oldPath :
                             System.IO.File.Exists(altPath) ? altPath : null;
 
@@ -284,7 +311,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                             try
                             {
                                 System.IO.File.Move(fileToMove, newPath, overwrite: true);
-                                renamed = true;
+                                isFileRenamed = true;
                             }
                             catch (Exception ex)
                             {
@@ -297,7 +324,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                             }
                         }
 
-                        if (renamed)
+                        if (isFileRenamed)
                         {
                             sheet.Filename = newFileName;
                             sheet.SystemFileName = newSystemFileName;
@@ -305,7 +332,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                             await scopedContext.SaveChangesAsync();
                         }
 
-                        if (current > 0 && current % 100 == 0)
+                        if ((current > 0 && current % 100 == 0) || current == total)
                         {
                             await scopedRenameHub.Clients.All.SendAsync("status",
                                 new { status = "progress", current, total, message = $"Renamed {current}/{total}" });
@@ -323,15 +350,15 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             }
             catch (Exception ex)
             {
+                //TODO: sometimes, service injection fails. Need to investigate
                 Console.WriteLine($"Unexpected error in rename process: {ex.Message}");
             }
             finally
             {
                 RenameLock.Release();
-                Console.WriteLine("Rename process finished.");
             }
         });
 
-        return Ok(new AppResponse<string>(null, true));
+        return Ok(new BaseResponseDto("Rename process started in the background"));
     }
 }

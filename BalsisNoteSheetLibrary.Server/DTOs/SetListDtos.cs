@@ -56,25 +56,3 @@ public class SetListItemDto
     }
 }
 
-public class NoteSheetDto
-{
-    public uint? Id { get; set; }
-    public string? Title { get; set; } = string.Empty;
-    public string? Author { get; set; } = string.Empty;
-    public string? Lyricist { get; set; } = string.Empty;
-    public uint? Year { get; set; }
-    public bool IsLatvian { get; set; }
-
-    public static NoteSheetDto FromEntity(NoteSheet entity)
-    {
-        return new NoteSheetDto
-        {
-            Id = entity.Id,
-            Title = entity.Title,
-            Author = entity.Author,
-            Lyricist = entity.Lyricist,
-            Year = entity.Year,
-            IsLatvian = entity.IsLatvian,
-        };
-    }
-}

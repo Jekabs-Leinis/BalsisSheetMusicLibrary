@@ -109,6 +109,9 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
             return new BaseResponseDto<NoteSheetDto>(null, false, "Note sheet not found");
         }
 
+        // Has to be done before file operations, to correctly generate the filename for the new file
+        updateDto.UpdateEntity(sheet);
+        
         var sheetsFolder = Path.Combine(env.ContentRootPath, "Static", "Sheets");
         var oldFilePath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
 
@@ -178,8 +181,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
                 sheet.Filename = string.Empty;
             }
         }
-
-        updateDto.UpdateEntity(sheet);
+        
         await context.SaveChangesAsync();
 
         return new BaseResponseDto<NoteSheetDto>(NoteSheetDto.FromEntity(sheet));

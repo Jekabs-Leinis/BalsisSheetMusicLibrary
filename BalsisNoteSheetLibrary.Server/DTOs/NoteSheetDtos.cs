@@ -75,7 +75,7 @@ public class UpdateNoteSheetDto
     [StringLength(100, ErrorMessage = "Lyricist cannot be longer than 100 characters")]
     public string? Lyricist { get; set; }
 
-    [Range(1000, 2100, ErrorMessage = "Year must be between 1000 and 2100")]
+    [Range(0, int.MaxValue, ErrorMessage = "Year must be between 0 and 2147483647")]
     public uint? Year { get; set; }
 
     public bool IsLatvian { get; set; }

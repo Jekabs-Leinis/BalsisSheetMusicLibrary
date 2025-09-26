@@ -38,6 +38,16 @@ export async function updateSetList(setList) {
   return response.data;
 }
 
+export async function updateSetListOrder(setList) {
+  const response = await axios.post("/api/setList/updateOrder", setList);
+
+  if (!response.data.success) {
+    throw Error(response.data.message || "Failed to update set list order");
+  }
+
+  return response.data;
+}
+
 export async function deleteSetList(setListId) {
   const response = await axios.delete(`/api/setList/delete/${setListId}`);
 

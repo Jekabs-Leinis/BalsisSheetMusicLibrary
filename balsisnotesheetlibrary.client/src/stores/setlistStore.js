@@ -7,6 +7,7 @@ import {
   deleteSetList, 
   archiveSetList as archiveSetListApi,
   unarchiveSetList as unarchiveSetListApi,
+  updateSetListOrder as updateSetListOrderApi
 } from '@/api/setListApi';
 import { SetList } from '@/models/sheetModels';
 
@@ -100,6 +101,24 @@ export const useSetListStore = defineStore('setlist', () => {
     }
   }
   
+  async function updateSetListOrder(setList) {
+    isLoading.value = true;
+    error.value = null;
+    
+    try {
+      const response = await updateSetListOrderApi(setList);
+      
+      if (!response.success) {
+        error.value = response.error || 'Failed to update setlist order';
+      }
+    } catch (err) {
+      console.error('Error updating setlist order:', err);
+      error.value = 'Failed to update setlist order';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
   async function removeSetList(setListId) {
     isLoading.value = true;
     error.value = null;
@@ -133,9 +152,12 @@ export const useSetListStore = defineStore('setlist', () => {
     
     reorderLists();
     
-    await saveSetList(firstSetList);
-    await saveSetList(secondSetList);
-    
+    try {
+      await updateSetListOrder(firstSetList);
+    } catch (err) {
+      console.error('Error updating setlist order:', err);
+      error.value = 'Failed to update setlist order';
+    }
   }
   
   async function archiveSetList(setListId) {

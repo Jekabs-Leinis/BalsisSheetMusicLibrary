@@ -10,14 +10,11 @@ import {
   updateSetListOrder as updateSetListOrderApi,
 } from "@/api/setListApi";
 import { SetList } from "@/models/sheetModels";
+import { reorderSetLists } from "@/services/setListServices";
 
 export const useSetListStore = defineStore("setlist", () => {
   const setLists = ref([]);
-  const archivedSetLists = computed(() =>
-    setLists.value
-      .filter((list) => list.archivedAt)
-      .sort((a, b) => b.archivedAt - a.archivedAt),
-  );
+  const archivedSetLists = ref([]);
   const isLoading = ref(false);
   const error = ref(null);
 
@@ -27,20 +24,18 @@ export const useSetListStore = defineStore("setlist", () => {
 
     try {
       const lists = await getAllSetLists(withSheets, withArchived);
-      setLists.value = lists.sort((a, b) => a.order - b.order);
+      setLists.value = lists
+        .filter((l) => !l.archivedAt)
+        .sort((a, b) => a.order - b.order);
+      archivedSetLists.value = lists
+        .filter((l) => l.archivedAt)
+        .sort((a, b) => b.archivedAt - a.archivedAt);
     } catch (err) {
       console.error("Error fetching setlists:", err);
       error.value = "Failed to load setlists";
     } finally {
       isLoading.value = false;
     }
-  }
-
-  function reorderLists() {
-    setLists.value.forEach((list, index) => {
-      list.order = index;
-    });
-    setLists.value.sort((a, b) => a.order - b.order);
   }
 
   async function createSetList(title) {
@@ -62,6 +57,7 @@ export const useSetListStore = defineStore("setlist", () => {
       const createdSetList = await addSetList(newSetList);
 
       setLists.value.push(createdSetList);
+      reorderSetLists(setLists.value);
     } catch (err) {
       console.error("Error creating setlist:", err);
       error.value = err.message || "Failed to create setlist";
@@ -134,7 +130,7 @@ export const useSetListStore = defineStore("setlist", () => {
     setLists.value[newIndex] = firstSetList;
     setLists.value[firstSetList.order] = secondSetList;
 
-    reorderLists();
+    reorderSetLists(setLists.value);
 
     try {
       await updateSetListOrder(firstSetList);
@@ -171,7 +167,7 @@ export const useSetListStore = defineStore("setlist", () => {
         const [unarchived] = archivedSetLists.value.splice(index, 1);
         unarchived.archivedAt = null;
         setLists.value.push(unarchived);
-        reorderLists();
+        reorderSetLists(setLists.value);
       }
       return true;
     } catch (err) {
@@ -191,7 +187,6 @@ export const useSetListStore = defineStore("setlist", () => {
     saveSetList,
     removeSetList,
     moveSetList,
-    reorderLists,
     archiveSetList,
     unarchiveSetList,
   };

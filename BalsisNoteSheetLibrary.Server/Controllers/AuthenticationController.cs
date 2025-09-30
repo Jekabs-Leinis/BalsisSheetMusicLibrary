@@ -1,4 +1,5 @@
-﻿using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.DTOs;
+using BalsisNoteSheetLibrary.Server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -11,71 +12,85 @@ public class AuthenticationController(
     SignInManager<IdentityUser> signInManager
 ) : ControllerBase
 {
-    public record UserDto(string Id, string? UserName, bool IsAdmin);
-
-    public record LoginForm(string UserName, string Password);
-
     [HttpPost]
     [AllowAnonymous]
-    public async Task<AppResponse<UserDto>> Login(LoginForm input)
+    public async Task<BaseResponseDto<LoginResponseDto>> Login(LoginRequestDto loginDto)
     {
         if (!ModelState.IsValid)
         {
-            return new AppResponse<UserDto>(null, false, "Invalid email or password");
+            var errors = string.Join(", ", ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage));
+            return new BaseResponseDto<LoginResponseDto>(null, false, errors);
         }
 
-        var identityUser = await signInManager.UserManager.FindByNameAsync(input.UserName);
+        var identityUser = await signInManager.UserManager.FindByNameAsync(loginDto.UserName);
 
         if (identityUser == null)
         {
-            return new AppResponse<UserDto>(null, false, "Invalid email or password");
+            return new BaseResponseDto<LoginResponseDto>(null, false, "Invalid username or password");
         }
 
-        var result =
-            await signInManager.PasswordSignInAsync(identityUser, input.Password, true, lockoutOnFailure: false);
+        var result = await signInManager.PasswordSignInAsync(
+            identityUser,
+            loginDto.Password,
+            isPersistent: true,
+            lockoutOnFailure: false);
 
         if (!result.Succeeded)
         {
-            return new AppResponse<UserDto>(null, false, "Invalid email or password");
+            return new BaseResponseDto<LoginResponseDto>(null, false, "Invalid username or password");
         }
 
         var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, Role.Admin);
 
-        return new AppResponse<UserDto>(new UserDto(identityUser.Id, identityUser.Email, isAdmin), true);
+        var response = new LoginResponseDto
+        {
+            Id = identityUser.Id,
+            UserName = identityUser.UserName,
+            IsAdmin = isAdmin
+        };
 
+        return new BaseResponseDto<LoginResponseDto>(response);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Logout()
+    public async Task<BaseResponseDto> Logout()
     {
         await signInManager.SignOutAsync();
-        return Ok(new { Success = true, Message = "User logged out successfully!" });
+        return new BaseResponseDto("User logged out successfully");
     }
 
     [HttpPost]
-    public async Task<IActionResult> ChangePassword(string username, string newPassword)
+    public async Task<BaseResponseDto> ChangePassword(ChangePasswordRequestDto changePasswordDto)
     {
-        if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(newPassword))
+        if (!ModelState.IsValid)
         {
-            return BadRequest("Username and new password must be provided.");
+            var errors = string.Join(", ", ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage));
+            return new BaseResponseDto(errors, false);
         }
 
-        var user = await signInManager.UserManager.FindByNameAsync(username);
+        var user = await signInManager.UserManager.FindByNameAsync(changePasswordDto.UserName);
+
         if (user == null)
         {
-            return NotFound("User not found.");
+            return new BaseResponseDto("User not found", false);
         }
 
         var resetToken = await signInManager.UserManager.GeneratePasswordResetTokenAsync(user);
-        var result = await signInManager.UserManager.ResetPasswordAsync(user, resetToken, newPassword);
+        var result = await signInManager.UserManager.ResetPasswordAsync(
+            user,
+            resetToken,
+            changePasswordDto.NewPassword);
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
         {
-            return Ok("Password changed successfully.");
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            return new BaseResponseDto($"Failed to change password: {errors}", false);
         }
 
-        return BadRequest("Failed to change password: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+        return new BaseResponseDto("Password changed successfully");
     }
-
 }
-

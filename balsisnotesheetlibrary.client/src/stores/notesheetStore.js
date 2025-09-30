@@ -2,6 +2,11 @@ import { defineStore } from "pinia";
 import { ref, computed } from "vue";
 import { getAllNoteSheets } from "@/api/noteSheetApi";
 import { SortDirection } from "@/models/utilModels";
+import {
+  filterAndSortNoteSheets,
+  filterLatvianNoteSheets,
+  filterForeignNoteSheets,
+} from "@/services/noteSheetService";
 
 export const useNoteSheetStore = defineStore("notesheet", () => {
   const noteSheets = ref([]);
@@ -10,9 +15,6 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
   const searchQuery = ref("");
   const sortField = ref("title");
   const sortDirection = ref(SortDirection.ASC);
-
-  // Latvian language collator for proper diacritic sorting
-  const latvianCollator = new Intl.Collator("lv-LV");
 
   async function fetchNoteSheets() {
     isLoading.value = true;
@@ -27,18 +29,6 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
       isLoading.value = false;
     }
   }
-
-  const getAvailableNoteSheets = (setList) => {
-    if (!setList) return noteSheets.value;
-
-    const setListNoteSheetIds = new Set(
-      setList.items.map((item) => item.noteSheetId),
-    );
-
-    return noteSheets.value.filter(
-      (sheet) => !setListNoteSheetIds.has(sheet.id),
-    );
-  };
 
   function setSearchQuery(query) {
     searchQuery.value = query.toLowerCase().trim();
@@ -57,66 +47,30 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
       sortDirection.value = SortDirection.ASC;
     }
   }
-  
+
   function setSortDirection(direction) {
     if (direction !== SortDirection.ASC && direction !== SortDirection.DESC) {
       throw new Error("Invalid sort direction");
     }
-    
+
     sortDirection.value = direction;
   }
 
-  const filteredNoteSheets = computed(() => {
-    let filtered = [];
-    let query = searchQuery.value.trim().toLowerCase();
-
-    // First filter by search query
-    if (!query) {
-      // Copy to prevert sorting
-      filtered = [...noteSheets.value];
-    } else {
-      filtered = noteSheets.value.filter((sheet) =>
-        sheet.getFormattedTitle().toLowerCase().includes(query),
-      );
-    }
-
-    // Then sort the filtered results
-    return filtered.sort((a, b) => {
-      let valA = a[sortField.value];
-      let valB = b[sortField.value];
-
-      const isEmptyA = valA === null || valA === undefined || valA === "";
-      const isEmptyB = valB === null || valB === undefined || valB === "";
-
-      // Always place empty values at the bottom regardless of sort direction
-      if (isEmptyA && !isEmptyB) return 1;
-      if (!isEmptyA && isEmptyB) return -1;
-      if (isEmptyA && isEmptyB) return 0;
-
-      // Both values are non-empty, proceed with normal comparison
-      if (typeof valA === "string" && typeof valB === "string") {
-        // Use Latvian collator for string comparison to properly handle diacritics
-        const comparisonResult = latvianCollator.compare(valA, valB);
-        return sortDirection.value === SortDirection.ASC
-          ? comparisonResult
-          : -comparisonResult;
-      }
-
-      // For non-string values, use standard comparison
-      if (sortDirection.value === SortDirection.ASC) {
-        return valA < valB ? -1 : valA > valB ? 1 : 0;
-      } else {
-        return valA > valB ? -1 : valA < valB ? 1 : 0;
-      }
-    });
-  });
+  const filteredNoteSheets = computed(() =>
+    filterAndSortNoteSheets(
+      noteSheets.value,
+      searchQuery.value,
+      sortField.value,
+      sortDirection.value,
+    ),
+  );
 
   const filteredLatvianNoteSheets = computed(() =>
-    filteredNoteSheets.value.filter((sheet) => sheet.isLatvian),
+    filterLatvianNoteSheets(filteredNoteSheets.value),
   );
 
   const filteredForeignNoteSheets = computed(() =>
-    filteredNoteSheets.value.filter((sheet) => !sheet.isLatvian),
+    filterForeignNoteSheets(filteredNoteSheets.value),
   );
 
   return {
@@ -130,7 +84,6 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     filteredLatvianNoteSheets,
     filteredForeignNoteSheets,
     fetchNoteSheets,
-    getAvailableNoteSheets,
     setSearchQuery,
     setSortField,
     setSortDirection,

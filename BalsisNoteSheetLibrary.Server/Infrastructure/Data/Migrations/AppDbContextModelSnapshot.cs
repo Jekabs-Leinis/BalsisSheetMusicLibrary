@@ -46,7 +46,7 @@ namespace BalsisNoteSheetLibrary.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NoteSheets");
+                    b.ToTable("NoteSheets", (string)null);
                 });
 
             modelBuilder.Entity("BalsisNoteSheetLibrary.Server.Models.SetList", b =>
@@ -69,7 +69,7 @@ namespace BalsisNoteSheetLibrary.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SetLists");
+                    b.ToTable("SetLists", (string)null);
                 });
 
             modelBuilder.Entity("BalsisNoteSheetLibrary.Server.Models.SetListItem", b =>
@@ -87,7 +87,7 @@ namespace BalsisNoteSheetLibrary.Server.Migrations
 
                     b.HasIndex("NoteSheetId");
 
-                    b.ToTable("SetListItems");
+                    b.ToTable("SetListItems", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

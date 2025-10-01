@@ -2,7 +2,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace BalsisNoteSheetLibrary.Server.Models;
+namespace BalsisNoteSheetLibrary.Server.Domain.Entities;
 
 public class NoteSheet
 {

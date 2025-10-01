@@ -1,7 +1,7 @@
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
-namespace BalsisNoteSheetLibrary.Server.Helpers;
+namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Seeders;
 
 public static class RoleSeeder
 {

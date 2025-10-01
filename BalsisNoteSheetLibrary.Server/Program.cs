@@ -1,7 +1,7 @@
 using System.Net;
-using BalsisNoteSheetLibrary.Server.Controllers;
-using BalsisNoteSheetLibrary.Server.Helpers;
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Api.Controllers;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Seeders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

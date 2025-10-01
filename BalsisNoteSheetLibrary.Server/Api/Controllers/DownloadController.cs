@@ -1,10 +1,11 @@
-using BalsisNoteSheetLibrary.Server.DTOs;
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Application.DTOs;
+using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BalsisNoteSheetLibrary.Server.Controllers;
+namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

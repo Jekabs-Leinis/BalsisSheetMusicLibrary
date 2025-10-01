@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BalsisNoteSheetLibrary.Server.DTOs;
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs;
 
 public class DownloadRequestDto
 {

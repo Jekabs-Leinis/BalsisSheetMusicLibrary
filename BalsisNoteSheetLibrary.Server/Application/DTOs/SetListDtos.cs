@@ -1,6 +1,6 @@
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BalsisNoteSheetLibrary.Server.DTOs;
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs;
 
 public class SetListDto
 {

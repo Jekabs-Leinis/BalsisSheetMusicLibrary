@@ -1,4 +1,4 @@
-namespace BalsisNoteSheetLibrary.Server.DTOs;
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs;
 
 public class BaseResponseDto<T>(T? data, bool success = true, string? message = null)
 {

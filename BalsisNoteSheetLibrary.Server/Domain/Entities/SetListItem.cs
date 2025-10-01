@@ -3,7 +3,7 @@
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace BalsisNoteSheetLibrary.Server.Models;
+namespace BalsisNoteSheetLibrary.Server.Domain.Entities;
 
 [PrimaryKey(nameof(SetListId), nameof(NoteSheetId))]
 public class SetListItem

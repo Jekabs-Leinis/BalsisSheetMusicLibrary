@@ -25,7 +25,7 @@ using System.Text;
  * limitations under the License.
  */
 
-namespace BalsisNoteSheetLibrary.Server.Helpers;
+namespace BalsisNoteSheetLibrary.Server.Application.Extensions;
 
 /// <summary>
 /// This class converts alphabetic, numeric, and symbolic Unicode characters

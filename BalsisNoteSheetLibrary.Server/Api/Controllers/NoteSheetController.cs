@@ -1,18 +1,20 @@
-using BalsisNoteSheetLibrary.Server.DTOs;
-using BalsisNoteSheetLibrary.Server.Helpers;
-using BalsisNoteSheetLibrary.Server.Models;
+using System.Text.RegularExpressions;
+using BalsisNoteSheetLibrary.Server.Application.DTOs;
+using BalsisNoteSheetLibrary.Server.Domain.Entities;
+using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.SignalR;
-using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
 
-namespace BalsisNoteSheetLibrary.Server.Controllers;
+namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, IServiceProvider sp)
+public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, IServiceProvider serviceProvider)
     : ControllerBase
 {
     private static readonly SemaphoreSlim RenameLock = new(1, 1);
@@ -22,6 +24,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
         var sheets = await context.NoteSheets
             .OrderBy(sheet => EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
             .Select(sheet => NoteSheetDto.FromEntity(sheet))
+            .AsNoTracking()
             .ToListAsync();
 
         return new BaseResponseDto<IEnumerable<NoteSheetDto>>(sheets);
@@ -277,7 +280,7 @@ public class NoteSheetController(AppDbContext context, IWebHostEnvironment env, 
         {
             try
             {
-                using var scope = sp.CreateScope();
+                await using var scope = serviceProvider.CreateAsyncScope();
                 var scopedContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var scopedRenameHub = scope.ServiceProvider.GetRequiredService<IHubContext<StatusHub>>();
                 var scopedEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();

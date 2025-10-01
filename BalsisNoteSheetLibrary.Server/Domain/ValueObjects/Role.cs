@@ -1,4 +1,4 @@
-namespace BalsisNoteSheetLibrary.Server.Models;
+namespace BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 
 public static class Role
 {

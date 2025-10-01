@@ -1,11 +1,13 @@
-using BalsisNoteSheetLibrary.Server.DTOs;
-using BalsisNoteSheetLibrary.Server.Helpers;
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Application.DTOs;
+using BalsisNoteSheetLibrary.Server.Domain.Entities;
+using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace BalsisNoteSheetLibrary.Server.Controllers;
+namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
@@ -20,7 +22,8 @@ public class SetListController(AppDbContext context) : ControllerBase
             .If(!withArchived, q => q.Where(sl => sl.ArchivedAt == null))
             .Include(list => list.Items)
             .ThenInclude(item => item.NoteSheet)
-            .OrderBy(list => list.Order);
+            .OrderBy(list => list.Order)
+            .AsNoTracking();
 
         var setLists = await query.ToListAsync();
         var result = setLists.Select(sl => SetListDto.FromEntity(sl, withSheets)).ToList();
@@ -34,6 +37,7 @@ public class SetListController(AppDbContext context) : ControllerBase
         var setList = await context.SetLists
             .Include(sl => sl.Items)
             .ThenInclude(i => i.NoteSheet)
+            .AsNoTracking()
             .FirstOrDefaultAsync(sl => sl.Id == id);
 
         if (setList == null)

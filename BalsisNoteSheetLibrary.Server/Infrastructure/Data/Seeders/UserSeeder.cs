@@ -1,10 +1,7 @@
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Threading.Tasks;
 
-namespace BalsisNoteSheetLibrary.Server.Helpers;
+namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Seeders;
 
 public static class UserSeeder
 {

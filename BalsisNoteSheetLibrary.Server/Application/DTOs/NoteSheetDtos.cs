@@ -1,7 +1,7 @@
-using BalsisNoteSheetLibrary.Server.Models;
 using System.ComponentModel.DataAnnotations;
+using BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BalsisNoteSheetLibrary.Server.DTOs;
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs;
 
 public class NoteSheetDto
 {

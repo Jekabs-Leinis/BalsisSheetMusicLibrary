@@ -1,9 +1,8 @@
 using System.Globalization;
-using BalsisNoteSheetLibrary.Server.Models;
+using BalsisNoteSheetLibrary.Server.Application.Extensions;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 
-namespace BalsisNoteSheetLibrary.Server.Helpers;
+namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 
 public abstract class SqliteExtensions
 {

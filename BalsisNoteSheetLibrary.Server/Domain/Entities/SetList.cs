@@ -1,6 +1,6 @@
 // ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
 
-namespace BalsisNoteSheetLibrary.Server.Models;
+namespace BalsisNoteSheetLibrary.Server.Domain.Entities;
 
 public class SetList
 {

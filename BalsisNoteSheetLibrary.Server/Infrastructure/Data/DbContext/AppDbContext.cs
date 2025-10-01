@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using System.Data;
+using BalsisNoteSheetLibrary.Server.Domain.Entities;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.Sqlite; // Add this
-using BalsisNoteSheetLibrary.Server.Helpers; // Add this
-using System.Data; // Add this for ConnectionState
 
-namespace BalsisNoteSheetLibrary.Server.Models
+namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext
 {
     public class AppDbContext : IdentityDbContext
     {

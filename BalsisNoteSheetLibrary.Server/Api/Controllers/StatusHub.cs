@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace BalsisNoteSheetLibrary.Server.Controllers;
+namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 public class StatusHub : Hub
 {

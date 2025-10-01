@@ -1,6 +1,6 @@
-namespace BalsisNoteSheetLibrary.Server.Helpers;
+namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 
-public static class LinqHelpers
+public static class LinqExtensions
 {
     public static IQueryable<T> If<T>(
         this IQueryable<T> query, 

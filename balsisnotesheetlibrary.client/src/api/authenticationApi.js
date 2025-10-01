@@ -1,20 +1,25 @@
 import axios from "axios";
 import { User } from "@/models/userModels";
+import { BaseDto } from "@/models/commonModels.js";
 
 export async function login(userName, password) {
-  const response = await axios.post("/api/authentication/login", { userName, password });
-  if (!response.data.success) {
-    throw new Error(response.data.error || "Login failed");
+  const response = BaseDto.fromResponse(
+    await axios.post("/api/authentication/login", { userName, password }),
+  );
+  if (!response.success) {
+    throw new Error(response.message || "Login failed");
   }
 
-  return new User(response.data.model);
+  return new User(response.data);
 }
 
 export async function logout() {
-  const response = await axios.post("/api/authentication/logout");
+  const response = BaseDto.fromResponse(
+    await axios.post("/api/authentication/logout"),
+  );
 
-  if (!response.data.success) {
-    throw new Error(response.data.error || "Logout failed");
+  if (!response.success) {
+    throw new Error(response.message || "Logout failed");
   }
 
   return response.data;

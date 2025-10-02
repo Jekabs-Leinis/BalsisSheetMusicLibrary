@@ -11,7 +11,7 @@ public class NoteSheet
     public string? Author { get; set; }
     public string? Lyricist { get; set; }
     public uint? Year { get; set; }
-    public string? Filename { get; set; }
+    public string? FileName { get; set; }
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; } = false;
     

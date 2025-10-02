@@ -32,16 +32,16 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
         var path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.SystemFileName ?? string.Empty);
         if (System.IO.File.Exists(path))
         {
-            return PhysicalFile(path, "application/octet-stream", sheet.Filename);
+            return PhysicalFile(path, "application/octet-stream", sheet.FileName);
         }
 
         // Fallback to Filename (legacy support)
-        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.Filename ?? string.Empty);
+        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.FileName ?? string.Empty);
         if (!System.IO.File.Exists(path))
         {
             return NotFound(new BaseResponseDto("File not found on server.", false));
         }
 
-        return PhysicalFile(path, "application/octet-stream", sheet.Filename);
+        return PhysicalFile(path, "application/octet-stream", sheet.FileName);
     }
 }

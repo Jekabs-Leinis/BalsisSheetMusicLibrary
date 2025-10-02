@@ -1,7 +1,13 @@
 using System.Net;
 using BalsisNoteSheetLibrary.Server.Api.Controllers;
+using BalsisNoteSheetLibrary.Server.Application.Interfaces;
+using BalsisNoteSheetLibrary.Server.Application.Services;
+using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Seeders;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Services;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -101,6 +107,13 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddSignalR();
+
+builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+builder.Services.AddScoped<INoteSheetRepository, NoteSheetRepository>();
+builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
+builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
+
+
 
 var app = builder.Build();
 

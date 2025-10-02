@@ -35,7 +35,7 @@ Read the contents of the most relevant files you've found. As you analyze the co
 * Synthesize all the information into a coherent overview that directly answers the user's question.
 
 ### 4. Generate Research Summary
-Present your findings to the user in a clear, structured markdown format. Use the template below. Provide concrete evidence for your claims, including file paths and code snippets where appropriate. Store the markdown file in /Docs/Research with the filename in the format DD.MM.YYYY - [Research Topic]
+Present your findings to the user in a clear, structured markdown format. Use the template below. Provide concrete evidence for your claims, including file paths and code snippets where appropriate. Store the markdown file in /Docs/AI/Research with the filename in the format DD.MM.YYYY - [Research Topic]
 
 ```markdown
 # Research: [User's Research Topic]

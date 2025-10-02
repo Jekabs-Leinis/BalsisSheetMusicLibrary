@@ -5,4 +5,7 @@
         <JavaScriptTestRoot>.\</JavaScriptTestRoot>
         <ShouldRunBuildScript>false</ShouldRunBuildScript>
     </PropertyGroup>
+    <ItemGroup>
+      <Folder Include="AI\Research\" />
+    </ItemGroup>
 </Project>

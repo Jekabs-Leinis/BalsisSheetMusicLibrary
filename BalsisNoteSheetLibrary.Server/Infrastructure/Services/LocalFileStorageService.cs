@@ -69,12 +69,12 @@ public class LocalFileStorageService : IFileStorageService
 
         if (!string.IsNullOrWhiteSpace(sheet.Author))
         {
-            nameParts.Add(CleanFileName(sheet.Author));
+            nameParts.Add(sheet.Author);
         }
 
         if (!string.IsNullOrWhiteSpace(sheet.Lyricist))
         {
-            nameParts.Add(CleanFileName(sheet.Lyricist));
+            nameParts.Add(sheet.Lyricist);
         }
 
         if (sheet.Year is not null)
@@ -95,7 +95,7 @@ public class LocalFileStorageService : IFileStorageService
 
         if (fileName.Length == 0)
         {
-            throw new ArgumentException("File name cannot be empty.", nameof(fileName));
+            throw new InvalidOperationException("File name cannot be empty.");
         }
 
         return fileName + ".pdf";

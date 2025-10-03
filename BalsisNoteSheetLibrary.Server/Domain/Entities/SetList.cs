@@ -10,5 +10,5 @@ public class SetList
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ArchivedAt { get; set; }
 
-    public IEnumerable<SetListItem> Items { get; set; } = new List<SetListItem>();
+    public List<SetListItem> Items { get; set; } = [];
 }

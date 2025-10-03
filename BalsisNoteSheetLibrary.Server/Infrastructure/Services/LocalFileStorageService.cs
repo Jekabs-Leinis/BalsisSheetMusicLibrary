@@ -24,7 +24,7 @@ public class LocalFileStorageService : IFileStorageService
         return fileName;
     }
 
-    public async Task<Stream> GetFileAsync(string fileName)
+    public Stream GetFile(string fileName)
     {
         var filePath = Path.Combine(_basePath, fileName);
 

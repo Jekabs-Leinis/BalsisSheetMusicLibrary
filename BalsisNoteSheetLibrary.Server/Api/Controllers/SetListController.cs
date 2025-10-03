@@ -1,262 +1,92 @@
-using BalsisNoteSheetLibrary.Server.Application.DTOs;
-using BalsisNoteSheetLibrary.Server.Domain.Entities;
+using BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
+using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class SetListController(AppDbContext context) : ControllerBase
+public class SetListController(ISetListService setListService) : ControllerBase
 {
     [HttpGet(Name = "GetAll")]
-    public async Task<BaseResponseDto<IEnumerable<SetListDto>>> GetAll(bool withSheets = false,
-        bool withArchived = false)
+    public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll()
     {
-        var query = context.SetLists
-            .If(!withArchived, q => q.Where(sl => sl.ArchivedAt == null))
-            .Include(list => list.Items)
-            .ThenInclude(item => item.NoteSheet)
-            .OrderBy(list => list.Order)
-            .AsNoTracking();
+        var setLists = await setListService.GetAllSetListsAsync();
 
-        var setLists = await query.ToListAsync();
-        var result = setLists.Select(sl => SetListDto.FromEntity(sl, withSheets)).ToList();
-
-        return new BaseResponseDto<IEnumerable<SetListDto>>(result);
+        return Ok(setLists);
     }
 
     [HttpGet("{id:int}")]
-    public async Task<BaseResponseDto<SetListDto?>> Get(uint id, bool withSheets = false)
+    public async Task<ActionResult<SetListDto>> Get(uint id)
     {
-        var setList = await context.SetLists
-            .Include(sl => sl.Items)
-            .ThenInclude(i => i.NoteSheet)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(sl => sl.Id == id);
+        var setList = await setListService.GetSetListByIdAsync(id);
 
         if (setList == null)
         {
-            return new BaseResponseDto<SetListDto?>(null, false, "Set list not found");
+            return NotFound();
         }
 
-        var result = SetListDto.FromEntity(setList, withSheets);
-        return new BaseResponseDto<SetListDto?>(result);
+        return Ok(setList);
     }
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto<string>> Add([FromBody] SetListDto setListDto)
+    public async Task<ActionResult<SetListDto>> Add([FromBody] CreateSetListDto dto)
     {
-        var setList = new SetList
+        if (!ModelState.IsValid)
         {
-            Title = setListDto.Title,
-            Order = setListDto.Order
-        };
+            return BadRequest(ModelState);
+        }
 
-        context.SetLists.Add(setList);
+        var created = await setListService.CreateSetListAsync(dto);
 
-        // Save set list to get ID for items
-        await context.SaveChangesAsync();
-
-        foreach (var itemDto in setListDto.Items)
-            context.SetListItems.Add(new SetListItem
-            {
-                SetListId = setList.Id,
-                NoteSheetId = itemDto.NoteSheetId,
-                Order = itemDto.Order
-            });
-
-        await context.SaveChangesAsync();
-
-
-        return new BaseResponseDto<string>("Set list added");
+        return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
     }
 
-    [HttpPost]
+    [HttpPut]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto> Update([FromBody] SetListDto setListDto)
+    public async Task<ActionResult<SetListDto>> Update([FromBody] UpdateSetListDto dto)
     {
-        var existingSetList = await context.SetLists
-            .Include(sl => sl.Items)
-            .FirstOrDefaultAsync(sl => sl.Id == setListDto.Id);
-
-        if (existingSetList is null)
+        if (!ModelState.IsValid)
         {
-            return new BaseResponseDto("Set list not found", false);
+            return BadRequest(ModelState);
         }
 
-        // Update main properties
-        existingSetList.Title = setListDto.Title;
-        existingSetList.Order = setListDto.Order;
-
-
-        // Update Items
-        // Remove items not present in the incoming setList
-        var incomingItemIds = setListDto.Items.Select(i => i.NoteSheetId).ToHashSet();
-        var itemsToRemove = existingSetList.Items
-            .Where(i => i.NoteSheetId.HasValue && !incomingItemIds.Contains(i.NoteSheetId.Value))
-            .ToList();
-
-        foreach (var item in itemsToRemove) context.SetListItems.Remove(item);
-
-        // Update existing and add new items
-        foreach (var itemDto in setListDto.Items)
+        try
         {
-            var existingItem = existingSetList.Items
-                .FirstOrDefault(i => i.NoteSheetId == itemDto.NoteSheetId);
+            var updated = await setListService.UpdateSetListAsync(dto);
 
-            if (existingItem != null)
-            {
-                existingItem.Order = itemDto.Order;
-            }
-            else if (itemDto.NoteSheetId.HasValue)
-            {
-                context.SetListItems.Add(new SetListItem
-                {
-                    SetListId = existingSetList.Id,
-                    NoteSheetId = itemDto.NoteSheetId,
-                    Order = itemDto.Order
-                });
-            }
+            return Ok(updated);
         }
-
-        await context.SaveChangesAsync();
-
-        return new BaseResponseDto("Set list updated");
-    }
-
-    public async Task<BaseResponseDto> UpdateOrder([FromBody] SetListDto setListDto)
-    {
-        var firstSetList = await context.SetLists
-            .FirstOrDefaultAsync(sl => sl.Id == setListDto.Id);
-
-        if (firstSetList is null)
+        catch (InvalidOperationException)
         {
-            return new BaseResponseDto("Set list not found", false);
+            return NotFound();
         }
-
-        var secondSetList = await context.SetLists
-            .FirstOrDefaultAsync(sl => sl.Order == setListDto.Order);
-
-        if (secondSetList is not null)
+        catch
         {
-            secondSetList.Order = firstSetList.Order;
+            //TODO LOG
+            return Problem();
         }
-        else
-        {
-            // Something has broken the ordering, fix it
-            // This can happen in situation where multiple clients update the setlist at the same time 
-            // An option would be to send a signal to "other" clients to refresh their state upon an update
-            // but that would still leave room for race conditions, so we just fix it here
-
-            var setLists = await context.SetLists
-                .Where(sl => sl.Order.HasValue)
-                .OrderBy(sl => sl.Order)
-                .ToListAsync();
-
-            for (var i = 0; i < setLists.Count; i++)
-            {
-                setLists[i].Order = (uint?)i;
-            }
-
-            await context.SaveChangesAsync();
-
-            // Try to find the swap target again
-            secondSetList = await context.SetLists
-                .FirstOrDefaultAsync(sl => sl.Order == setListDto.Order);
-
-            if (secondSetList is not null)
-            {
-                secondSetList.Order = firstSetList.Order;
-            }
-            else
-            {
-                // Trying to fix ordering failed, just return
-                // Might be because of a race condition
-                return new BaseResponseDto("Set list order update failed", false);
-            }
-        }
-
-        firstSetList.Order = setListDto.Order;
-
-        await context.SaveChangesAsync();
-
-        return new BaseResponseDto("Set list order updated");
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto> Delete(uint id)
+    public async Task<IActionResult> Delete(uint id)
     {
-        var setList = await context.SetLists.FindAsync(id);
+        await setListService.DeleteSetListAsync(id);
 
-        if (setList is null)
-        {
-            return new BaseResponseDto("Set list not found", false);
-        }
-
-        // Archived setlists have no order, but can be deleted
-        if (setList.Order.HasValue)
-        {
-            await context.SetLists.Where(sl => sl.Order > setList.Order)
-                .ForEachAsync(sl => sl.Order -= 1);
-        }
-
-        context.SetLists.Remove(setList);
-
-        // Also remove associated items
-        var itemsToRemove = context.SetListItems.Where(item => item.SetListId == id);
-        context.SetListItems.RemoveRange(itemsToRemove);
-
-        await context.SaveChangesAsync();
-
-        return new BaseResponseDto("Set list deleted");
+        return NoContent();
     }
 
-    [HttpPost("{id:int}")]
+    [HttpPost("{id:int}/order")]
     [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto> Archive(uint id)
+    public async Task<IActionResult> UpdateOrder(uint id, [FromBody] uint newOrder)
     {
-        var setList = await context.SetLists.FindAsync(id);
+        await setListService.UpdateSetListOrderAsync(id, newOrder);
 
-        if (setList is null)
-        {
-            return new BaseResponseDto("Set list not found", false);
-        }
-
-        setList.ArchivedAt = DateTime.UtcNow;
-        setList.Order = null;
-
-        await context.SetLists.Where(sl => sl.Order > setList.Order)
-            .ForEachAsync(sl => sl.Order -= 1);
-
-        await context.SaveChangesAsync();
-
-        return new BaseResponseDto("Set list archived");
-    }
-
-    [HttpPost("{id:int}")]
-    [Authorize(Roles = Role.Admin)]
-    public async Task<BaseResponseDto> Unarchive(uint id)
-    {
-        var setList = await context.SetLists.FindAsync(id);
-
-        if (setList is null)
-        {
-            return new BaseResponseDto("Set list not found", false);
-        }
-
-        setList.ArchivedAt = null;
-        setList.Order = (uint?)context.SetLists.Count(sl => sl.Order.HasValue);
-
-        await context.SaveChangesAsync();
-
-        return new BaseResponseDto("Set list unarchived");
+        return NoContent();
     }
 }

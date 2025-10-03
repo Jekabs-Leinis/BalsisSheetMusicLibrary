@@ -3,7 +3,7 @@ namespace BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 public interface IFileStorageService
 {
     Task<string> SaveFileAsync(Stream fileStream, string fileName);
-    Task<Stream> GetFileAsync(string fileName);
+    Stream GetFile(string fileName);
     Task DeleteFileAsync(string fileName);
     void MoveFile(string oldFileName, string newFileName);
     

@@ -1,9 +1,8 @@
-using BalsisNoteSheetLibrary.Server.Api.Controllers;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Entities;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
-using Microsoft.AspNetCore.SignalR;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
@@ -37,15 +36,15 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
         {
             await using var scope = scopeProvider.CreateAsyncScope();
             var scopedContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var scopedRenameHub = scope.ServiceProvider.GetRequiredService<IHubContext<StatusHub>>();
+            var scopedRenameHub = scope.ServiceProvider.GetRequiredService<StatusHub>();
             var scopedEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var scopedFileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
-
-            SendStatus(scopedRenameHub, "start", "Renaming started.");
+            // Intentionally not awaited, as we don't want to block on this.
+            _ = scopedRenameHub.SendStatus("start", "Renaming started.");
             var sheets = scopedContext.NoteSheets.ToList();
             var sheetsFolder = Path.Combine(scopedEnv.ContentRootPath, "Static", "Sheets");
             await RenameAllSheets(sheets, sheetsFolder, scopedContext, scopedFileStorageService, scopedRenameHub);
-            SendStatus(scopedRenameHub, "complete", "Renaming complete.");
+            _ = scopedRenameHub.SendStatus("complete", "Renaming complete.");
         }
         catch (Exception ex)
         {
@@ -54,7 +53,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
     }
 
     private async Task RenameAllSheets(List<NoteSheet> sheets, string sheetsFolder, AppDbContext scopedContext,
-        IFileStorageService fileStorage, IHubContext<StatusHub> hub)
+        IFileStorageService fileStorage, StatusHub hub)
     {
         var total = sheets.Count;
         var current = 0;
@@ -69,17 +68,17 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
 
                 if (!renamed)
                 {
-                    SendStatus(hub, "error", $"File not found for sheet {sheet.Id}");
+                    _ = hub.SendStatus("error", $"File not found for sheet {sheet.Id}");
                 }
             }
             catch (Exception ex)
             {
-                SendStatus(hub, "error", $"Error renaming file for sheet {sheet.Id}: {ex.Message}");
+                _ = hub.SendStatus("error", $"Error renaming file for sheet {sheet.Id}: {ex.Message}");
             }
 
             if ((current > 0 && current % 100 == 0) || current == total)
             {
-                SendStatus(hub, "progress", $"Renamed {current}/{total}", current, total);
+                _ = hub.SendStatus("progress", $"Renamed {current}/{total}", current, total);
             }
         }
     }
@@ -87,8 +86,8 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
     private async Task<bool> RenameSingleSheet(NoteSheet sheet, string sheetsFolder, AppDbContext scopedContext,
         IFileStorageService fileStorage)
     {
-        var newFileName = fileStorage.GetFileName(sheet);
-        var newSystemFileName = fileStorage.GetSystemFileName(sheet);
+        var newFileName = sheet.GetFileName();
+        var newSystemFileName = sheet.GetSystemFileName();
         var oldPath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
         var newPath = Path.Combine(sheetsFolder, newSystemFileName);
 
@@ -107,19 +106,5 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
         await scopedContext.SaveChangesAsync();
 
         return true;
-    }
-
-    private void SendStatus(IHubContext<StatusHub> hub, string status, string message, int? current = null,
-        int? total = null)
-    {
-        if (current.HasValue && total.HasValue)
-        {
-            // While this is not awaited, it's acceptable in this context as we don't need or want to block on it.
-            hub.Clients.All.SendAsync("status", new { status, current, total, message });
-        }
-        else
-        {
-            hub.Clients.All.SendAsync("status", new { status, message });
-        }
     }
 }

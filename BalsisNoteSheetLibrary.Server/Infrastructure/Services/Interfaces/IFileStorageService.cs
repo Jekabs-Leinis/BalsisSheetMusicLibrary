@@ -6,8 +6,4 @@ public interface IFileStorageService
     Stream GetFile(string fileName);
     Task DeleteFileAsync(string fileName);
     void MoveFile(string oldFileName, string newFileName);
-    
-    string GetFileName(Domain.Entities.NoteSheet sheet);
-    
-    string GetSystemFileName(Domain.Entities.NoteSheet sheet);
 }

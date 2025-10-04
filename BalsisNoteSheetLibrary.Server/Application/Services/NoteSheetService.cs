@@ -14,62 +14,62 @@ public class NoteSheetService(
 {
     public async Task<NoteSheetDto?> GetNoteSheetAsync(uint id)
     {
-        var entity = await context.NoteSheets.FindAsync(id);
-        return entity != null ? NoteSheetDto.FromEntity(entity) : null;
+        var noteSheet = await context.NoteSheets.FindAsync(id);
+        return noteSheet != null ? NoteSheetDto.FromEntity(noteSheet) : null;
     }
 
     public async Task<IEnumerable<NoteSheetDto>> GetAllNoteSheetsAsync()
     {
-        var entities = await repository.GetAllOrderedByTitleAsync();
-        return entities.Select(NoteSheetDto.FromEntity);
+        var noteSheets = await repository.GetAllOrderedByTitleAsync();
+        return noteSheets.Select(NoteSheetDto.FromEntity);
     }
 
     public async Task<NoteSheetDto> CreateNoteSheetAsync(CreateNoteSheetDto dto, Stream fileStream)
     {
-        var entity = dto.ToEntity();
-        context.NoteSheets.Add(entity);
+        var noteSheet = dto.ToEntity();
+        context.NoteSheets.Add(noteSheet);
         // Save initially to generate ID for filename
         await context.SaveChangesAsync();
 
-        entity.FileName = fileStorageService.GetFileName(entity);
-        entity.SystemFileName = fileStorageService.GetFileName(entity);
-        await fileStorageService.SaveFileAsync(fileStream, entity.SystemFileName);
+        noteSheet.FileName = noteSheet.GetFileName();
+        noteSheet.SystemFileName = noteSheet.GetFileName();
+        await fileStorageService.SaveFileAsync(fileStream, noteSheet.SystemFileName);
         await context.SaveChangesAsync();
 
-        return NoteSheetDto.FromEntity(entity);
+        return NoteSheetDto.FromEntity(noteSheet);
     }
 
     public async Task<NoteSheetDto> UpdateNoteSheetAsync(UpdateNoteSheetDto dto, Stream? fileStream)
     {
-        var entity = await context.NoteSheets.FindAsync(dto.Id);
+        var noteSheet = await context.NoteSheets.FindAsync(dto.Id);
 
-        if (entity == null)
+        if (noteSheet == null)
         {
             throw new InvalidOperationException("NoteSheet not found");
         }
 
-        dto.UpdateEntity(entity);
+        dto.UpdateEntity(noteSheet);
 
         if (fileStream != null)
         {
-            if (!string.IsNullOrEmpty(entity.SystemFileName))
+            if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
             {
-                await fileStorageService.DeleteFileAsync(entity.SystemFileName);
+                await fileStorageService.DeleteFileAsync(noteSheet.SystemFileName);
             }
 
-            entity.FileName = fileStorageService.GetFileName(entity);
-            entity.SystemFileName = fileStorageService.GetSystemFileName(entity);
-            await fileStorageService.SaveFileAsync(fileStream, entity.SystemFileName);
+            noteSheet.FileName = noteSheet.GetFileName();
+            noteSheet.SystemFileName = noteSheet.GetSystemFileName();
+            await fileStorageService.SaveFileAsync(fileStream, noteSheet.SystemFileName);
         }
         else
         {
-            var oldFileName = entity.SystemFileName;
+            var oldFileName = noteSheet.SystemFileName;
 
             if (oldFileName != null)
             {
-                entity.FileName = fileStorageService.GetFileName(entity);
-                entity.SystemFileName = fileStorageService.GetSystemFileName(entity);
-                fileStorageService.MoveFile(oldFileName, entity.SystemFileName);
+                noteSheet.FileName = noteSheet.GetFileName();
+                noteSheet.SystemFileName = noteSheet.GetSystemFileName();
+                fileStorageService.MoveFile(oldFileName, noteSheet.SystemFileName);
             }
             else
             {
@@ -79,24 +79,24 @@ public class NoteSheetService(
 
         await context.SaveChangesAsync();
 
-        return NoteSheetDto.FromEntity(entity);
+        return NoteSheetDto.FromEntity(noteSheet);
     }
 
     public async Task DeleteNoteSheetAsync(uint id)
     {
-        var entity = await context.NoteSheets.FindAsync(id);
+        var noteSheet = await context.NoteSheets.FindAsync(id);
 
-        if (entity == null)
+        if (noteSheet == null)
         {
             throw new InvalidOperationException("NoteSheet not found");
         }
 
-        if (!string.IsNullOrEmpty(entity.SystemFileName))
+        if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
         {
-            await fileStorageService.DeleteFileAsync(entity.SystemFileName);
+            await fileStorageService.DeleteFileAsync(noteSheet.SystemFileName);
         }
 
-        context.NoteSheets.Remove(entity);
+        context.NoteSheets.Remove(noteSheet);
         await context.SaveChangesAsync();
     }
 }

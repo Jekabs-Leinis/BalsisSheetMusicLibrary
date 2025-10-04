@@ -1,9 +1,9 @@
 import axios from "axios";
 import { SetList } from "@/models/sheetModels";
 
-export async function getAllSetLists() {
+export async function getAllSetLists(withNoteSheets = false) {
   try {
-    const response = await axios.get(`/api/setList/getAll`);
+    const response = await axios.get(`/api/setList/getAll`, { params: { withNoteSheets } });
 
     return response.data.map((setList) => new SetList(setList));
   } catch (e) {

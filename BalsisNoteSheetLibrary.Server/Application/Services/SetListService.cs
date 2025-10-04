@@ -1,5 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
+using BalsisNoteSheetLibrary.Server.Domain.Entities;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 
@@ -7,9 +8,18 @@ namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
 public class SetListService(AppDbContext context, ISetListRepository setListRepository) : ISetListService
 {
-    public async Task<IEnumerable<SetListDto>> GetAllSetListsAsync()
+    public async Task<IEnumerable<SetListDto>> GetAllSetListsAsync(bool withNoteSheets = false)
     {
-        var setLists = await setListRepository.GetAllAsync();
+        IEnumerable<SetList> setLists;
+        
+        if (withNoteSheets)
+        {
+            setLists = await setListRepository.GetAllWithNoteSheetsAsync();
+        }
+        else
+        {
+            setLists = await setListRepository.GetAllAsync();
+        }
 
         return setLists.Select(SetListDto.FromEntity);
     }

@@ -6,5 +6,6 @@ public interface ISetListRepository
 {
     Task<SetList?> GetByIdAsync(uint id);
     Task<IEnumerable<SetList>> GetAllAsync();
+    Task<IEnumerable<SetList>> GetAllWithNoteSheetsAsync();
     Task<IEnumerable<SetList>> GetAllArchivedAsync();
 }

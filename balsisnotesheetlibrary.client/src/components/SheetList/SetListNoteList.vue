@@ -15,7 +15,7 @@ const props = defineProps({
       <h1 class="set-list-title fw-bold ps-2">Aktuālās notis</h1>
       <div class="row">
         <div
-          v-for="setList in props.setLists"
+          v-for="setList in setLists"
           :key="setList.title"
           class="col-12"
         >

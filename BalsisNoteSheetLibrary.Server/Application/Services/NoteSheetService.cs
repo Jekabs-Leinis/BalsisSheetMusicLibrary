@@ -1,4 +1,4 @@
-using BalsisNoteSheetLibrary.Server.Application.DTOs;
+using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;

@@ -17,7 +17,18 @@ public class SetListRepository(AppDbContext context) : ISetListRepository
     public async Task<IEnumerable<SetList>> GetAllAsync()
     {
         return await context.SetLists
-            .Include(s => s.Items)
+            .Include(list => list.Items)
+            .Where(list => list.ArchivedAt == null)
+            .OrderBy(list => list.Order)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<SetList>> GetAllWithNoteSheetsAsync()
+    {
+        return await context.SetLists
+            .Include(list => list.Items)
+            .ThenInclude(item => item.NoteSheet)
             .Where(list => list.ArchivedAt == null)
             .OrderBy(list => list.Order)
             .AsNoTracking()
@@ -28,6 +39,7 @@ public class SetListRepository(AppDbContext context) : ISetListRepository
     {
         return await context.SetLists
             .Include(list => list.Items)
+            .ThenInclude(item => item.NoteSheet)
             .Where(list => list.ArchivedAt != null)
             .OrderBy(list => list.ArchivedAt)
             .AsNoTracking()

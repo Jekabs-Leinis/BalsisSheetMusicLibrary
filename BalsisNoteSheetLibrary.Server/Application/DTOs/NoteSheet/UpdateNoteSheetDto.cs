@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BalsisNoteSheetLibrary.Server.Application.DTOs;
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 
 public class UpdateNoteSheetDto
 {
@@ -21,7 +20,7 @@ public class UpdateNoteSheetDto
     public uint? Year { get; set; }
     public bool IsLatvian { get; set; }
 
-    public void UpdateEntity(NoteSheet entity)
+    public void UpdateEntity(Domain.Entities.NoteSheet entity)
     {
         entity.Title = Title;
         entity.Author = Author;

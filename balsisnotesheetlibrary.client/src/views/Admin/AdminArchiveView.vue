@@ -12,7 +12,7 @@ const isInitializing = ref(true);
 
 onMounted(async () => {
   try {
-    await setListStore.fetchSetLists(true, true);
+    await setListStore.fetchArchivedSetLists();
   } catch (error) {
     console.error("Error loading archived setlists:", error);
   } finally {

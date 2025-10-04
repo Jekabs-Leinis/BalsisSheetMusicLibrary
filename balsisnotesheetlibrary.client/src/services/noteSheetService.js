@@ -55,10 +55,14 @@ export function filterForeignNoteSheets(noteSheets) {
   return noteSheets.filter((sheet) => !sheet.isLatvian);
 }
 
-export function getAvailableNoteSheets(noteSheets, setList) {
-  if (!setList) return noteSheets;
+export function getSheetsNotInList(noteSheets, setList) {
+  if (!setList || !setList.items.length) {
+    return noteSheets;
+  }
+
   const setListNoteSheetIds = new Set(
     setList.items.map((item) => item.noteSheetId),
   );
+
   return noteSheets.filter((sheet) => !setListNoteSheetIds.has(sheet.id));
 }

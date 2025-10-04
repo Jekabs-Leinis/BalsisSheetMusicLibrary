@@ -1,4 +1,4 @@
-using BalsisNoteSheetLibrary.Server.Application.DTOs;
+using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Interfaces;
 

@@ -1,6 +1,4 @@
-using BalsisNoteSheetLibrary.Server.Domain.Entities;
-
-namespace BalsisNoteSheetLibrary.Server.Application.DTOs;
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 
 public class NoteSheetDto
 {
@@ -13,7 +11,7 @@ public class NoteSheetDto
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
 
-    public static NoteSheetDto FromEntity(NoteSheet entity)
+    public static NoteSheetDto FromEntity(Domain.Entities.NoteSheet entity)
     {
         return new NoteSheetDto
         {

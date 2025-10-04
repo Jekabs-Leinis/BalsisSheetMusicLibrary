@@ -19,12 +19,12 @@ export const useSetListStore = defineStore("setlist", () => {
   const isLoading = ref(false);
   const error = ref(null);
 
-  async function fetchSetLists() {
+  async function fetchSetLists(withNoteSheets = false) {
     isLoading.value = true;
     error.value = null;
 
     try {
-      const lists = await getAllSetLists();
+      const lists = await getAllSetLists(withNoteSheets);
       setLists.value = lists.sort((a, b) => a.order - b.order);
     } catch (err) {
       console.error("Error fetching setlists:", err);
@@ -40,7 +40,7 @@ export const useSetListStore = defineStore("setlist", () => {
 
     try {
       const lists = await getAllArchivedSetLists();
-      setLists.value = lists.sort((a, b) => a.archivedAt - b.archivedAt);
+      archivedSetLists.value = lists.sort((a, b) => a.archivedAt - b.archivedAt);
     } catch (err) {
       console.error("Error fetching setlists:", err);
       error.value = "Failed to load setlists";
@@ -194,6 +194,7 @@ export const useSetListStore = defineStore("setlist", () => {
     isLoading,
     error,
     fetchSetLists,
+    fetchArchivedSetLists,
     createSetList,
     saveSetList,
     removeSetList,

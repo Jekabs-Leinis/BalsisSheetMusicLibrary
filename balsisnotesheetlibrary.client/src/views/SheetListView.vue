@@ -1,27 +1,22 @@
 <script setup>
 import SheetListHeader from "@/components/SheetList/SheetListHeader.vue";
-import { ref, onMounted } from "vue";
+import { onMounted } from "vue";
 import SetListNoteList from "@/components/SheetList/SetListNoteList.vue";
 import NoteSheetList from "@/components/SheetList/NoteSheetList.vue";
-import { getAllSetLists } from "@/api/setListApi";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { SortDirection } from "@/models/utilModels";
+import { useSetListStore } from "@/stores/setlistStore.js";
 
 const noteSheetStore = useNoteSheetStore();
+const setListStore = useSetListStore();
 
 onMounted(async () => {
   await noteSheetStore.fetchNoteSheets();
+  await setListStore.fetchSetLists();
 
   // Reset sorting to default as user might navigate here from admin view with different sorting
   noteSheetStore.setSortField("title", false);
   noteSheetStore.setSortDirection(SortDirection.ASC);
-});
-
-/* @type {Ref<UnwrapRef<SetList[]>>} */
-const setLists = ref([]);
-
-getAllSetLists().then((lists) => {
-  setLists.value = lists;
 });
 </script>
 
@@ -30,7 +25,7 @@ getAllSetLists().then((lists) => {
   <SetListNoteList
     id="active-sheets"
     :note-sheets="noteSheetStore.filteredNoteSheets"
-    :set-lists="setLists"
+    :set-lists="setListStore.setLists"
   />
   <div class="invert" id="lv-sheets">
     <div class="container">
@@ -56,14 +51,16 @@ getAllSetLists().then((lists) => {
 }
 
 #lv-sheets {
-  &, :deep(a) {
+  &,
+  :deep(a) {
     color: var(--color-light) !important;
     background-color: var(--text-color) !important;
   }
 }
 
-#lv-sheets, #foreign-sheets {
-  scroll-margin-top: 80px
+#lv-sheets,
+#foreign-sheets {
+  scroll-margin-top: 80px;
 }
 </style>
 

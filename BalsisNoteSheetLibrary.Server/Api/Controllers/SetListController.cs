@@ -12,9 +12,9 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 public class SetListController(ISetListService setListService) : ControllerBase
 {
     [HttpGet(Name = "GetAll")]
-    public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll()
+    public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll(bool withNoteSheets = false)
     {
-        var setLists = await setListService.GetAllSetListsAsync();
+        var setLists = await setListService.GetAllSetListsAsync(withNoteSheets);
 
         return Ok(setLists);
     }
@@ -54,7 +54,7 @@ public class SetListController(ISetListService setListService) : ControllerBase
         return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
     }
 
-    [HttpPut]
+    [HttpPost]
     [Authorize(Roles = Role.Admin)]
     public async Task<ActionResult<SetListDto>> Update([FromBody] UpdateSetListDto dto)
     {

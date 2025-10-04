@@ -4,7 +4,7 @@ namespace BalsisNoteSheetLibrary.Server.Application.Interfaces;
 
 public interface ISetListService
 {
-    Task<IEnumerable<SetListDto>> GetAllSetListsAsync();
+    Task<IEnumerable<SetListDto>> GetAllSetListsAsync(bool withNoteSheets = false);
     Task<IEnumerable<SetListDto>> GetAllArchivedSetListsAsync();
     Task<SetListDto?> GetSetListByIdAsync(uint id);
     Task<SetListDto> CreateSetListAsync(CreateSetListDto dto);

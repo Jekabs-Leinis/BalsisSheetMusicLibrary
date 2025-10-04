@@ -5,7 +5,7 @@ import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { VueDraggable } from "vue-draggable-plus";
 import { moveSheetInSetList } from "@/services/setListServices";
 import { SetListItem } from "@/models/sheetModels";
-import { getAvailableNoteSheets } from "@/services/noteSheetService.js";
+import { getSheetsNotInList } from "@/services/noteSheetService.js";
 
 const props = defineProps({
   /** @type {SetList} */
@@ -42,7 +42,7 @@ const setListItems = computed({
 });
 
 const availableSheets = computed(() => {
-  return getAvailableNoteSheets(noteSheetStore.noteSheets.value, setList.value);
+  return getSheetsNotInList(noteSheetStore.noteSheets, setList.value);
 });
 
 const addSheet = async (sheet) => {

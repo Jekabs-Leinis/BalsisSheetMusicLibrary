@@ -1,4 +1,7 @@
-<script setup></script>
+<script setup>
+import { useRoute } from "vue-router";
+const route = useRoute();
+</script>
 
 <template>
   <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
@@ -45,6 +48,7 @@
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin"
+                :class="{ 'text-decoration-underline': route.path === '/admin' }"
                 >Funkcijas</a
               >
             </li>
@@ -52,6 +56,7 @@
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/sheets"
+                :class="{ 'text-decoration-underline': route.path === '/admin/sheets' }"
                 >Notis</a
               >
             </li>
@@ -59,6 +64,7 @@
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/edit-set-lists"
+                :class="{ 'text-decoration-underline': route.path === '/admin/edit-set-lists' }"
                 >Dziesmu saraksti</a
               >
             </li>
@@ -66,6 +72,7 @@
               <a
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/archive"
+                :class="{ 'text-decoration-underline': route.path === '/admin/archive' }"
                 >Arhīvs</a
               >
             </li>

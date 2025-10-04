@@ -9,7 +9,6 @@ public class StatusHub : Hub
     {
         if (current.HasValue && total.HasValue)
         {
-
             await Clients.Caller.SendAsync("status", new { status, current, total, message });
         }
         else
@@ -18,4 +17,3 @@ public class StatusHub : Hub
         }
     }
 }
-

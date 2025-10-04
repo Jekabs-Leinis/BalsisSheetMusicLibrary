@@ -21,10 +21,12 @@ builder.Services.AddControllers();
 
 // Configure DbContext
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 }
+
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
 
 // Dev only services
@@ -67,7 +69,7 @@ builder.Services.ConfigureApplicationCookie(options =>
         {
             context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
             context.Response.Headers.Location = context.RedirectUri;
-            
+
             return Task.CompletedTask;
         }
     };
@@ -118,7 +120,6 @@ builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
 builder.Services.AddScoped<ISetListService, SetListService>();
 
 
-
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -148,11 +149,11 @@ app.MapControllers();
 app.MapHub<StatusHub>("/api/statusHub");
 
 //Fallback to 404
-app.MapFallback((context =>
+app.MapFallback(context =>
 {
     context.Response.StatusCode = 404;
 
     return context.Response.CompleteAsync();
-}));
+});
 
 app.Run();

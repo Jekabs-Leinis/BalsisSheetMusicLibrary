@@ -6,7 +6,7 @@ public class DownloadRequestDto
 {
     [Required(ErrorMessage = "ID is required")]
     public uint Id { get; set; }
-    
+
     [Required(ErrorMessage = "Filename is required")]
     public string Filename { get; set; } = string.Empty;
 }

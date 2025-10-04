@@ -19,8 +19,7 @@ public abstract class SqliteExtensions
             CultureInfo.CurrentCulture,
             CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase
         ));
-        
+
         Console.WriteLine("Fold collation created for SQLite database.");
     }
 }
-

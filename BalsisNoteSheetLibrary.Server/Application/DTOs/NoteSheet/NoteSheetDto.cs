@@ -13,15 +13,18 @@ public class NoteSheetDto
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
 
-    public static NoteSheetDto FromEntity(NoteSheet entity) => new()
+    public static NoteSheetDto FromEntity(NoteSheet entity)
     {
-        Id = entity.Id,
-        Title = entity.Title,
-        Author = entity.Author,
-        Lyricist = entity.Lyricist,
-        Year = entity.Year,
-        Filename = entity.FileName,
-        SystemFileName = entity.SystemFileName,
-        IsLatvian = entity.IsLatvian
-    };
+        return new NoteSheetDto
+        {
+            Id = entity.Id,
+            Title = entity.Title,
+            Author = entity.Author,
+            Lyricist = entity.Lyricist,
+            Year = entity.Year,
+            Filename = entity.FileName,
+            SystemFileName = entity.SystemFileName,
+            IsLatvian = entity.IsLatvian
+        };
+    }
 }

@@ -1,13 +1,10 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BalsisNoteSheetLibrary.Server.Domain.Interfaces
+namespace BalsisNoteSheetLibrary.Server.Domain.Interfaces;
+
+public interface ISetListRepository
 {
-    public interface ISetListRepository
-    {
-        Task<SetList?> GetByIdAsync(uint id);
-        Task<IEnumerable<SetList>> GetAllAsync();
-        Task<IEnumerable<SetList>> GetAllArchivedAsync();
-    }
+    Task<SetList?> GetByIdAsync(uint id);
+    Task<IEnumerable<SetList>> GetAllAsync();
+    Task<IEnumerable<SetList>> GetAllArchivedAsync();
 }

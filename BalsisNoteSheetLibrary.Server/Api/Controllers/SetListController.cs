@@ -18,7 +18,7 @@ public class SetListController(ISetListService setListService) : ControllerBase
 
         return Ok(setLists);
     }
-    
+
     [HttpGet(Name = "GetAllArchived")]
     public async Task<ActionResult<IEnumerable<SetListDto>>> GetAllArchived()
     {

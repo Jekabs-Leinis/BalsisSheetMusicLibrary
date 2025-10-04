@@ -3,13 +3,13 @@ namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 public static class LinqExtensions
 {
     public static IQueryable<T> If<T>(
-        this IQueryable<T> query, 
+        this IQueryable<T> query,
         bool should,
         params Func<IQueryable<T>, IQueryable<T>>[] transforms)
     {
-        return should 
+        return should
             ? transforms.Aggregate(query,
-                (current, transform) => transform.Invoke(current)) 
+                (current, transform) => transform.Invoke(current))
             : query;
     }
 
@@ -18,9 +18,9 @@ public static class LinqExtensions
         bool should,
         params Func<IEnumerable<T>, IEnumerable<T>>[] transforms)
     {
-        return should 
+        return should
             ? transforms.Aggregate(query,
-                (current, transform) => transform.Invoke(current)) 
+                (current, transform) => transform.Invoke(current))
             : query;
     }
 }

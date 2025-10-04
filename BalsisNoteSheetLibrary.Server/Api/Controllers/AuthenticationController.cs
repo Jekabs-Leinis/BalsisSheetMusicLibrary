@@ -31,8 +31,8 @@ public class AuthenticationController(
         var result = await signInManager.PasswordSignInAsync(
             identityUser,
             loginDto.Password,
-            isPersistent: true,
-            lockoutOnFailure: false);
+            true,
+            false);
 
         if (!result.Succeeded)
         {
@@ -55,7 +55,7 @@ public class AuthenticationController(
     public async Task<IActionResult> Logout()
     {
         await signInManager.SignOutAsync();
-        
+
         return Ok("User logged out successfully");
     }
 
@@ -83,7 +83,10 @@ public class AuthenticationController(
         if (!result.Succeeded)
         {
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return Problem($"Failed to change password: {errors}", statusCode: 500, title: "An internal error occurred");
+            return Problem(
+                $"Failed to change password: {errors}",
+                statusCode: 500,
+                title: "An internal error occurred");
         }
 
         return Ok("Password changed successfully");

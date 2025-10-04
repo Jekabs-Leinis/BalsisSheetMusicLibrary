@@ -13,10 +13,9 @@ public class NoteSheet
     public string? FileName { get; set; }
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
-    
-    [JsonIgnore]
-    public IEnumerable<SetListItem>? SetListItems { get; set; }
-    
+
+    [JsonIgnore] public IEnumerable<SetListItem>? SetListItems { get; set; }
+
     public string GetFileName()
     {
         var nameParts = new List<string> { Title ?? "" };

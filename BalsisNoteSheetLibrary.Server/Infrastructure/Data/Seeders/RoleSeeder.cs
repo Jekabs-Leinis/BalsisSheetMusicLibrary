@@ -9,13 +9,14 @@ public static class RoleSeeder
     {
         using var scope = serviceProvider.CreateScope();
 
-        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>(); 
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        string[] roleNames = [Role.Admin, Role.User]; 
+        string[] roleNames = [Role.Admin, Role.User];
 
         foreach (var roleName in roleNames)
         {
             var roleExists = await roleManager.RoleExistsAsync(roleName);
+
             if (!roleExists)
             {
                 Console.WriteLine($"Creating role: {roleName}");

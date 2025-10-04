@@ -1,14 +1,16 @@
-namespace BalsisNoteSheetLibrary.Server.Application.DTOs.SetList
+namespace BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
+
+public class SetListDto
 {
-    public class SetListDto
+    public uint? Id { get; set; }
+    public string? Title { get; set; }
+    public uint? Order { get; set; }
+    public List<SetListItemDto> Items { get; set; }
+    public DateTime? ArchivedAt { get; set; }
+
+    public static SetListDto FromEntity(Domain.Entities.SetList entity)
     {
-        public uint? Id { get; set; }
-        public string? Title { get; set; }
-        public uint? Order { get; set; }
-        public List<SetListItemDto> Items { get; set; }
-        public DateTime? ArchivedAt { get; set; }
-        
-        public static SetListDto FromEntity(Domain.Entities.SetList entity) => new()
+        return new SetListDto
         {
             Id = entity.Id,
             Title = entity.Title,

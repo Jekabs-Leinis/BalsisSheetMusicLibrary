@@ -28,56 +28,139 @@ using System.Text;
 namespace BalsisNoteSheetLibrary.Server.Application.Extensions;
 
 /// <summary>
-/// This class converts alphabetic, numeric, and symbolic Unicode characters
-/// which are not in the first 127 ASCII characters (the "Basic Latin" Unicode
-/// block) into their ASCII equivalents, if one exists.
-/// <para/>
-/// Characters from the following Unicode blocks are converted; however, only
-/// those characters with reasonable ASCII alternatives are converted:
-/// 
-/// <ul>
-///   <item><description>C1 Controls and Latin-1 Supplement: <a href="http://www.unicode.org/charts/PDF/U0080.pdf">http://www.unicode.org/charts/PDF/U0080.pdf</a></description></item>
-///   <item><description>Latin Extended-A: <a href="http://www.unicode.org/charts/PDF/U0100.pdf">http://www.unicode.org/charts/PDF/U0100.pdf</a></description></item>
-///   <item><description>Latin Extended-B: <a href="http://www.unicode.org/charts/PDF/U0180.pdf">http://www.unicode.org/charts/PDF/U0180.pdf</a></description></item>
-///   <item><description>Latin Extended Additional: <a href="http://www.unicode.org/charts/PDF/U1E00.pdf">http://www.unicode.org/charts/PDF/U1E00.pdf</a></description></item>
-///   <item><description>Latin Extended-C: <a href="http://www.unicode.org/charts/PDF/U2C60.pdf">http://www.unicode.org/charts/PDF/U2C60.pdf</a></description></item>
-///   <item><description>Latin Extended-D: <a href="http://www.unicode.org/charts/PDF/UA720.pdf">http://www.unicode.org/charts/PDF/UA720.pdf</a></description></item>
-///   <item><description>IPA Extensions: <a href="http://www.unicode.org/charts/PDF/U0250.pdf">http://www.unicode.org/charts/PDF/U0250.pdf</a></description></item>
-///   <item><description>Phonetic Extensions: <a href="http://www.unicode.org/charts/PDF/U1D00.pdf">http://www.unicode.org/charts/PDF/U1D00.pdf</a></description></item>
-///   <item><description>Phonetic Extensions Supplement: <a href="http://www.unicode.org/charts/PDF/U1D80.pdf">http://www.unicode.org/charts/PDF/U1D80.pdf</a></description></item>
-///   <item><description>General Punctuation: <a href="http://www.unicode.org/charts/PDF/U2000.pdf">http://www.unicode.org/charts/PDF/U2000.pdf</a></description></item>
-///   <item><description>Superscripts and Subscripts: <a href="http://www.unicode.org/charts/PDF/U2070.pdf">http://www.unicode.org/charts/PDF/U2070.pdf</a></description></item>
-///   <item><description>Enclosed Alphanumerics: <a href="http://www.unicode.org/charts/PDF/U2460.pdf">http://www.unicode.org/charts/PDF/U2460.pdf</a></description></item>
-///   <item><description>Dingbats: <a href="http://www.unicode.org/charts/PDF/U2700.pdf">http://www.unicode.org/charts/PDF/U2700.pdf</a></description></item>
-///   <item><description>Supplemental Punctuation: <a href="http://www.unicode.org/charts/PDF/U2E00.pdf">http://www.unicode.org/charts/PDF/U2E00.pdf</a></description></item>
-///   <item><description>Alphabetic Presentation Forms: <a href="http://www.unicode.org/charts/PDF/UFB00.pdf">http://www.unicode.org/charts/PDF/UFB00.pdf</a></description></item>
-///   <item><description>Halfwidth and Fullwidth Forms: <a href="http://www.unicode.org/charts/PDF/UFF00.pdf">http://www.unicode.org/charts/PDF/UFF00.pdf</a></description></item>
-/// </ul>
-/// <para/>
-/// See: <a href="http://en.wikipedia.org/wiki/Latin_characters_in_Unicode">http://en.wikipedia.org/wiki/Latin_characters_in_Unicode</a>
-/// <para/>
-/// For example, '&amp;agrave;' will be replaced by 'a'.
+///     This class converts alphabetic, numeric, and symbolic Unicode characters
+///     which are not in the first 127 ASCII characters (the "Basic Latin" Unicode
+///     block) into their ASCII equivalents, if one exists.
+///     <para />
+///     Characters from the following Unicode blocks are converted; however, only
+///     those characters with reasonable ASCII alternatives are converted:
+///     <ul>
+///         <item>
+///             <description>
+///                 C1 Controls and Latin-1 Supplement:
+///                 <a href="http://www.unicode.org/charts/PDF/U0080.pdf">http://www.unicode.org/charts/PDF/U0080.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Latin Extended-A:
+///                 <a href="http://www.unicode.org/charts/PDF/U0100.pdf">http://www.unicode.org/charts/PDF/U0100.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Latin Extended-B:
+///                 <a href="http://www.unicode.org/charts/PDF/U0180.pdf">http://www.unicode.org/charts/PDF/U0180.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Latin Extended Additional:
+///                 <a href="http://www.unicode.org/charts/PDF/U1E00.pdf">http://www.unicode.org/charts/PDF/U1E00.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Latin Extended-C:
+///                 <a href="http://www.unicode.org/charts/PDF/U2C60.pdf">http://www.unicode.org/charts/PDF/U2C60.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Latin Extended-D:
+///                 <a href="http://www.unicode.org/charts/PDF/UA720.pdf">http://www.unicode.org/charts/PDF/UA720.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 IPA Extensions:
+///                 <a href="http://www.unicode.org/charts/PDF/U0250.pdf">http://www.unicode.org/charts/PDF/U0250.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Phonetic Extensions:
+///                 <a href="http://www.unicode.org/charts/PDF/U1D00.pdf">http://www.unicode.org/charts/PDF/U1D00.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Phonetic Extensions Supplement:
+///                 <a href="http://www.unicode.org/charts/PDF/U1D80.pdf">http://www.unicode.org/charts/PDF/U1D80.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 General Punctuation:
+///                 <a href="http://www.unicode.org/charts/PDF/U2000.pdf">http://www.unicode.org/charts/PDF/U2000.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Superscripts and Subscripts:
+///                 <a href="http://www.unicode.org/charts/PDF/U2070.pdf">http://www.unicode.org/charts/PDF/U2070.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Enclosed Alphanumerics:
+///                 <a href="http://www.unicode.org/charts/PDF/U2460.pdf">http://www.unicode.org/charts/PDF/U2460.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Dingbats:
+///                 <a href="http://www.unicode.org/charts/PDF/U2700.pdf">http://www.unicode.org/charts/PDF/U2700.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Supplemental Punctuation:
+///                 <a href="http://www.unicode.org/charts/PDF/U2E00.pdf">http://www.unicode.org/charts/PDF/U2E00.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Alphabetic Presentation Forms:
+///                 <a href="http://www.unicode.org/charts/PDF/UFB00.pdf">http://www.unicode.org/charts/PDF/UFB00.pdf</a>
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 Halfwidth and Fullwidth Forms:
+///                 <a href="http://www.unicode.org/charts/PDF/UFF00.pdf">http://www.unicode.org/charts/PDF/UFF00.pdf</a>
+///             </description>
+///         </item>
+///     </ul>
+///     <para />
+///     See:
+///     <a href="http://en.wikipedia.org/wiki/Latin_characters_in_Unicode">http://en.wikipedia.org/wiki/Latin_characters_in_Unicode</a>
+///     <para />
+///     For example, '&amp;agrave;' will be replaced by 'a'.
 /// </summary>
 public static class StringExtensions
 {
     /// <summary>
-    /// Converts characters above ASCII to their ASCII equivalents.  For example,
-    /// accents are removed from accented characters. 
+    ///     Converts characters above ASCII to their ASCII equivalents.  For example,
+    ///     accents are removed from accented characters.
     /// </summary>
     /// <param name="input">     The string of characters to fold </param>
     /// <param name="length">    The length of the folded return string </param>
     /// <returns> length of output </returns>
     public static string FoldToASCII(this string input, int? length = null)
     {
-        if (string.IsNullOrWhiteSpace(input)) return input;
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return input;
+        }
 
-        int end = length ?? input.Length;
+        var end = length ?? input.Length;
 
         var foldedString = new StringBuilder(end);
 
-        for (int pos = 0; pos < end; ++pos)
+        for (var pos = 0; pos < end; ++pos)
         {
-            char c = input[pos];
+            var c = input[pos];
 
             // Quick test: if it's not in range then just keep current character
             if (c < '\u0080')

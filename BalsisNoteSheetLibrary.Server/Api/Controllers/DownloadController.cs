@@ -1,4 +1,3 @@
-using BalsisNoteSheetLibrary.Server.Application.DTOs;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +17,6 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
     [HttpGet("{id:int}/{filename}")]
     public async Task<IActionResult> Index(uint id, string filename)
     {
-
         var sheet = await context.NoteSheets
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.Id == id);
@@ -29,7 +27,9 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
         }
 
         // Try with SystemFileName first (new format)
-        var path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.SystemFileName ?? string.Empty);
+        var path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets",
+            sheet.SystemFileName ?? string.Empty);
+
         if (System.IO.File.Exists(path))
         {
             return PhysicalFile(path, "application/octet-stream", sheet.FileName);
@@ -37,6 +37,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
 
         // Fallback to Filename (legacy support)
         path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.FileName ?? string.Empty);
+
         if (!System.IO.File.Exists(path))
         {
             return NotFound("File not found on server.");

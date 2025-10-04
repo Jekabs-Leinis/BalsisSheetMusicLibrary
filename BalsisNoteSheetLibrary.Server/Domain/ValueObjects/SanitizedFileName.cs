@@ -4,14 +4,19 @@ namespace BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 
 public record SanitizedFileName
 {
-    private string Value { get; }
+    private SanitizedFileName(string value)
+    {
+        Value = value;
+    }
 
-    private SanitizedFileName(string value) => Value = value;
+    private string Value { get; }
 
     public static SanitizedFileName Create(string fileName)
     {
         if (string.IsNullOrWhiteSpace(fileName))
+        {
             throw new ArgumentException("File name cannot be empty", nameof(fileName));
+        }
 
         var sanitized = SanitizeFileName(fileName);
         return new SanitizedFileName(sanitized);
@@ -70,5 +75,8 @@ public record SanitizedFileName
         return fileName;
     }
 
-    public static implicit operator string(SanitizedFileName sanitizedFileName) => sanitizedFileName.Value;
+    public static implicit operator string(SanitizedFileName sanitizedFileName)
+    {
+        return sanitizedFileName.Value;
+    }
 }

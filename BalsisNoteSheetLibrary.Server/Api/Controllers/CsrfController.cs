@@ -19,4 +19,3 @@ public class CsrfController(IAntiforgery antiforgery) : Controller
         return Ok();
     }
 }
-

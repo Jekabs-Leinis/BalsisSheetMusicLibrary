@@ -22,9 +22,10 @@ public static class UserSeeder
         {
             var newUser = new IdentityUser
             {
-                UserName = userName,
+                UserName = userName
             };
             var result = await userManager.CreateAsync(newUser, "changeme");
+
             if (result.Succeeded)
             {
                 Console.WriteLine($"Created user: {newUser.UserName}");
@@ -33,7 +34,8 @@ public static class UserSeeder
             }
             else
             {
-                Console.WriteLine($"Error creating user {newUser.UserName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Console.WriteLine(
+                    $"Error creating user {newUser.UserName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
         }
         else

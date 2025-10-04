@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import {
   getAllSetLists,
+  getAllArchivedSetLists,
   addSetList,
   updateSetList,
   deleteSetList,
@@ -18,18 +19,28 @@ export const useSetListStore = defineStore("setlist", () => {
   const isLoading = ref(false);
   const error = ref(null);
 
-  async function fetchSetLists(withSheets = false, withArchived = false) {
+  async function fetchSetLists() {
     isLoading.value = true;
     error.value = null;
 
     try {
-      const lists = await getAllSetLists(withSheets, withArchived);
-      setLists.value = lists
-        .filter((l) => !l.archivedAt)
-        .sort((a, b) => a.order - b.order);
-      archivedSetLists.value = lists
-        .filter((l) => l.archivedAt)
-        .sort((a, b) => b.archivedAt - a.archivedAt);
+      const lists = await getAllSetLists();
+      setLists.value = lists.sort((a, b) => a.order - b.order);
+    } catch (err) {
+      console.error("Error fetching setlists:", err);
+      error.value = "Failed to load setlists";
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchArchivedSetLists() {
+    isLoading.value = true;
+    error.value = null;
+
+    try {
+      const lists = await getAllArchivedSetLists();
+      setLists.value = lists.sort((a, b) => a.archivedAt - b.archivedAt);
     } catch (err) {
       console.error("Error fetching setlists:", err);
       error.value = "Failed to load setlists";

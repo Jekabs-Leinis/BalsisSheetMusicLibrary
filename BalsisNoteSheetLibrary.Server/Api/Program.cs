@@ -109,9 +109,13 @@ builder.Services.AddCors(options =>
 builder.Services.AddSignalR();
 
 builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+
 builder.Services.AddScoped<INoteSheetRepository, NoteSheetRepository>();
+builder.Services.AddScoped<ISetListRepository, SetListRepository>();
+
 builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
 builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
+builder.Services.AddScoped<ISetListService, SetListService>();
 
 
 

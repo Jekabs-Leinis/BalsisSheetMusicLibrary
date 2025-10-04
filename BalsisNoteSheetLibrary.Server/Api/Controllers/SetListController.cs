@@ -18,6 +18,14 @@ public class SetListController(ISetListService setListService) : ControllerBase
 
         return Ok(setLists);
     }
+    
+    [HttpGet(Name = "GetAllArchived")]
+    public async Task<ActionResult<IEnumerable<SetListDto>>> GetAllArchived()
+    {
+        var setLists = await setListService.GetAllArchivedSetListsAsync();
+
+        return Ok(setLists);
+    }
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<SetListDto>> Get(uint id)

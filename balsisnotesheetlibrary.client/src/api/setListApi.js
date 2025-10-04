@@ -1,14 +1,19 @@
 import axios from "axios";
 import { SetList } from "@/models/sheetModels";
 
-export async function getAllSetLists(withSheets = false, withArchived = false) {
+export async function getAllSetLists() {
   try {
-    const response = await axios.get(`/api/setList/getAll`, {
-      params: {
-        withSheets,
-        withArchived,
-      },
-    });
+    const response = await axios.get(`/api/setList/getAll`);
+
+    return response.data.map((setList) => new SetList(setList));
+  } catch (e) {
+    throw new Error(e.message || "Failed to get all set lists");
+  }
+}
+
+export async function getAllArchivedSetLists() {
+  try {
+    const response = await axios.get(`/api/setList/getAllArchived`);
 
     return response.data.map((setList) => new SetList(setList));
   } catch (e) {

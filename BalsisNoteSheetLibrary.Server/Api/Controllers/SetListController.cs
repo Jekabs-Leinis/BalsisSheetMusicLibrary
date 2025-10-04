@@ -26,7 +26,7 @@ public class SetListController(ISetListService setListService) : ControllerBase
 
         if (setList == null)
         {
-            return NotFound();
+            return NotFound("Set list not found.");
         }
 
         return Ok(setList);
@@ -63,7 +63,7 @@ public class SetListController(ISetListService setListService) : ControllerBase
         }
         catch (InvalidOperationException)
         {
-            return NotFound();
+            return NotFound("Set list not found.");
         }
         catch
         {
@@ -78,7 +78,7 @@ public class SetListController(ISetListService setListService) : ControllerBase
     {
         await setListService.DeleteSetListAsync(id);
 
-        return NoContent();
+        return Ok("Set list deleted.");
     }
 
     [HttpPost("{id:int}/order")]
@@ -87,6 +87,6 @@ public class SetListController(ISetListService setListService) : ControllerBase
     {
         await setListService.UpdateSetListOrderAsync(id, newOrder);
 
-        return NoContent();
+        return Ok("Set list order updated.");
     }
 }

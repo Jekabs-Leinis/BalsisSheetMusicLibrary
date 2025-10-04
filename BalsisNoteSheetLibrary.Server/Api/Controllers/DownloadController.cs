@@ -25,7 +25,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
 
         if (sheet is null)
         {
-            return NotFound(new BaseResponseDto("Note sheet not found.", false));
+            return NotFound("Note sheet not found.");
         }
 
         // Try with SystemFileName first (new format)
@@ -39,7 +39,7 @@ public class DownloadController(AppDbContext context, IWebHostEnvironment webHos
         path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.FileName ?? string.Empty);
         if (!System.IO.File.Exists(path))
         {
-            return NotFound(new BaseResponseDto("File not found on server.", false));
+            return NotFound("File not found on server.");
         }
 
         return PhysicalFile(path, "application/octet-stream", sheet.FileName);

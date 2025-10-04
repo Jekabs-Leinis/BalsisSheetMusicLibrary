@@ -17,7 +17,7 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     {
         var result = await noteSheetService.GetAllNoteSheetsAsync();
 
-        return Ok(new BaseResponseDto<IEnumerable<NoteSheetDto>>(result));
+        return Ok(result);
     }
 
     [HttpGet("{id:int}")]
@@ -27,37 +27,35 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
 
         if (result == null)
         {
-            return NotFound(new BaseResponseDto<NoteSheetDto?>(null, false, "Note sheet not found"));
+            return NotFound("Note sheet not found");
         }
 
-        return Ok(new BaseResponseDto<NoteSheetDto?>(result));
+        return Ok(result);
     }
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> Add([FromForm] CreateNoteSheetDto createDto, IFormFile file)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
         if (file.Length == 0)
         {
-            return BadRequest(new BaseResponseDto<NoteSheetDto>(null, false, "PDF file is required"));
+            return BadRequest("PDF file is required");
         }
 
         if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
         {
-            return BadRequest(new BaseResponseDto<NoteSheetDto>(null, false, "Only PDF files are allowed"));
-        }
-
-        if (!ModelState.IsValid)
-        {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-
-            return BadRequest(new BaseResponseDto<NoteSheetDto>(null, false, string.Join(", ", errors)));
+            return BadRequest("Only PDF files are allowed");
         }
 
         await using var stream = file.OpenReadStream();
         var result = await noteSheetService.CreateNoteSheetAsync(createDto, stream);
 
-        return CreatedAtAction(nameof(Get), new { id = result.Id }, new BaseResponseDto<NoteSheetDto>(result));
+        return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
     }
 
     [HttpPost]
@@ -66,9 +64,7 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     {
         if (!ModelState.IsValid)
         {
-            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
-
-            return BadRequest(new BaseResponseDto<NoteSheetDto>(null, false, string.Join(", ", errors)));
+            return BadRequest(ModelState);
         }
 
         var fileStream = file is { Length: > 0 } ? file.OpenReadStream() : null;
@@ -77,11 +73,11 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
         {
             var result = await noteSheetService.UpdateNoteSheetAsync(updateDto, fileStream);
 
-            return Ok(new BaseResponseDto<NoteSheetDto>(result));
+            return Ok(result);
         }
         catch (InvalidOperationException ex)
         {
-            return NotFound(new BaseResponseDto<NoteSheetDto>(null, false, ex.Message));
+            return NotFound(ex.Message);
         }
     }
 
@@ -91,7 +87,7 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     {
         await noteSheetService.DeleteNoteSheetAsync(id);
 
-        return Ok(new BaseResponseDto("Note sheet deleted successfully"));
+        return Ok("Note sheet deleted successfully");
     }
 
     [HttpPost]
@@ -100,6 +96,6 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     {
         await renameService.RenameAllFilenamesAsync();
 
-        return Ok(new BaseResponseDto("Rename process started in the background"));
+        return Ok("Rename process started in the background");
     }
 }

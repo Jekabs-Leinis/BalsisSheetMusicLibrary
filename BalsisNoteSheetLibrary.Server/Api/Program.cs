@@ -118,6 +118,7 @@ builder.Services.AddScoped<ISetListRepository, SetListRepository>();
 builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
 builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
 builder.Services.AddScoped<ISetListService, SetListService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 
 var app = builder.Build();

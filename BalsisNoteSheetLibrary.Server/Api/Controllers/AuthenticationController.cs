@@ -1,16 +1,14 @@
-using BalsisNoteSheetLibrary.Server.Application.DTOs;
+using BalsisNoteSheetLibrary.Server.Application.DTOs.Auth;
+using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class AuthenticationController(
-    SignInManager<IdentityUser> signInManager
-) : ControllerBase
+public class AuthenticationController(IAuthService authService) : ControllerBase
 {
     [HttpPost]
     [AllowAnonymous]
@@ -21,74 +19,48 @@ public class AuthenticationController(
             return BadRequest(ModelState);
         }
 
-        var identityUser = await signInManager.UserManager.FindByNameAsync(loginDto.UserName);
-
-        if (identityUser == null)
+        try
         {
-            return NotFound("Invalid username or password");
+            var result = await authService.LoginAsync(loginDto);
+
+            return Ok(result);
         }
-
-        var result = await signInManager.PasswordSignInAsync(
-            identityUser,
-            loginDto.Password,
-            true,
-            false);
-
-        if (!result.Succeeded)
+        catch (InvalidOperationException)
         {
-            return NotFound("Invalid username or password");
+            return Unauthorized("Invalid username or password.");
         }
-
-        var isAdmin = await signInManager.UserManager.IsInRoleAsync(identityUser, Role.Admin);
-
-        var response = new LoginResponseDto
-        {
-            Id = identityUser.Id,
-            UserName = identityUser.UserName,
-            IsAdmin = isAdmin
-        };
-
-        return Ok(response);
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Logout()
     {
-        await signInManager.SignOutAsync();
+        await authService.LogoutAsync();
 
         return Ok("User logged out successfully");
     }
 
     [HttpPost]
+    [Authorize(Roles = $"{Role.Admin}")]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto changePasswordDto)
     {
+        //TODO: figure out the implementation for this
+        return Ok("Not implemented yet");
+
         if (!ModelState.IsValid)
         {
-            BadRequest(ModelState);
+            return BadRequest(ModelState);
         }
 
-        var user = await signInManager.UserManager.FindByNameAsync(changePasswordDto.UserName);
-
-        if (user == null)
+        try
         {
-            return NotFound("User not found");
+            await authService.ChangePasswordAsync(changePasswordDto);
+
+            return Ok("Password changed successfully.");
         }
-
-        var resetToken = await signInManager.UserManager.GeneratePasswordResetTokenAsync(user);
-        var result = await signInManager.UserManager.ResetPasswordAsync(
-            user,
-            resetToken,
-            changePasswordDto.NewPassword);
-
-        if (!result.Succeeded)
+        catch (InvalidOperationException)
         {
-            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return Problem(
-                $"Failed to change password: {errors}",
-                statusCode: 500,
-                title: "An internal error occurred");
+            return BadRequest("Failed to change password.");
         }
-
-        return Ok("Password changed successfully");
     }
 }

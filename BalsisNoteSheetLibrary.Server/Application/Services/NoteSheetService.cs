@@ -99,4 +99,14 @@ public class NoteSheetService(
         context.NoteSheets.Remove(noteSheet);
         await context.SaveChangesAsync();
     }
+    
+    public bool HasValidFile(NoteSheetDto dto)
+    {
+        if (string.IsNullOrEmpty(dto.SystemFileName) || string.IsNullOrWhiteSpace(dto.FileName))
+        {
+            return false;
+        }
+
+        return fileStorageService.FileExists(dto.SystemFileName);
+    }
 }

@@ -22,17 +22,11 @@ public class LocalFileStorageService : IFileStorageService
         return fileName;
     }
 
-    public Stream GetFile(string fileName)
+    public bool FileExists(string fileName)
     {
         var filePath = Path.Combine(_basePath, fileName);
 
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException();
-        }
-
-        return new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 4096,
-            true);
+        return File.Exists(filePath);
     }
 
     public Task DeleteFileAsync(string fileName)

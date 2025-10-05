@@ -1,48 +1,33 @@
+using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class DownloadController(AppDbContext context, IWebHostEnvironment webHostEnvironment) : ControllerBase
+public class DownloadController(INoteSheetService noteSheetService) : ControllerBase
 {
     /**
-     * We don't really care about the filename, but we accept it to ensure readability of the URL.
+     * We don't really care about the filename, but we include it in the URL to ensure readability.
      */
     [HttpGet("{id:int}/{filename}")]
     public async Task<IActionResult> Index(uint id, string filename)
     {
-        var sheet = await context.NoteSheets
-            .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.Id == id);
+        var sheet = await noteSheetService.GetNoteSheetAsync(id);
 
-        if (sheet is null)
+        if (sheet == null)
         {
             return NotFound("Note sheet not found.");
         }
 
-        // Try with SystemFileName first (new format)
-        var path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets",
-            sheet.SystemFileName ?? string.Empty);
-
-        if (System.IO.File.Exists(path))
+        if (!noteSheetService.HasValidFile(sheet))
         {
-            return PhysicalFile(path, "application/octet-stream", sheet.FileName);
+            return NotFound("No valid file associated with this note sheet.");
         }
 
-        // Fallback to Filename (legacy support)
-        path = Path.Combine(webHostEnvironment.ContentRootPath, "Static", "Sheets", sheet.FileName ?? string.Empty);
-
-        if (!System.IO.File.Exists(path))
-        {
-            return NotFound("File not found on server.");
-        }
-
-        return PhysicalFile(path, "application/octet-stream", sheet.FileName);
+        return PhysicalFile(sheet.SystemFileName, "application/octet-stream", sheet.FileName);
     }
 }

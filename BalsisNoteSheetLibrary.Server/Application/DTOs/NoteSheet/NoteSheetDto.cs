@@ -7,7 +7,7 @@ public class NoteSheetDto
     public string? Author { get; set; }
     public string? Lyricist { get; set; }
     public uint? Year { get; set; }
-    public string? Filename { get; set; }
+    public string? FileName { get; set; }
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
 
@@ -20,7 +20,7 @@ public class NoteSheetDto
             Author = entity.Author,
             Lyricist = entity.Lyricist,
             Year = entity.Year,
-            Filename = entity.FileName,
+            FileName = entity.FileName,
             SystemFileName = entity.SystemFileName,
             IsLatvian = entity.IsLatvian
         };

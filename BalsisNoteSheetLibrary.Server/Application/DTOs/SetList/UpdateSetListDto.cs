@@ -7,9 +7,9 @@ public class UpdateSetListDto
 {
     [Required] public uint Id { get; set; }
 
-    [Required] public string Title { get; set; }
+    [Required] public required string Title { get; set; }
 
-    public List<UpdateSetListItemDto> Items { get; set; }
+    public required List<UpdateSetListItemDto> Items { get; set; }
 
     public Domain.Entities.SetList ToEntity()
     {

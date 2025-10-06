@@ -5,16 +5,13 @@ namespace BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
 
 public class CreateSetListDto
 {
-    [Required] public string Title { get; set; }
-
-    public List<CreateSetListItemDto> Items { get; set; }
+    [Required] public required string Title { get; set; }
 
     public Domain.Entities.SetList ToEntity()
     {
         return new Domain.Entities.SetList
         {
-            Title = Title,
-            Items = Items.Select(i => i.ToEntity()).ToList()
+            Title = Title
         };
     }
 }

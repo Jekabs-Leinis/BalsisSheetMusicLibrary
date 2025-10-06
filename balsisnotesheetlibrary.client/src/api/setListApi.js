@@ -3,7 +3,9 @@ import { SetList } from "@/models/sheetModels";
 
 export async function getAllSetLists(withNoteSheets = false) {
   try {
-    const response = await axios.get(`/api/setList/getAll`, { params: { withNoteSheets } });
+    const response = await axios.get(`/api/setList/getAll`, {
+      params: { withNoteSheets },
+    });
 
     return response.data.map((setList) => new SetList(setList));
   } catch (e) {
@@ -42,9 +44,9 @@ export async function updateSetList(setList) {
   }
 }
 
-export async function updateSetListOrder(setList) {
+export async function moveSetList(id, newOrder) {
   try {
-    const response = await axios.post("/api/setList/updateOrder", setList);
+    const response = await axios.post("/api/setList/move", { id, newOrder });
 
     return response.data;
   } catch (e) {
@@ -54,7 +56,7 @@ export async function updateSetListOrder(setList) {
 
 export async function deleteSetList(setListId) {
   try {
-    const response = await axios.delete(`/api/setList/delete/${setListId}`);
+    const response = await axios.delete(`/api/setList/delete`, { setListId });
 
     return response.data;
   } catch (e) {
@@ -64,7 +66,7 @@ export async function deleteSetList(setListId) {
 
 export async function archiveSetList(setListId) {
   try {
-    const response = await axios.post(`/api/setList/archive/${setListId}`);
+    const response = await axios.post(`/api/setList/archive`, { setListId });
 
     return response.data;
   } catch (e) {
@@ -72,12 +74,26 @@ export async function archiveSetList(setListId) {
   }
 }
 
-export async function unarchiveSetList(setListId) {
+export async function restoreSetList(setListId) {
   try {
-    const response = await axios.post(`/api/setList/unarchive/${setListId}`);
+    const response = await axios.post(`/api/setList/restore`, { setListId });
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to unarchive set list");
+    throw new Error(e.message || "Failed to restore set list");
+  }
+}
+
+export async function moveSetListItem(setListId, noteSheetId, newOrder) {
+  try {
+    const response = await axios.post(`/api/setList/moveSetListItem`, {
+      setListId,
+      noteSheetId,
+      newOrder,
+    });
+
+    return response.data;
+  } catch (e) {
+    throw new Error(e.message || "Failed to update set list item order");
   }
 }

@@ -5,7 +5,7 @@ public class SetListDto
     public uint? Id { get; set; }
     public string? Title { get; set; }
     public uint? Order { get; set; }
-    public List<SetListItemDto> Items { get; set; }
+    public List<SetListItemDto> Items { get; set; } = [];
     public DateTime? ArchivedAt { get; set; }
 
     public static SetListDto FromEntity(Domain.Entities.SetList entity)

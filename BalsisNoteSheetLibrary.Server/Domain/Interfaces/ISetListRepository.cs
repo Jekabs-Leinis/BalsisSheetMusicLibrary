@@ -5,7 +5,8 @@ namespace BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 public interface ISetListRepository
 {
     Task<SetList?> GetByIdAsync(uint id);
-    Task<IEnumerable<SetList>> GetAllAsync();
-    Task<IEnumerable<SetList>> GetAllWithNoteSheetsAsync();
-    Task<IEnumerable<SetList>> GetAllArchivedAsync();
+    Task<List<SetList>> GetAllAsync();
+    Task<List<SetList>> GetAllWithNoteSheetsAsync();
+    Task<List<SetList>> GetAllArchivedAsync();
+    Task<List<SetList>> GetAllWithTrackingAsync();
 }

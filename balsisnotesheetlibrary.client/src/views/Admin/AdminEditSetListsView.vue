@@ -1,13 +1,11 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import { useSetListStore } from "@/stores/setlistStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import EditSetList from "@/components/Admin/EditSetLists/EditSetList.vue";
 import { VueDraggable } from "vue-draggable-plus";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSetList from "@/components/Admin/EditSetLists/DeleteSetList.vue";
-import { useRouter } from "vue-router";
-import { useToast } from "vue-toastification";
 
 // Initialize stores
 const setListStore = useSetListStore();
@@ -47,39 +45,12 @@ const cancelCreateSetList = () => {
   newSetListTitle.value = "";
 };
 
-const handleSetListMove = ({ setListId, newIndex }) => {
-  setListStore.moveSetList(setListId, newIndex);
-};
-
-const handleDraggableMove = ({ newIndex, oldIndex }) => {
-  // The draggable component will update the array position automatically,
-  // but we still need to update the order field in each set list item.
-  setListStore.reorderLists();
-  setListStore.saveSetList(setListStore.setLists[newIndex]);
-  setListStore.saveSetList(setListStore.setLists[oldIndex]);
+const handleDraggableListMove = ({ oldIndex, newIndex }) => {
+  setListStore.moveSetList(oldIndex, newIndex);
 };
 
 const showDeleteModal = ref(false);
 const setListToDelete = ref(null);
-const router = useRouter();
-const toast = useToast();
-const handleSetListDelete = (setList) => {
-  setListToDelete.value = setList;
-  showDeleteModal.value = true;
-};
-
-const handleSetListArchive = async (setList) => {
-  if (confirm(`Are you sure you want to archive "${setList.title}"?`)) {
-    try {
-      await setListStore.archiveSetList(setList.id);
-      toast.success(`"${setList.title}" has been archived`);
-      router.push('/admin/archive');
-    } catch (error) {
-      console.error('Error archiving setlist:', error);
-      toast.error('Failed to archive setlist');
-    }
-  }
-};
 </script>
 
 <template>
@@ -109,27 +80,21 @@ const handleSetListArchive = async (setList) => {
       <div v-if="!isInitializing" class="row">
         <div class="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2">
           <!-- For each item we also provide moving using arrow buttons,
-          as dragging might not always work on mobile devices.
-          However this requires us to implement manual array order update 
-          in handleSetListMove() -->
+          as dragging might not always work on mobile devices. -->
           <VueDraggable
             v-model="setListStore.setLists"
+            class="setlists-container"
+            group="setlists"
             handle=".setlist-header"
             item-key="id"
-            group="setlists"
-            class="setlists-container"
-            @sort="handleDraggableMove"
+            @sort="handleDraggableListMove"
           >
             <EditSetList
               v-for="setList in setListStore.setLists"
               :key="setList.id"
+              :is-loading="setListStore.isLoading"
               :set-list="setList"
               :set-list-count="setListStore.setLists.length"
-              :is-loading="setListStore.isLoading"
-              @remove="handleSetListDelete(setList)"
-              @archive="handleSetListArchive(setList)"
-              @updated="setListStore.saveSetList"
-              @move="handleSetListMove"
               class="mb-3"
             />
           </VueDraggable>
@@ -145,31 +110,31 @@ const handleSetListArchive = async (setList) => {
             </div>
             <div class="card-body">
               <div class="mb-3">
-                <label for="setListTitle" class="form-label"
+                <label class="form-label" for="setListTitle"
                   >Dziesmu saraksta nosaukums</label
                 >
                 <input
-                  type="text"
-                  class="form-control"
                   id="setListTitle"
                   v-model="newSetListTitle"
+                  autofocus
+                  class="form-control"
                   placeholder="Ievadi dziesmu saraksta nosaukumu"
                   required
-                  autofocus
+                  type="text"
                 />
               </div>
               <div class="d-flex justify-content-between gap-2">
                 <button
-                  type="button"
                   class="btn btn-outline-secondary"
+                  type="button"
                   @click="cancelCreateSetList"
                 >
                   Atcelt
                 </button>
                 <button
+                  class="btn btn-primary"
                   type="button"
                   @click="createSetList"
-                  class="btn btn-primary"
                 >
                   Izveidot jaunu sarakstu
                 </button>
@@ -191,8 +156,8 @@ const handleSetListArchive = async (setList) => {
   </div>
 
   <DeleteSetList
-    :set-list="setListToDelete"
     v-model:show="showDeleteModal"
+    :set-list="setListToDelete"
     @close="showDeleteModal = false"
     @confirm="setListStore.removeSetList"
   />

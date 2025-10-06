@@ -10,5 +10,8 @@ public interface ISetListService
     Task<SetListDto> CreateSetListAsync(CreateSetListDto dto);
     Task<SetListDto> UpdateSetListAsync(UpdateSetListDto dto);
     Task DeleteSetListAsync(uint id);
-    Task UpdateSetListOrderAsync(uint id, uint newOrder);
+    Task MoveSetListAsync(MoveSetListDto dto);
+    Task ArchiveSetListAsync(uint id);
+    Task RestoreSetListAsync(uint id);
+    Task MoveSetListItemAsync(MoveSetListItemDto dto);
 }

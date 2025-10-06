@@ -28,6 +28,6 @@ public class DownloadController(INoteSheetService noteSheetService) : Controller
             return NotFound("No valid file associated with this note sheet.");
         }
 
-        return PhysicalFile(sheet.SystemFileName, "application/octet-stream", sheet.FileName);
+        return PhysicalFile(sheet.SystemFileName ?? "", "application/octet-stream", sheet.FileName);
     }
 }

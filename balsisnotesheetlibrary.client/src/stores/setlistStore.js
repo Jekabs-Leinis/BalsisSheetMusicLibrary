@@ -1,17 +1,17 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import {
-  getAllSetLists,
-  getAllArchivedSetLists,
   addSetList,
-  updateSetList,
-  deleteSetList,
   archiveSetList as archiveSetListApi,
-  unarchiveSetList as unarchiveSetListApi,
-  updateSetListOrder as updateSetListOrderApi,
+  deleteSetList,
+  getAllArchivedSetLists,
+  getAllSetLists,
+  moveSetList as updateSetListOrderApi,
+  moveSetListItem as moveSetListItemApi,
+  restoreSetList as restoreSetListApi,
+  updateSetList,
 } from "@/api/setListApi";
 import { SetList } from "@/models/sheetModels";
-import { reorderSetLists } from "@/services/setListServices";
 
 export const useSetListStore = defineStore("setlist", () => {
   const setLists = ref([]);
@@ -40,7 +40,9 @@ export const useSetListStore = defineStore("setlist", () => {
 
     try {
       const lists = await getAllArchivedSetLists();
-      archivedSetLists.value = lists.sort((a, b) => a.archivedAt - b.archivedAt);
+      archivedSetLists.value = lists.sort(
+        (a, b) => a.archivedAt - b.archivedAt,
+      );
     } catch (err) {
       console.error("Error fetching setlists:", err);
       error.value = "Failed to load setlists";
@@ -105,7 +107,7 @@ export const useSetListStore = defineStore("setlist", () => {
     error.value = null;
 
     try {
-      await updateSetListOrderApi(setList);
+      await updateSetListOrderApi(setList.id, setList.order);
     } catch (err) {
       console.error("Error updating setlist order:", err);
       error.value = "Failed to update setlist order";
@@ -130,8 +132,8 @@ export const useSetListStore = defineStore("setlist", () => {
     }
   }
 
-  async function moveSetList(setListId, newIndex) {
-    const firstSetList = setLists.value.find((list) => list.id === setListId);
+  async function moveSetList(oldIndex, newIndex) {
+    const firstSetList = setLists.value[oldIndex];
     const secondSetList = setLists.value[newIndex];
 
     if (!firstSetList || !secondSetList) {
@@ -145,6 +147,30 @@ export const useSetListStore = defineStore("setlist", () => {
 
     try {
       await updateSetListOrder(firstSetList);
+    } catch (err) {
+      console.error("Error updating setlist order:", err);
+      error.value = "Failed to update setlist order";
+    }
+  }
+
+  async function moveSetListItem(setListId, oldIndex, newIndex) {
+    const setList = setLists.value.find((sl) => sl.id === setListId);
+    if (!setList) {
+      throw new Error("Setlist not found");
+    }
+    const firstItem = setList.items[oldIndex];
+    const secondItem = setList.items[newIndex];
+
+    if (!firstItem || !secondItem) {
+      throw new Error("Invalid items for moving song in setlist");
+    }
+
+    setList.items[newIndex] = firstItem;
+    setList.items[oldIndex] = secondItem;
+    setList.reorderItems();
+
+    try {
+      await moveSetListItemApi(setListId, firstItem.noteSheetId, newIndex);
     } catch (err) {
       console.error("Error updating setlist order:", err);
       error.value = "Failed to update setlist order";
@@ -168,9 +194,9 @@ export const useSetListStore = defineStore("setlist", () => {
     }
   }
 
-  async function unarchiveSetList(setListId) {
+  async function restoreSetList(setListId) {
     try {
-      await unarchiveSetListApi(setListId);
+      await restoreSetListApi(setListId);
       const index = archivedSetLists.value.findIndex(
         (sl) => sl.id === setListId,
       );
@@ -188,6 +214,15 @@ export const useSetListStore = defineStore("setlist", () => {
     }
   }
 
+  function reorderSetLists(setLists) {
+    setLists.forEach((list, index) => {
+      list.order = index;
+    });
+    setLists.sort((a, b) => a.order - b.order);
+
+    return setLists;
+  }
+
   return {
     setLists,
     archivedSetLists,
@@ -199,7 +234,8 @@ export const useSetListStore = defineStore("setlist", () => {
     saveSetList,
     removeSetList,
     moveSetList,
+    moveSetListItem,
     archiveSetList,
-    unarchiveSetList,
+    restoreSetList,
   };
 });

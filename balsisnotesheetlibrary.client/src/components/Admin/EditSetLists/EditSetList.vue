@@ -1,11 +1,12 @@
 <script setup>
 import { computed, toRefs } from "vue";
-import SheetSearchDropdown from "./SheetSearchDropdown.vue";
+import SheetSearchDropdown from "@/components/Admin/EditSetLists/SheetSearchDropdown.vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { VueDraggable } from "vue-draggable-plus";
-import { moveSheetInSetList } from "@/services/setListServices";
 import { SetListItem } from "@/models/sheetModels";
 import { getSheetsNotInList } from "@/services/noteSheetService.js";
+import EditSetListTitle from "@/components/Admin/EditSetLists/EditSetListTitle.vue";
+import { useSetListStore } from "@/stores/setlistStore.js";
 
 const props = defineProps({
   /** @type {SetList} */
@@ -17,29 +18,12 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  isLoading: {
-    type: Boolean,
-    default: false,
-  },
 });
-
-const emit = defineEmits(["remove", "updated", "archive"]);
 
 const { setList } = toRefs(props);
 
 const noteSheetStore = useNoteSheetStore();
-
-// Create a computed prop that's reactive to changes made to the items
-/** @type {SetListItem[]} */
-const setListItems = computed({
-  get: () => setList.value.items,
-  set: (value) => {
-    // setListItems can be modified by draggable or moving
-    setList.value.items = value;
-    setList.value.reorderItems();
-    emit("updated", setList.value);
-  },
-});
+const setListStore = useSetListStore();
 
 const availableSheets = computed(() => {
   return getSheetsNotInList(noteSheetStore.noteSheets, setList.value);
@@ -49,26 +33,30 @@ const addSheet = async (sheet) => {
   const item = new SetListItem({
     noteSheetId: sheet.id,
     setListId: setList.value.id,
-    order: setListItems.value.length, // Place at the end of set
+    order: setList.value.items.length, // Place at the end of set
     noteSheet: sheet,
   });
 
-  // Have to use explicit assignment to trigger setter
-  setListItems.value = [...setListItems.value, item];
+  setList.value.items.push(item);
+  await setListStore.saveSetList(setList.value);
 };
 
-const removeSheet = async (noteSheetId) => {
-  setListItems.value = setListItems.value.filter(
+const removeItem = async (noteSheetId) => {
+  setList.value.items = setList.value.items.filter(
     (item) => item.noteSheetId !== noteSheetId,
   );
+
+  await setListStore.saveSetList(setList.value);
 };
 
-const moveSheet = async (noteSheetId, order) => {
-  setListItems.value = moveSheetInSetList(setList.value, noteSheetId, order);
-};
-
-const moveSetList = (setListId, newIndex) => {
-  emit("move", { setListId, newIndex });
+const handleDraggableItemMove = ({ newIndex }) => {
+  // VueDraggable has already swapped the items in setList.value.items
+  // However we still have to update the order field and call api with error handling
+  // To avoid creating a separate store action for this,
+  // we can just call moveSetListItem() with a bogus in-place move
+  // This is ok, because on server side we re-order items
+  // based on the first item, and it's target order
+  setListStore.moveSetListItem(setList.value.id, newIndex, newIndex);
 };
 </script>
 
@@ -77,51 +65,19 @@ const moveSetList = (setListId, newIndex) => {
     <div
       class="card-header d-flex justify-content-between align-items-center setlist-header"
     >
-      <h5 class="mb-0 flex-grow-1">{{ setList.title }}</h5>
-      <button
-        v-if="setList.order > 0"
-        class="btn btn-sm fs-6"
-        :class="[
-          setList.order < setListCount - 1 ? 'pe-0' : 'no-down-arrow-padding',
-        ]"
-        @click="moveSetList(setList.id, setList.order - 1)"
-      >
-        <i class="bi bi-arrow-up movement-arrows" />
-      </button>
-      <button
-        v-if="setList.order < setListCount - 1"
-        class="btn btn-sm fs-6"
-        @click="moveSetList(setList.id, setList.order + 1)"
-      >
-        <i class="bi bi-arrow-down movement-arrows" />
-      </button>
-      <div class="d-flex gap-2">
-        <button 
-          class="btn btn-sm btn-outline-secondary" 
-          @click.stop="$emit('archive')"
-          title="Archive setlist"
-        >
-          <i class="bi bi-archive" />
-        </button>
-        <button 
-          class="btn btn-sm btn-outline-danger" 
-          @click.stop="$emit('remove')"
-          title="Delete setlist"
-        >
-          <i class="bi bi-trash" />
-        </button>
-      </div>
+      <EditSetListTitle :set-list="setList" :set-list-count="setListCount" />
     </div>
     <div class="card-body">
       <VueDraggable
-        v-model="setListItems"
+        v-model="setList.items"
         :group="`sheets-${setList.id}`"
-        item-key="noteSheetId"
-        handle=".sheet-drag-handle"
         class="list-group sheets-list mb-3"
+        handle=".sheet-drag-handle"
+        item-key="noteSheetId"
+        @sort="handleDraggableItemMove"
       >
         <div
-          v-for="item in setListItems"
+          v-for="item in setList.items"
           :key="`${setList.id}-${item.noteSheetId}`"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
@@ -131,47 +87,57 @@ const moveSetList = (setListId, newIndex) => {
             </span>
             <span>
               {{ item.order + 1 }}.
-              {{ item.noteSheet?.getFormattedTitle() || "Nosaukums nav pieejams" }}
+              {{
+                item.noteSheet?.getFormattedTitle() || "Nosaukums nav pieejams"
+              }}
             </span>
           </div>
           <button
             v-if="item.order > 0"
-            class="btn btn-sm fs-6"
             :class="[
-              item.order < setListItems.length - 1
+              item.order < setList.items.length - 1
                 ? 'pe-0'
                 : 'no-down-arrow-padding',
             ]"
-            @click="moveSheet(item.noteSheetId, item.order - 1)"
+            class="btn btn-sm fs-6"
+            @click="
+              setListStore.moveSetListItem(
+                setList.id,
+                item.order,
+                item.order - 1,
+              )
+            "
           >
             <i class="bi bi-arrow-up movement-arrows" />
           </button>
           <button
-            v-if="item.order < setListItems.length - 1"
+            v-if="item.order < setList.items.length - 1"
             class="btn btn-sm fs-6"
-            @click="moveSheet(item.noteSheetId, item.order + 1)"
+            @click="
+              setListStore.moveSetListItem(
+                setList.id,
+                item.order,
+                item.order + 1,
+              )
+            "
           >
             <i class="bi bi-arrow-down movement-arrows" />
           </button>
           <button
             class="btn btn-sm btn-close"
-            @click="removeSheet(item.noteSheetId)"
+            @click="removeItem(item.noteSheetId)"
           />
         </div>
       </VueDraggable>
 
       <div class="add-sheet-wrapper">
-        <sheet-search-dropdown
-          :sheets="availableSheets"
-          :isLoading="isLoading"
-          @select="addSheet"
-        />
+        <SheetSearchDropdown :sheets="availableSheets" @select="addSheet" />
       </div>
     </div>
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .setlist-item {
   transition: background-color 0.2s ease;
 
@@ -198,16 +164,5 @@ const moveSetList = (setListId, newIndex) => {
 
 .add-sheet-wrapper {
   margin-top: 10px;
-}
-
-.movement-arrows {
-  opacity: 0.75;
-  &:hover {
-    opacity: 1;
-  }
-}
-
-.no-down-arrow-padding {
-  padding-right: 2.1rem;
 }
 </style>

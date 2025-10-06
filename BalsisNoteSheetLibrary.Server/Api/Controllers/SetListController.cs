@@ -11,7 +11,7 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
 public class SetListController(ISetListService setListService) : ControllerBase
 {
-    [HttpGet(Name = "GetAll")]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll(bool withNoteSheets = false)
     {
         var setLists = await setListService.GetAllSetListsAsync(withNoteSheets);
@@ -19,7 +19,8 @@ public class SetListController(ISetListService setListService) : ControllerBase
         return Ok(setLists);
     }
 
-    [HttpGet(Name = "GetAllArchived")]
+    [HttpGet]
+    [Authorize(Roles = Role.Admin)]
     public async Task<ActionResult<IEnumerable<SetListDto>>> GetAllArchived()
     {
         var setLists = await setListService.GetAllArchivedSetListsAsync();
@@ -27,7 +28,7 @@ public class SetListController(ISetListService setListService) : ControllerBase
         return Ok(setLists);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("get/{id:int}")]
     public async Task<ActionResult<SetListDto>> Get(uint id)
     {
         var setList = await setListService.GetSetListByIdAsync(id);
@@ -73,28 +74,60 @@ public class SetListController(ISetListService setListService) : ControllerBase
         {
             return NotFound("Set list not found.");
         }
-        catch
-        {
-            //TODO LOG
-            return Problem();
-        }
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete]
     [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> Delete(uint id)
+    public async Task<IActionResult> Delete(uint setListId)
     {
-        await setListService.DeleteSetListAsync(id);
+        await setListService.DeleteSetListAsync(setListId);
 
         return Ok("Set list deleted.");
     }
 
-    [HttpPost("{id:int}/order")]
+    [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> UpdateOrder(uint id, [FromBody] uint newOrder)
+    public async Task<IActionResult> Move([FromBody] MoveSetListDto dto)
     {
-        await setListService.UpdateSetListOrderAsync(id, newOrder);
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        await setListService.MoveSetListAsync(dto);
 
         return Ok("Set list order updated.");
+    }
+
+    [HttpPost]
+    [Authorize(Roles = Role.Admin)]
+    public async Task<IActionResult> Archive(uint id)
+    {
+        await setListService.ArchiveSetListAsync(id);
+
+        return Ok("Set list archived.");
+    }
+
+    [HttpPost]
+    [Authorize(Roles = Role.Admin)]
+    public async Task<IActionResult> Restore(uint id)
+    {
+        await setListService.RestoreSetListAsync(id);
+
+        return Ok("Set list restored.");
+    }
+
+    [HttpPost]
+    [Authorize(Roles = Role.Admin)]
+    public async Task<IActionResult> MoveSetListItem([FromBody] MoveSetListItemDto dto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        await setListService.MoveSetListItemAsync(dto);
+
+        return Ok("Set list item order updated.");
     }
 }

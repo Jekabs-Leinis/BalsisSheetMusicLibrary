@@ -119,6 +119,7 @@ builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
 builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
 builder.Services.AddScoped<ISetListService, SetListService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ISetListItemService, SetListItemService>();
 
 
 var app = builder.Build();

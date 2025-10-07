@@ -13,5 +13,4 @@ public interface ISetListService
     Task MoveSetListAsync(MoveSetListDto dto);
     Task ArchiveSetListAsync(uint id);
     Task RestoreSetListAsync(uint id);
-    Task MoveSetListItemAsync(MoveSetListItemDto dto);
 }

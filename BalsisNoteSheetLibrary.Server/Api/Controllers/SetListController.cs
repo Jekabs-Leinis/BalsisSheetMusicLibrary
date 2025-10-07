@@ -76,10 +76,15 @@ public class SetListController(ISetListService setListService) : ControllerBase
         }
     }
 
-    [HttpDelete]
+    [HttpDelete("{setListId:int}")]
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> Delete(uint setListId)
     {
+        if (setListId == 0)
+        {
+            BadRequest("Set list ID is required.");
+        }
+        
         await setListService.DeleteSetListAsync(setListId);
 
         return Ok("Set list deleted.");
@@ -99,35 +104,31 @@ public class SetListController(ISetListService setListService) : ControllerBase
         return Ok("Set list order updated.");
     }
 
-    [HttpPost]
+    [HttpPost("{setListId:int}")]
     [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> Archive(uint id)
+    public async Task<IActionResult> Archive(uint setListId)
     {
-        await setListService.ArchiveSetListAsync(id);
+        if (setListId == 0)
+        {
+            BadRequest("Set list ID is required.");
+        }
+        
+        await setListService.ArchiveSetListAsync(setListId);
 
         return Ok("Set list archived.");
     }
 
-    [HttpPost]
+    [HttpPost("{setListId:int}")]
     [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> Restore(uint id)
+    public async Task<IActionResult> Restore(uint setListId)
     {
-        await setListService.RestoreSetListAsync(id);
+        if (setListId == 0)
+        {
+            BadRequest("Set list ID is required.");
+        }
+        
+        await setListService.RestoreSetListAsync(setListId);
 
         return Ok("Set list restored.");
-    }
-
-    [HttpPost]
-    [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> MoveSetListItem([FromBody] MoveSetListItemDto dto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState);
-        }
-
-        await setListService.MoveSetListItemAsync(dto);
-
-        return Ok("Set list item order updated.");
     }
 }

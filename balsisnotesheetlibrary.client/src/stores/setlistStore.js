@@ -7,10 +7,10 @@ import {
   getAllArchivedSetLists,
   getAllSetLists,
   moveSetList as updateSetListOrderApi,
-  moveSetListItem as moveSetListItemApi,
   restoreSetList as restoreSetListApi,
   updateSetList,
 } from "@/api/setListApi";
+import { moveSetListItem as moveSetListItemApi } from "@/api/setListItemApi";
 import { SetList } from "@/models/sheetModels";
 
 export const useSetListStore = defineStore("setlist", () => {

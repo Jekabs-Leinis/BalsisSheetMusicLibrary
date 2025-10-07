@@ -56,7 +56,7 @@ export async function moveSetList(id, newOrder) {
 
 export async function deleteSetList(setListId) {
   try {
-    const response = await axios.delete(`/api/setList/delete`, { setListId });
+    const response = await axios.delete(`/api/setList/delete/${setListId}`);
 
     return response.data;
   } catch (e) {
@@ -66,7 +66,7 @@ export async function deleteSetList(setListId) {
 
 export async function archiveSetList(setListId) {
   try {
-    const response = await axios.post(`/api/setList/archive`, { setListId });
+    const response = await axios.post(`/api/setList/archive/${setListId}`);
 
     return response.data;
   } catch (e) {
@@ -76,24 +76,10 @@ export async function archiveSetList(setListId) {
 
 export async function restoreSetList(setListId) {
   try {
-    const response = await axios.post(`/api/setList/restore`, { setListId });
+    const response = await axios.post(`/api/setList/restore/${setListId}`);
 
     return response.data;
   } catch (e) {
     throw new Error(e.message || "Failed to restore set list");
-  }
-}
-
-export async function moveSetListItem(setListId, noteSheetId, newOrder) {
-  try {
-    const response = await axios.post(`/api/setList/moveSetListItem`, {
-      setListId,
-      noteSheetId,
-      newOrder,
-    });
-
-    return response.data;
-  } catch (e) {
-    throw new Error(e.message || "Failed to update set list item order");
   }
 }

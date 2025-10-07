@@ -1,4 +1,6 @@
 <script setup>
+import { useSetListStore } from "@/stores/setlistStore.js";
+
 defineProps({
   setList: {
     type: Object,
@@ -12,6 +14,7 @@ defineProps({
 
 defineEmits(["toggleExpand"]);
 
+const setListStore = useSetListStore();
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
@@ -40,6 +43,21 @@ const formatDate = (dateString) => {
         <span class="badge text-bg-secondary">
           Arhivēts: {{ formatDate(setList.archivedAt) }}
         </span>
+        <div class="flex-grow-1"/>
+        <button
+          class="btn btn-action btn-sm btn-outline-secondary me-1"
+          title="Atjaunot nošu sarakstu"
+          @click.stop="setListStore.restoreSetList(setList.id)"
+        >
+          <i class="bi bi-arrow-counterclockwise" />
+        </button>
+        <button
+          class="btn btn-action btn-sm btn-outline-danger"
+          title="Dzēst nošu sarakstu"
+          @click.stop="setListStore.removeSetList(setList.id)"
+        >
+          <i class="bi bi-trash" />
+        </button>
       </div>
     </div>
     <div v-if="isExpanded" class="card-body">
@@ -48,7 +66,9 @@ const formatDate = (dateString) => {
           <thead>
             <tr>
               <th>#</th>
-              <th>Nosaukums</th>
+              <th>
+                Nosaukums
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +85,6 @@ const formatDate = (dateString) => {
 </template>
 
 <style scoped>
-
 .card-header {
   transition: background-color 0.2s ease-in-out;
   cursor: pointer;

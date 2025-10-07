@@ -215,10 +215,10 @@ function handleInputBlur(field) {
         <label for="file-input" class="form-label">
           PDF fails{{ isCreateMode ? " *" : "" }}
         </label>
-        <div v-if="formData.filename && !selectedFile" class="d-flex align-items-center mb-2">
+        <div v-if="formData.fileName && !selectedFile" class="d-flex align-items-center mb-2">
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-          <span>{{ formData.filename }}</span>
-          <a :href="`/api/download/${formData.id}/${formData.filename}`" target="_blank" class="ms-2 text-decoration-none">
+          <span>{{ formData.fileName }}</span>
+          <a :href="`/api/download/${formData.id}/${formData.fileName}`" target="_blank" class="ms-2 text-decoration-none">
             <i class="bi bi-download"></i>
           </a>
         </div>

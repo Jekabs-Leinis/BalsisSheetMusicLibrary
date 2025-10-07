@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { getAllNoteSheets } from "@/api/noteSheetApi";
+import {
+  getAllNoteSheets,
+  deleteNoteSheet as deleteNoteSheetApi,
+} from "@/api/noteSheetApi";
 import { SortDirection } from "@/models/utilModels";
 import {
   filterAndSortNoteSheets,
@@ -73,6 +76,16 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     filterForeignNoteSheets(filteredNoteSheets.value),
   );
 
+  async function deleteNoteSheet(id) {
+    try {
+      await deleteNoteSheetApi(id);
+      noteSheets.value = noteSheets.value.filter((sheet) => sheet.id !== id);
+    } catch (err) {
+      console.error("Error deleting note sheet:", err);
+      error.value = "Failed to delete note sheet";
+    }
+  }
+
   return {
     noteSheets,
     isLoading,
@@ -87,5 +100,6 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     setSearchQuery,
     setSortField,
     setSortDirection,
+    deleteNoteSheet,
   };
 });

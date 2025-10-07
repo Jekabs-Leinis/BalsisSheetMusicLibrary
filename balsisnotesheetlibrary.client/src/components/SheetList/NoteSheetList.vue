@@ -19,7 +19,7 @@ defineProps({
       <ul class="mb-0 pb-4">
         <li v-for="sheet in noteSheets" :key="sheet.id">
           <a
-            :href="`/api/download/${sheet.id}/${sheet.filename}`"
+            :href="`/api/download/${sheet.id}/${sheet.fileName}`"
             class="fw-bold"
             target="_blank"
             >{{ sheet.title }}</a

@@ -34,7 +34,7 @@ public class NoteSheetService(
         await context.SaveChangesAsync();
 
         noteSheet.FileName = noteSheet.GetFileName();
-        noteSheet.SystemFileName = noteSheet.GetFileName();
+        noteSheet.SystemFileName = noteSheet.GetSystemFileName();
         await fileStorageService.SaveFileAsync(fileStream, noteSheet.SystemFileName);
         await context.SaveChangesAsync();
 

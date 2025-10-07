@@ -39,11 +39,7 @@ const openDeleteModal = (sheet) => {
 
 const deleteSheet = async (sheetId) => {
   try {
-    // Replace with your actual delete API call
-    // await deleteNoteSheet(sheetId);
-    console.log("Dzēšot noti", sheetId);
-    // Refresh the list after deletion
-    await noteSheetStore.fetchNoteSheets();
+    await noteSheetStore.deleteNoteSheet(sheetId);
   } catch (error) {
     console.error("Kļūda dzēšot notis:", error);
   }
@@ -188,11 +184,11 @@ const saveSheet = async (sheet) => {
             </td>
             <td>
               <a
-                :href="`/api/download/${sheet.id}/${sheet.filename}`"
+                :href="`/api/download/${sheet.id}/${sheet.fileName}`"
                 target="_blank"
                 class="text-decoration-none text-break"
               >
-                {{ sheet.filename }}
+                {{ sheet.fileName }}
               </a>
             </td>
             <td>

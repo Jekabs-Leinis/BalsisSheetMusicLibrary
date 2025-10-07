@@ -14,7 +14,7 @@ export class NoteSheet {
   /** @type {?Number} */
   year= null;
   /** @type {string} */
-  filename= "";
+  fileName= "";
   /** @type {boolean} */
   isLatvian= false;
 

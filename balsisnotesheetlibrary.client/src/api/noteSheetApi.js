@@ -67,3 +67,11 @@ export async function updateNoteSheet(noteSheet, file) {
     throw new Error(e.message || "Failed to update note sheet");
   }
 }
+
+export async function deleteNoteSheet(noteSheetId) {
+  try {
+    await axios.delete(`/api/noteSheet/delete/${noteSheetId}`);
+  } catch (e) {
+    throw new Error(e.message || "Failed to delete note sheet");
+  }
+}

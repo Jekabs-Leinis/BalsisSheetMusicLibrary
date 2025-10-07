@@ -9,7 +9,7 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class SetListController(ISetListService setListService) : ControllerBase
+public class SetListController(ISetListService setListService, ILogger<SetListController> logger) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll(bool withNoteSheets = false)
@@ -35,6 +35,8 @@ public class SetListController(ISetListService setListService) : ControllerBase
 
         if (setList == null)
         {
+            logger.LogWarning("User attempted to access a non-existent set list with ID {Id}.", id);
+            
             return NotFound("Set list not found.");
         }
 
@@ -47,6 +49,8 @@ public class SetListController(ISetListService setListService) : ControllerBase
     {
         if (!ModelState.IsValid)
         {
+            logger.LogWarning("Invalid model state for CreateSetListDto: {ModelState}", ModelState);
+            
             return BadRequest(ModelState);
         }
 
@@ -61,6 +65,8 @@ public class SetListController(ISetListService setListService) : ControllerBase
     {
         if (!ModelState.IsValid)
         {
+            logger.LogWarning("Invalid model state for UpdateSetListDto: {ModelState}", ModelState);
+            
             return BadRequest(ModelState);
         }
 
@@ -70,8 +76,10 @@ public class SetListController(ISetListService setListService) : ControllerBase
 
             return Ok(updated);
         }
-        catch (InvalidOperationException)
+        catch (InvalidOperationException ex)
         {
+            logger.LogError(ex, "Failed to update set list with ID {Id}.", dto.Id);
+            
             return NotFound("Set list not found.");
         }
     }
@@ -80,11 +88,6 @@ public class SetListController(ISetListService setListService) : ControllerBase
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> Delete(uint setListId)
     {
-        if (setListId == 0)
-        {
-            BadRequest("Set list ID is required.");
-        }
-        
         await setListService.DeleteSetListAsync(setListId);
 
         return Ok("Set list deleted.");
@@ -96,6 +99,8 @@ public class SetListController(ISetListService setListService) : ControllerBase
     {
         if (!ModelState.IsValid)
         {
+            logger.LogWarning("Invalid model state for MoveSetListDto: {ModelState}", ModelState);
+            
             return BadRequest(ModelState);
         }
 
@@ -108,11 +113,6 @@ public class SetListController(ISetListService setListService) : ControllerBase
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> Archive(uint setListId)
     {
-        if (setListId == 0)
-        {
-            BadRequest("Set list ID is required.");
-        }
-        
         await setListService.ArchiveSetListAsync(setListId);
 
         return Ok("Set list archived.");
@@ -122,11 +122,6 @@ public class SetListController(ISetListService setListService) : ControllerBase
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> Restore(uint setListId)
     {
-        if (setListId == 0)
-        {
-            BadRequest("Set list ID is required.");
-        }
-        
         await setListService.RestoreSetListAsync(setListId);
 
         return Ok("Set list restored.");

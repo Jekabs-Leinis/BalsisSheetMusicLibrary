@@ -8,7 +8,7 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class DownloadController(INoteSheetService noteSheetService) : ControllerBase
+public class DownloadController(INoteSheetService noteSheetService, ILogger<DownloadController> logger) : ControllerBase
 {
     /**
      * We don't really care about the filename, but we include it in the URL to ensure readability.
@@ -20,11 +20,19 @@ public class DownloadController(INoteSheetService noteSheetService) : Controller
 
         if (sheet == null)
         {
+            logger.LogWarning("User attempted to download a non-existent note sheet with ID {Id}.", id);
+
             return NotFound("Note sheet not found.");
         }
 
         if (!noteSheetService.HasValidFile(sheet))
         {
+            logger.LogError(
+                "Note sheet with ID {Id} has no valid file associated with it. System filename: {filename}",
+                id,
+                sheet.SystemFileName
+                );
+
             return NotFound("No valid file associated with this note sheet.");
         }
 

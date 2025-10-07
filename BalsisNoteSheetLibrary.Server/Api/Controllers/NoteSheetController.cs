@@ -9,7 +9,10 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetRenameService renameService)
+public class NoteSheetController(
+    INoteSheetService noteSheetService,
+    INoteSheetRenameService renameService,
+    ILogger<NoteSheetController> logger)
     : ControllerBase
 {
     [HttpGet]
@@ -27,6 +30,8 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
 
         if (result == null)
         {
+            logger.LogWarning("Tried to access non-existent note sheet with ID {Id}", id);
+            
             return NotFound("Note sheet not found");
         }
 
@@ -39,16 +44,22 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     {
         if (!ModelState.IsValid)
         {
+            logger.LogWarning("Invalid model state for CreateNoteSheetDto: {ModelState}", ModelState);
+            
             return BadRequest(ModelState);
         }
 
         if (file.Length == 0)
         {
+            logger.LogWarning("User attempted to upload an empty PDF file.");
+            
             return BadRequest("PDF file is required");
         }
 
         if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
         {
+            logger.LogWarning("Invalid file type for CreateNoteSheetDto: {FileType}", file.ContentType);
+            
             return BadRequest("Only PDF files are allowed");
         }
 
@@ -64,6 +75,8 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     {
         if (!ModelState.IsValid)
         {
+            logger.LogWarning("Invalid model state for UpdateNoteSheetDto: {ModelState}", ModelState);
+            
             return BadRequest(ModelState);
         }
 
@@ -77,6 +90,8 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
         }
         catch (InvalidOperationException ex)
         {
+            logger.LogError(ex, "Failed to update note sheet with ID {Id}", updateDto.Id);
+            
             return NotFound(ex.Message);
         }
     }
@@ -85,8 +100,17 @@ public class NoteSheetController(INoteSheetService noteSheetService, INoteSheetR
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> Delete(uint id)
     {
-        await noteSheetService.DeleteNoteSheetAsync(id);
-
+        try
+        {
+            await noteSheetService.DeleteNoteSheetAsync(id);
+        }
+        catch (InvalidOperationException ex)
+        {
+            logger.LogError(ex, "Failed to delete note sheet with ID {Id}", id);
+            
+            return NotFound(ex.Message);
+        }
+        
         return Ok("Note sheet deleted successfully");
     }
 

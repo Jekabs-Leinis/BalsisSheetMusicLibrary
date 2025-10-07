@@ -15,12 +15,14 @@ public class NoteSheetService(
     public async Task<NoteSheetDto?> GetNoteSheetAsync(uint id)
     {
         var noteSheet = await context.NoteSheets.FindAsync(id);
+
         return noteSheet != null ? NoteSheetDto.FromEntity(noteSheet) : null;
     }
 
     public async Task<IEnumerable<NoteSheetDto>> GetAllNoteSheetsAsync()
     {
         var noteSheets = await repository.GetAllOrderedByTitleAsync();
+
         return noteSheets.Select(NoteSheetDto.FromEntity);
     }
 
@@ -99,7 +101,7 @@ public class NoteSheetService(
         context.NoteSheets.Remove(noteSheet);
         await context.SaveChangesAsync();
     }
-    
+
     public bool HasValidFile(NoteSheetDto dto)
     {
         if (string.IsNullOrEmpty(dto.SystemFileName) || string.IsNullOrWhiteSpace(dto.FileName))

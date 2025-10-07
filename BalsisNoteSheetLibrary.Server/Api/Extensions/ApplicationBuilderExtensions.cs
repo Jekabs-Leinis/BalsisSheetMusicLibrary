@@ -7,9 +7,9 @@ public static class ApplicationBuilderExtensions
 {
     public static IApplicationBuilder ConfigurePipeline(this IApplicationBuilder app)
     {
-        app.UseDefaultFiles();
-        app.UseStaticFiles();
         app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
         var env = app.ApplicationServices.GetService<IHostEnvironment>();
 
@@ -22,12 +22,11 @@ public static class ApplicationBuilderExtensions
         else
         {
             app.UseHttpsRedirection();
-            app.UseAuthentication();
-            app.UseAuthorization();
             app.UseAntiforgery();
         }
 
         app.UseMiddleware<RequestLoggingMiddleware>();
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseEndpoints(endpoints =>
         {

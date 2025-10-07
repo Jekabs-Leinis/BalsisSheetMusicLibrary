@@ -6,14 +6,18 @@ using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
-public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteSheetRenameService
+public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<NoteSheetRenameService> logger) : INoteSheetRenameService
 {
     private static readonly SemaphoreSlim RenameLock = new(1, 1);
 
     public async Task RenameAllFilenamesAsync()
     {
+        logger.LogInformation("Starting rename operation for all note sheet filenames.");
+        
         if (!await RenameLock.WaitAsync(0))
         {
+            logger.LogInformation("Rename operation already in progress. Exiting.");
+            
             return;
         }
 
@@ -26,6 +30,8 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
             finally
             {
                 RenameLock.Release();
+                
+                logger.LogInformation("Rename operation completed.");
             }
         });
     }
@@ -48,7 +54,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
         }
         catch (Exception ex)
         {
-            // TODO: Log the exception
+            logger.LogError(ex, "Error renaming note sheets");
         }
     }
 
@@ -73,6 +79,8 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
             }
             catch (Exception ex)
             {
+                logger.LogError(ex, "Error renaming note sheets");
+                
                 _ = hub.SendStatus("error", $"Error renaming file for sheet {sheet.Id}: {ex.Message}");
             }
 
@@ -95,8 +103,10 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider) : INoteShe
         {
             fileStorage.MoveFile(oldPath, newPath);
         }
-        catch (FileNotFoundException)
+        catch (FileNotFoundException ex)
         {
+            logger.LogError(ex, "File not found for NoteSheet ID {Id} at path {Path}", sheet.Id, oldPath);
+            
             return false;
         }
 

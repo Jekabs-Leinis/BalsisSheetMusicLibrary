@@ -4,47 +4,52 @@ using BalsisNoteSheetLibrary.Server.Application.Services;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Extensions;
 
-public static class ServiceCollectionExtensions
+public static class WebApplicationBuilderExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection services,
-        IConfiguration configuration)
+    public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
     {
-        RegisterDb(services, configuration);
-        RegisterAuthentication(services);
-        RegisterAuthorization(services);
-        RegisterAntiforgery(services);
+        RegisterDb(builder);
+        RegisterAuthentication(builder);
+        RegisterAuthorization(builder);
+        RegisterAntiforgery(builder);
 
-        services.AddControllers();
-        services.AddSignalR();
-        services.AddLogging();
+        builder.Services.AddControllers();
+        builder.Services.AddSignalR();
+        builder.Services.AddSerilog((services, lc) =>
+        {
+            lc.ReadFrom.Configuration(builder.Configuration)
+                .ReadFrom.Services(services);
+        });
 
         // Dev only services
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
 
-        RegisterAppServices(services);
+        RegisterAppServices(builder);
 
-        return services;
+        return builder;
     }
 
-    private static void RegisterAntiforgery(IServiceCollection services)
+    private static void RegisterAntiforgery(WebApplicationBuilder builder)
     {
-        services.AddAntiforgery(options =>
+        builder.Services.AddAntiforgery(options =>
         {
             options.Cookie.Name = "XSRF-TOKEN";
             options.HeaderName = "X-CSRF-TOKEN";
         });
 
-        services.AddCors(options =>
+        builder.Services.AddCors(options =>
         {
             options.AddPolicy("DisableCSRFAndAuthForLocalhost",
                 b =>
@@ -57,32 +62,32 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    private static void RegisterAppServices(IServiceCollection services)
+    private static void RegisterAppServices(WebApplicationBuilder builder)
     {
         // Infrastructure services
-        services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
         // Repositories
-        services.AddScoped<INoteSheetRepository, NoteSheetRepository>();
-        services.AddScoped<ISetListRepository, SetListRepository>();
+        builder.Services.AddScoped<INoteSheetRepository, NoteSheetRepository>();
+        builder.Services.AddScoped<ISetListRepository, SetListRepository>();
         // Application services
-        services.AddScoped<INoteSheetService, NoteSheetService>();
-        services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
-        services.AddScoped<ISetListService, SetListService>();
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<ISetListItemService, SetListItemService>();
+        builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
+        builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
+        builder.Services.AddScoped<ISetListService, SetListService>();
+        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<ISetListItemService, SetListItemService>();
     }
 
-    private static void RegisterAuthorization(IServiceCollection services)
+    private static void RegisterAuthorization(WebApplicationBuilder builder)
     {
-        services.AddAuthorizationBuilder()
+        builder.Services.AddAuthorizationBuilder()
             .SetFallbackPolicy(new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
                 .Build());
     }
 
-    private static void RegisterAuthentication(IServiceCollection services)
+    private static void RegisterAuthentication(WebApplicationBuilder builder)
     {
-        services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
             {
                 options.Password.RequiredLength = 1;
                 options.Password.RequireLowercase = false;
@@ -93,14 +98,14 @@ public static class ServiceCollectionExtensions
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
-        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
                 options.LoginPath = "/login";
                 options.AccessDeniedPath = "/login";
             });
 
-        services.ConfigureApplicationCookie(options =>
+        builder.Services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = "/login";
             options.Events = new CookieAuthenticationEvents
@@ -116,15 +121,15 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    private static void RegisterDb(IServiceCollection services, IConfiguration configuration)
+    private static void RegisterDb(WebApplicationBuilder builder)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection");
+        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
         if (string.IsNullOrEmpty(connectionString))
         {
             throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         }
 
-        services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+        builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
     }
 }

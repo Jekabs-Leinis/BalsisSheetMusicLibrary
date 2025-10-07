@@ -1,10 +1,11 @@
 using System.Globalization;
 using BalsisNoteSheetLibrary.Server.Application.Extensions;
 using Microsoft.Data.Sqlite;
+using Serilog;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 
-public abstract class SqliteExtensions
+public abstract class SqliteExtensions(ILogger<SqliteExtensions> logger)
 {
     public const string InsensitiveCollation = "FOLD";
 
@@ -20,6 +21,6 @@ public abstract class SqliteExtensions
             CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreCase
         ));
 
-        Console.WriteLine("Fold collation created for SQLite database.");
+        Log.Information("Fold collation created for SQLite database.");
     }
 }

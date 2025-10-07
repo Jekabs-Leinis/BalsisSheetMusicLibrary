@@ -1,17 +1,36 @@
 using BalsisNoteSheetLibrary.Server.Api.Extensions;
+using Serilog;
+using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-builder.Services.Configure<RouteOptions>(options =>
+try
 {
-    options.LowercaseUrls = true;
-    options.LowercaseQueryStrings = true;
-});
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplicationServices(builder.Configuration);
+    builder.Services.Configure<RouteOptions>(options =>
+    {
+        options.LowercaseUrls = true;
+        options.LowercaseQueryStrings = true;
+    });
 
-var app = builder.Build();
+    builder.AddApplicationServices();
 
-app.ConfigurePipeline();
+    var app = builder.Build();
 
-app.Run();
+    app.ConfigurePipeline();
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Application terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

@@ -3,6 +3,7 @@ using BalsisNoteSheetLibrary.Server.Domain.Entities;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
+using Microsoft.AspNetCore.SignalR;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
@@ -42,15 +43,15 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         {
             await using var scope = scopeProvider.CreateAsyncScope();
             var scopedContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            var scopedRenameHub = scope.ServiceProvider.GetRequiredService<StatusHub>();
+            var scopedRenameHub = scope.ServiceProvider.GetRequiredService<IHubContext<StatusHub>>();
             var scopedEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var scopedFileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
             // Intentionally not awaited, as we don't want to block on this.
-            _ = scopedRenameHub.SendStatus("start", "Renaming started.");
+            _ = SendStatus( scopedRenameHub,"start", "Pārsaukšana uzsākta.");
             var sheets = scopedContext.NoteSheets.ToList();
             var sheetsFolder = Path.Combine(scopedEnv.ContentRootPath, "Static", "Sheets");
             await RenameAllSheets(sheets, sheetsFolder, scopedContext, scopedFileStorageService, scopedRenameHub);
-            _ = scopedRenameHub.SendStatus("complete", "Renaming complete.");
+            _ = SendStatus(scopedRenameHub,"complete", "Pāršaukšana pabeigta.");
         }
         catch (Exception ex)
         {
@@ -59,34 +60,36 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
     }
 
     private async Task RenameAllSheets(List<NoteSheet> sheets, string sheetsFolder, AppDbContext scopedContext,
-        IFileStorageService fileStorage, StatusHub hub)
+        IFileStorageService fileStorage, IHubContext<StatusHub> scopedHub)
     {
         var total = sheets.Count;
         var current = 0;
 
         foreach (var sheet in sheets)
         {
-            current++;
-
             try
             {
                 var renamed = await RenameSingleSheet(sheet, sheetsFolder, scopedContext, fileStorage);
 
                 if (!renamed)
                 {
-                    _ = hub.SendStatus("error", $"File not found for sheet {sheet.Id}");
+                    _ = SendStatus(scopedHub, "error", $"Notīm \"{sheet.Title}\" neizdvās atrast failu.");
+                }
+                else
+                {
+                    current++;
                 }
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error renaming note sheets");
                 
-                _ = hub.SendStatus("error", $"Error renaming file for sheet {sheet.Id}: {ex.Message}");
+                _ = SendStatus(scopedHub, "error", $"Radās kļūda pārsaucot notis {sheet.Title}: {ex.Message}");
             }
 
             if ((current > 0 && current % 100 == 0) || current == total)
             {
-                _ = hub.SendStatus("progress", $"Renamed {current}/{total}", current, total);
+                _ = SendStatus(scopedHub, "progress", $"Pārsauktas {current}/{total}");
             }
         }
     }
@@ -116,5 +119,11 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         await scopedContext.SaveChangesAsync();
 
         return true;
+    }
+    
+    private static async Task SendStatus(IHubContext<StatusHub> hub, string status, string message)
+    {
+        // Should only produce notification for clients that are on the rename page, so sending to all is ok.
+        await hub.Clients.All.SendAsync("status", new { status, message });
     }
 }

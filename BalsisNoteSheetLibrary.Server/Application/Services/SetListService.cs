@@ -2,12 +2,10 @@ using BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Entities;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
-using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
-public class SetListService(AppDbContext context, ISetListRepository setListRepository) : ISetListService
+public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 {
     public async Task<IEnumerable<SetListDto>> GetAllSetListsAsync(bool withNoteSheets = false)
     {
@@ -15,11 +13,11 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
 
         if (withNoteSheets)
         {
-            setLists = await setListRepository.GetAllWithNoteSheetsAsync();
+            setLists = await unitOfWork.SetLists.GetAllWithNoteSheetsAsync();
         }
         else
         {
-            setLists = await setListRepository.GetAllAsync();
+            setLists = await unitOfWork.SetLists.GetAllAsync();
         }
 
         return setLists.Select(SetListDto.FromEntity);
@@ -27,14 +25,14 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
 
     public async Task<IEnumerable<SetListDto>> GetAllArchivedSetListsAsync()
     {
-        var setLists = await setListRepository.GetAllArchivedAsync();
+        var setLists = await unitOfWork.SetLists.GetAllArchivedAsync();
 
         return setLists.Select(SetListDto.FromEntity);
     }
 
     public async Task<SetListDto?> GetSetListByIdAsync(uint id)
     {
-        var setList = await setListRepository.GetByIdAsync(id);
+        var setList = await unitOfWork.SetLists.GetByKeysAsync(id);
 
         return setList == null ? null : SetListDto.FromEntity(setList);
     }
@@ -43,18 +41,18 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
     {
         var setList = dto.ToEntity();
 
-        var maxOrder = await context.SetLists.Where(sl => sl.Order != null).MaxAsync(sl => sl.Order) ?? 0;
+        var maxOrder = await unitOfWork.SetLists.GetMaxOrderAsync();
         setList.Order = maxOrder + 1;
 
-        context.SetLists.Add(setList);
-        await context.SaveChangesAsync();
+        unitOfWork.SetLists.Add(setList);
+        await unitOfWork.SaveChangesAsync();
 
         return SetListDto.FromEntity(setList);
     }
 
     public async Task<SetListDto> UpdateSetListAsync(UpdateSetListDto dto)
     {
-        var setList = await setListRepository.GetByIdAsync(dto.Id);
+        var setList = await unitOfWork.SetLists.GetByKeysAsync(dto.Id);
 
         if (setList == null)
         {
@@ -72,7 +70,7 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
 
         if (itemsToRemove.Count > 0)
         {
-            context.SetListItems.RemoveRange(itemsToRemove);
+            unitOfWork.SetListItems.RemoveRange(itemsToRemove);
         }
 
         // Update existing items and add new ones
@@ -91,41 +89,41 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
                 existingItem.NoteSheetId = updatedItem.NoteSheetId;
                 existingItem.Order = (uint)i;
 
-                context.SetListItems.Update(existingItem);
+                unitOfWork.SetListItems.Update(existingItem);
             }
             else
             {
                 // New item
                 updatedItem.SetListId = setList.Id;
                 updatedItem.Order = (uint)i;
-                context.SetListItems.Add(updatedItem);
+                unitOfWork.SetListItems.Add(updatedItem);
             }
         }
 
-        context.SetLists.Update(setList);
-        await context.SaveChangesAsync();
+        unitOfWork.SetLists.Update(setList);
+        await unitOfWork.SaveChangesAsync();
 
         return SetListDto.FromEntity(setList);
     }
 
     public async Task DeleteSetListAsync(uint id)
     {
-        var setList = await setListRepository.GetByIdAsync(id);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(id);
 
         if (setList == null)
         {
             throw new InvalidOperationException("SetList not found");
         }
 
-        context.SetLists.Remove(setList);
-        context.SetListItems.RemoveRange(setList.Items);
+        unitOfWork.SetLists.Remove(setList);
+        unitOfWork.SetListItems.RemoveRange(setList.Items);
 
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task MoveSetListAsync(MoveSetListDto dto)
     {
-        var setList = await setListRepository.GetByIdAsync(dto.Id);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(dto.Id);
 
         if (setList == null)
         {
@@ -134,18 +132,18 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
 
         // Have to reorder all set lists to ensure no gaps or duplicates
         // Otherwise updating from two different clients without either reloading causes issues
-        var reorderableLists = await setListRepository.GetAllWithTrackingAsync();
+        var reorderableLists = await unitOfWork.SetLists.GetAllWithTrackingAsync();
         reorderableLists.RemoveAll(sl => sl.Id == setList.Id);
         reorderableLists.Insert((int)dto.NewOrder, setList);
         ReorderSetLists(reorderableLists);
-        context.UpdateRange(reorderableLists);
+        unitOfWork.SetLists.UpdateRange(reorderableLists);
 
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task ArchiveSetListAsync(uint id)
     {
-        var setList = await setListRepository.GetByIdAsync(id);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(id);
 
         if (setList == null)
         {
@@ -154,20 +152,20 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
 
         setList.ArchivedAt = DateTime.Now;
         setList.Order = null;
-        context.SetLists.Update(setList);
+        unitOfWork.SetLists.Update(setList);
 
-        var reorderableLists = await setListRepository.GetAllWithTrackingAsync();
+        var reorderableLists = await unitOfWork.SetLists.GetAllWithTrackingAsync();
         reorderableLists.RemoveAll(sl => sl.Id == setList.Id);
 
         ReorderSetLists(reorderableLists);
-        context.UpdateRange(reorderableLists);
+        unitOfWork.SetLists.UpdateRange(reorderableLists);
 
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 
     public async Task RestoreSetListAsync(uint id)
     {
-        var setList = await setListRepository.GetByIdAsync(id);
+        var setList = await unitOfWork.SetLists.GetByKeysAsync(id);
 
         if (setList == null)
         {
@@ -176,13 +174,13 @@ public class SetListService(AppDbContext context, ISetListRepository setListRepo
 
         setList.ArchivedAt = null;
 
-        var reorderableLists = await setListRepository.GetAllWithTrackingAsync();
+        var reorderableLists = await unitOfWork.SetLists.GetAllWithTrackingAsync();
         reorderableLists.Add(setList);
 
         ReorderSetLists(reorderableLists);
-        context.UpdateRange(reorderableLists);
+        unitOfWork.SetLists.UpdateRange(reorderableLists);
 
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 
     private static void ReorderSetLists(List<SetList> setLists)

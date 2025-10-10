@@ -1,15 +1,14 @@
 using BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
-public class SetListItemService(AppDbContext context, ISetListRepository setListRepository) : ISetListItemService
+public class SetListItemService(IUnitOfWork unitOfWork) : ISetListItemService
 {
     public async Task MoveSetListItemAsync(MoveSetListItemDto dto)
     {
-        var setList = await setListRepository.GetByIdAsync(dto.SetListId);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(dto.SetListId);
 
         if (setList == null)
         {
@@ -30,9 +29,9 @@ public class SetListItemService(AppDbContext context, ISetListRepository setList
         for (var i = 0; i < reorderableItems.Count; i++)
         {
             reorderableItems[i].Order = (uint)i;
-            context.SetListItems.Update(reorderableItems[i]);
+            unitOfWork.SetListItems.Update(reorderableItems[i]);
         }
 
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
     }
 }

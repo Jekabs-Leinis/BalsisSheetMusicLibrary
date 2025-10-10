@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 
-public class NoteSheetRepository(AppDbContext context) : INoteSheetRepository
+public class NoteSheetRepository(AppDbContext context) : BaseRepository<NoteSheet>(context), INoteSheetRepository
 {
-    public async Task<IReadOnlyList<NoteSheet>> GetAllOrderedByTitleAsync(CancellationToken cancellationToken = default)
+    public async Task<List<NoteSheet>> GetAllOrderedByTitleAsync()
     {
         return await context.Set<NoteSheet>()
             .AsNoTracking()
             .OrderBy(sheet => EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
-            .ToListAsync(cancellationToken);
+            .ToListAsync();
     }
 }

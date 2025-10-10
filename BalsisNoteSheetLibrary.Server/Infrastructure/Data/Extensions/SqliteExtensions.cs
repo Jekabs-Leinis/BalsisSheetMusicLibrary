@@ -5,7 +5,7 @@ using Serilog;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 
-public abstract class SqliteExtensions(ILogger<SqliteExtensions> logger)
+public abstract class SqliteExtensions()
 {
     public const string InsensitiveCollation = "FOLD";
 

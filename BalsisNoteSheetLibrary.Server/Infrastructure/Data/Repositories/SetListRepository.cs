@@ -5,16 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 
-public class SetListRepository(AppDbContext context) : ISetListRepository
+public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(context), ISetListRepository
 {
-    public async Task<SetList?> GetByIdAsync(uint id)
+    public new async Task<SetList?> GetByIdAsync(uint id)
     {
         return await context.SetLists
             .Include(list => list.Items)
             .FirstOrDefaultAsync(list => list.Id == id);
     }
 
-    public async Task<List<SetList>> GetAllAsync()
+    public new async Task<List<SetList>> GetAllAsync()
     {
         return await context.SetLists
             .Include(list => list.Items)
@@ -52,5 +52,10 @@ public class SetListRepository(AppDbContext context) : ISetListRepository
             .Where(list => list.ArchivedAt == null)
             .OrderBy(sl => sl.Order)
             .ToListAsync();
+    }
+
+    public async Task<uint> GetMaxOrderAsync()
+    {
+        return await context.SetLists.Where(sl => sl.Order != null).MaxAsync(sl => sl.Order) ?? 0;
     }
 }

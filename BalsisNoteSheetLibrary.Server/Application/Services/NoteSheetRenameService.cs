@@ -1,6 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Entities;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.SignalR;
@@ -42,16 +42,16 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         try
         {
             await using var scope = scopeProvider.CreateAsyncScope();
-            var scopedContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var scopedUnitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var scopedRenameHub = scope.ServiceProvider.GetRequiredService<IHubContext<StatusHub>>();
             var scopedEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var scopedFileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
             // Intentionally not awaited, as we don't want to block on this.
-            _ = SendStatus( scopedRenameHub,"start", "Pārsaukšana uzsākta.");
-            var sheets = scopedContext.NoteSheets.ToList();
+            _ = SendStatus(scopedRenameHub, "start", "Pārsaukšana uzsākta.");
+            var sheets = await scopedUnitOfWork.NoteSheets.GetAllAsync();
             var sheetsFolder = Path.Combine(scopedEnv.ContentRootPath, "Static", "Sheets");
-            await RenameAllSheets(sheets, sheetsFolder, scopedContext, scopedFileStorageService, scopedRenameHub);
-            _ = SendStatus(scopedRenameHub,"complete", "Pāršaukšana pabeigta.");
+            await RenameAllSheets(sheets, sheetsFolder, scopedUnitOfWork, scopedFileStorageService, scopedRenameHub);
+            _ = SendStatus(scopedRenameHub, "complete", "Pāršaukšana pabeigta.");
         }
         catch (Exception ex)
         {
@@ -59,7 +59,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         }
     }
 
-    private async Task RenameAllSheets(List<NoteSheet> sheets, string sheetsFolder, AppDbContext scopedContext,
+    private async Task RenameAllSheets(List<NoteSheet> sheets, string sheetsFolder, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage, IHubContext<StatusHub> scopedHub)
     {
         var total = sheets.Count;
@@ -69,7 +69,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         {
             try
             {
-                var renamed = await RenameSingleSheet(sheet, sheetsFolder, scopedContext, fileStorage);
+                var renamed = await RenameSingleSheet(sheet, sheetsFolder, scopedUnitOfWork, fileStorage);
 
                 if (!renamed)
                 {
@@ -94,7 +94,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         }
     }
 
-    private async Task<bool> RenameSingleSheet(NoteSheet sheet, string sheetsFolder, AppDbContext scopedContext,
+    private async Task<bool> RenameSingleSheet(NoteSheet sheet, string sheetsFolder, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage)
     {
         var newFileName = sheet.GetFileName();
@@ -115,8 +115,8 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
 
         sheet.FileName = newFileName;
         sheet.SystemFileName = newSystemFileName;
-        scopedContext.Update(sheet);
-        await scopedContext.SaveChangesAsync();
+        scopedUnitOfWork.NoteSheets.Update(sheet);
+        await scopedUnitOfWork.SaveChangesAsync();
 
         return true;
     }

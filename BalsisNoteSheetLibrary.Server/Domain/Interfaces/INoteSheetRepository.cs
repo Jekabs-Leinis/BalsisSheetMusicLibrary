@@ -2,7 +2,7 @@ using BalsisNoteSheetLibrary.Server.Domain.Entities;
 
 namespace BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 
-public interface INoteSheetRepository
+public interface INoteSheetRepository : IBaseRepository<NoteSheet>
 {
-    Task<IReadOnlyList<NoteSheet>> GetAllOrderedByTitleAsync(CancellationToken cancellationToken = default);
+    Task<List<NoteSheet>> GetAllOrderedByTitleAsync();
 }

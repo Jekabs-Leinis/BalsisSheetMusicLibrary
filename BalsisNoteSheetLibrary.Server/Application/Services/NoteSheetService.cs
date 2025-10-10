@@ -1,27 +1,25 @@
 using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
 public class NoteSheetService(
-    AppDbContext context,
-    INoteSheetRepository repository,
+    IUnitOfWork unitOfWork,
     IFileStorageService fileStorageService)
     : INoteSheetService
 {
     public async Task<NoteSheetDto?> GetNoteSheetAsync(uint id)
     {
-        var noteSheet = await context.NoteSheets.FindAsync(id);
+        var noteSheet = await unitOfWork.NoteSheets.GetByIdAsync(id);
 
         return noteSheet != null ? NoteSheetDto.FromEntity(noteSheet) : null;
     }
 
     public async Task<IEnumerable<NoteSheetDto>> GetAllNoteSheetsAsync()
     {
-        var noteSheets = await repository.GetAllOrderedByTitleAsync();
+        var noteSheets = await unitOfWork.NoteSheets.GetAllOrderedByTitleAsync();
 
         return noteSheets.Select(NoteSheetDto.FromEntity);
     }
@@ -29,21 +27,21 @@ public class NoteSheetService(
     public async Task<NoteSheetDto> CreateNoteSheetAsync(CreateNoteSheetDto dto, Stream fileStream)
     {
         var noteSheet = dto.ToEntity();
-        context.NoteSheets.Add(noteSheet);
+        unitOfWork.NoteSheets.Add(noteSheet);
         // Save initially to generate ID for filename
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
 
         noteSheet.FileName = noteSheet.GetFileName();
         noteSheet.SystemFileName = noteSheet.GetSystemFileName();
         await fileStorageService.SaveFileAsync(fileStream, noteSheet.SystemFileName);
-        await context.SaveChangesAsync();
+        await unitOfWork.SaveChangesAsync();
 
         return NoteSheetDto.FromEntity(noteSheet);
     }
 
     public async Task<NoteSheetDto> UpdateNoteSheetAsync(UpdateNoteSheetDto dto, Stream? fileStream)
     {
-        var noteSheet = await context.NoteSheets.FindAsync(dto.Id);
+        var noteSheet = await unitOfWork.NoteSheets.GetByIdAsync(dto.Id);
 
         if (noteSheet == null)
         {
@@ -79,14 +77,15 @@ public class NoteSheetService(
             }
         }
 
-        await context.SaveChangesAsync();
+        unitOfWork.NoteSheets.Update(noteSheet);
+        await unitOfWork.SaveChangesAsync();
 
         return NoteSheetDto.FromEntity(noteSheet);
     }
 
     public async Task DeleteNoteSheetAsync(uint id)
     {
-        var noteSheet = await context.NoteSheets.FindAsync(id);
+        var noteSheet = await unitOfWork.NoteSheets.GetByIdAsync(id);
 
         if (noteSheet == null)
         {
@@ -98,8 +97,8 @@ public class NoteSheetService(
             await fileStorageService.DeleteFileAsync(noteSheet.SystemFileName);
         }
 
-        context.NoteSheets.Remove(noteSheet);
-        await context.SaveChangesAsync();
+        unitOfWork.NoteSheets.Remove(noteSheet);
+        await unitOfWork.SaveChangesAsync();
     }
 
     public bool HasValidFile(NoteSheetDto dto)

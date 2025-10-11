@@ -17,11 +17,11 @@ public class NoteSheetService(
         return noteSheet != null ? NoteSheetDto.FromEntity(noteSheet) : null;
     }
 
-    public async Task<IEnumerable<NoteSheetDto>> GetAllNoteSheetsAsync()
+    public async Task<List<NoteSheetDto>> GetAllNoteSheetsAsync()
     {
         var noteSheets = await unitOfWork.NoteSheets.GetAllOrderedByTitleAsync();
 
-        return noteSheets.Select(NoteSheetDto.FromEntity);
+        return noteSheets.Select(NoteSheetDto.FromEntity).ToList();
     }
 
     public async Task<NoteSheetDto> CreateNoteSheetAsync(CreateNoteSheetDto dto, Stream fileStream)

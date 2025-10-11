@@ -149,4 +149,49 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Assert
         Assert.False(result);
     }
+
+    [Fact]
+    public async Task UpdateNoteSheetAsync_NonExistingId_ThrowsException()
+    {
+        // Arrange
+        var updateDto = new UpdateNoteSheetDto { Id = NonexistentId, Title = "Doesn't exist" };
+        var fileStream = new MemoryStream([1, 2, 3]);
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateNoteSheetAsync(updateDto, fileStream));
+    }
+
+    [Fact]
+    public async Task UpdateNoteSheetAsync_WithoutFile_UpdatesMetadataOnly()
+    {
+        // Arrange
+        var noteSheet = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Id = 2, Title = "Original", SystemFileName = "original.txt" };
+        UnitOfWork.NoteSheets.Add(noteSheet);
+        await UnitOfWork.SaveChangesAsync();
+        var updateDto = new UpdateNoteSheetDto { Id = 2, Title = "Updated Title" };
+        _fileStorageServiceMock.Setup(x => x.MoveFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+
+        // Act
+        var result = await _service.UpdateNoteSheetAsync(updateDto, null);
+
+        // Assert
+        Assert.Equal(updateDto.Title, result.Title);
+        // FileStorageService should not be called
+        _fileStorageServiceMock.Verify(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()), Times.Never);
+        _fileStorageServiceMock.Verify(x => x.MoveFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public void HasValidFile_WithSystemFileNameButFileMissing_ReturnsFalse()
+    {
+        // Arrange
+        var dto = new NoteSheetDto { SystemFileName = "missing.txt", FileName = "missing.txt" };
+        _fileStorageServiceMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
+
+        // Act
+        var result = _service.HasValidFile(dto);
+
+        // Assert
+        Assert.False(result);
+    }
 }

@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
 using BalsisNoteSheetLibrary.Server.Application.Services;
-using BalsisNoteSheetLibrary.Server.Domain.Entities;
-using Xunit;
+using Entities = BalsisNoteSheetLibrary.Server.Domain.Entities;
 
 namespace BasisNoteSheetLibrary.Tests.Integration.SetList;
 
@@ -182,13 +177,14 @@ public class SetListServiceTests : IntegrationTestBase
     {
         // Arrange
         var setList = await _service.CreateSetListAsync(new CreateSetListDto { Title = "With Items" });
-        var noteSheet = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet {
+        var noteSheet = new Entities.NoteSheet
+        {
             Title = "NoteSheet 1"
         };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
         // Add an item manually
-        var item = new SetListItem { SetListId = setList.Id, NoteSheetId = noteSheet.Id, Order = 0 };
+        var item = new Entities.SetListItem { SetListId = setList.Id, NoteSheetId = noteSheet.Id, Order = 0 };
         UnitOfWork.SetListItems.Add(item);
         await UnitOfWork.SaveChangesAsync();
 
@@ -222,17 +218,17 @@ public class SetListServiceTests : IntegrationTestBase
     {
         // Arrange
         var setList = await _service.CreateSetListAsync(new CreateSetListDto { Title = "With Items" });
-        var noteSheet1 = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Title = "NoteSheet 1" };
-        var noteSheet2 = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Title = "NoteSheet 2" };
-        var noteSheet3 = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet
+        var noteSheet1 = new Entities.NoteSheet { Title = "NoteSheet 1" };
+        var noteSheet2 = new Entities.NoteSheet { Title = "NoteSheet 2" };
+        var noteSheet3 = new Entities.NoteSheet
         {
             Title = "NoteSheet 3"
         };
         UnitOfWork.NoteSheets.AddRange([noteSheet1, noteSheet2, noteSheet3]);
         await UnitOfWork.SaveChangesAsync();
-        
-        var item1 = new SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet1.Id, Order = 0 };
-        var item2 = new SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet2.Id, Order = 1 };
+
+        var item1 = new Entities.SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet1.Id, Order = 0 };
+        var item2 = new Entities.SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet2.Id, Order = 1 };
         UnitOfWork.SetListItems.Add(item1);
         UnitOfWork.SetListItems.Add(item2);
         await UnitOfWork.SaveChangesAsync();
@@ -245,7 +241,7 @@ public class SetListServiceTests : IntegrationTestBase
             Items =
             [
                 new UpdateSetListItemDto { NoteSheetId = noteSheet2.Id!.Value, Order = 0 }, // item2 moved to first
-                new UpdateSetListItemDto { NoteSheetId = noteSheet3.Id!.Value , Order = 1 }
+                new UpdateSetListItemDto { NoteSheetId = noteSheet3.Id!.Value, Order = 1 }
             ]
         };
 
@@ -269,7 +265,8 @@ public class SetListServiceTests : IntegrationTestBase
     public async Task MoveSetListAsync_WithNonexistentId_ThrowsInvalidOperationException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.MoveSetListAsync(new MoveSetListDto { Id = NonexistentId, NewOrder = 0 }));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _service.MoveSetListAsync(new MoveSetListDto { Id = NonexistentId, NewOrder = 0 }));
     }
 
     [Fact]

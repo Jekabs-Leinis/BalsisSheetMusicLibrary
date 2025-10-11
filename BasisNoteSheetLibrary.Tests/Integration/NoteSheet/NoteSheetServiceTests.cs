@@ -2,6 +2,7 @@ using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 using BalsisNoteSheetLibrary.Server.Application.Services;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Moq;
+using Entities = BalsisNoteSheetLibrary.Server.Domain.Entities;
 
 namespace BasisNoteSheetLibrary.Tests.Integration.NoteSheet;
 
@@ -20,7 +21,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public async Task GetNoteSheetAsync_WithExistingId_ReturnsNoteSheet()
     {
         // Arrange
-        var noteSheet = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Id = 1, Title = "Test" };
+        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Test" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
 
@@ -47,8 +48,8 @@ public class NoteSheetServiceTests : IntegrationTestBase
     {
         // Arrange
         UnitOfWork.NoteSheets.AddRange([
-            new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Title = "B" },
-            new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Title = "A" }
+            new Entities.NoteSheet { Title = "B" },
+            new Entities.NoteSheet { Title = "A" }
         ]);
         await UnitOfWork.SaveChangesAsync();
 
@@ -67,7 +68,8 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Arrange
         var dto = new CreateNoteSheetDto { Title = "New Note" };
         var fileStream = new MemoryStream([1, 2, 3]);
-        _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>())).ReturnsAsync("savedfile.txt");
+        _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
+            .ReturnsAsync("savedfile.txt");
 
         // Act
         var result = await _service.CreateNoteSheetAsync(dto, fileStream);
@@ -83,12 +85,13 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public async Task UpdateNoteSheetAsync_WithFile_UpdatesNoteSheetAndFile()
     {
         // Arrange
-        var noteSheet = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Id = 1, Title = "Original" };
+        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Original" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
         var updateDto = new UpdateNoteSheetDto { Id = 1, Title = "Updated Title" };
         var fileStream = new MemoryStream([1, 2, 3]);
-        _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>())).ReturnsAsync("savedfile.txt");
+        _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
+            .ReturnsAsync("savedfile.txt");
 
         // Act
         var result = await _service.UpdateNoteSheetAsync(updateDto, fileStream);
@@ -102,7 +105,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public async Task DeleteNoteSheetAsync_WithExistingId_DeletesNoteSheetAndFile()
     {
         // Arrange
-        var noteSheet = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
+        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
         _fileStorageServiceMock.Setup(x => x.DeleteFileAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
@@ -165,7 +168,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public async Task UpdateNoteSheetAsync_WithoutFile_UpdatesMetadataOnly()
     {
         // Arrange
-        var noteSheet = new BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet { Id = 2, Title = "Original", SystemFileName = "original.txt" };
+        var noteSheet = new Entities.NoteSheet { Id = 2, Title = "Original", SystemFileName = "original.txt" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
         var updateDto = new UpdateNoteSheetDto { Id = 2, Title = "Updated Title" };

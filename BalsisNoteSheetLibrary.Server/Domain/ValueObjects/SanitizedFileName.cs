@@ -15,7 +15,7 @@ public record SanitizedFileName
     {
         if (string.IsNullOrWhiteSpace(fileName))
         {
-            throw new ArgumentException("File name cannot be empty", nameof(fileName));
+            throw new InvalidOperationException("File name cannot be empty");
         }
 
         var sanitized = SanitizeFileName(fileName);

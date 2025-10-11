@@ -9,7 +9,7 @@ public class NoteSheetRepositoryTests : IntegrationTestBase
     public NoteSheetRepositoryTests()
     {
         _repository = new NoteSheetRepository(DbContext);
-        
+
         // Ensure the database is clean before each test
         DbContext.NoteSheets.RemoveRange(DbContext.NoteSheets);
         DbContext.SaveChanges();
@@ -85,7 +85,7 @@ public class NoteSheetRepositoryTests : IntegrationTestBase
         Assert.Equal("Second", titles[3]);
         Assert.Equal("Third", titles[4]);
     }
-    
+
     [Fact]
     public async Task GetAllOrderedByTitleAsync_WithNonEnglishChars_OrdersCorrectly()
     {

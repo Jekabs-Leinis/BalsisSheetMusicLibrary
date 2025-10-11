@@ -24,6 +24,12 @@ public class SetListItemService(IUnitOfWork unitOfWork) : ISetListItemService
 
         var reorderableItems = setList.Items.OrderBy(sl => sl.Order).ToList();
         reorderableItems.RemoveAll(i => i.NoteSheetId == dto.NoteSheetId);
+
+        if (dto.NewOrder > reorderableItems.Count)
+        {
+            dto.NewOrder = (uint)reorderableItems.Count;
+        }
+
         reorderableItems.Insert((int)dto.NewOrder, item);
 
         for (var i = 0; i < reorderableItems.Count; i++)

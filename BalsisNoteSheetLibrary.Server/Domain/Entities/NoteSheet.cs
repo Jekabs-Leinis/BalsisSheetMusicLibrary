@@ -62,7 +62,7 @@ public class NoteSheet
         }
 
         // If filename has already been set, trust it
-        return string.IsNullOrEmpty(FileName)
+        return string.IsNullOrWhiteSpace(FileName)
             ? $"{Id}_{GetFileName()}"
             : $"{Id}_{FileName}";
     }

@@ -32,12 +32,12 @@ function onDeleteConfirm() {
 <template>
   <VModal
     v-model:show="showModal"
-    title="Dzēst nošu sarakstu"
+    title="Dzēst dziesmu sarakstu"
     centered
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p>Vai tiešām vēlaties dzēst nošu sarakstu "{{ setList.title }}"?</p>
+      <p>Vai tiešām vēlaties dzēst dziesmu sarakstu "{{ setList.title }}"?</p>
       <p class="text-danger">
         <strong>Šī darbība ir neatgriezeniska.</strong>
       </p>

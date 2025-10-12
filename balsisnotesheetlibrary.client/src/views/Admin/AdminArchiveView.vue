@@ -6,8 +6,10 @@ import ArchiveSetList from "@/components/Admin/Archive/ArchiveSetList.vue";
 import ArchiveSearchBar from "@/components/Admin/Archive/ArchiveSearchBar.vue";
 import ConfirmSetListDelete from "@/components/Admin/EditSetLists/ConfirmSetListDelete.vue";
 import ConfirmSetListRestore from "@/components/Admin/Archive/ConfirmSetListRestore.vue";
+import { useToast } from "vue-toastification";
 
 const setListStore = useSetListStore();
+const toast = useToast();
 const searchQuery = ref("");
 const expandedSetLists = ref(new Set());
 const isInitializing = ref(true);
@@ -71,7 +73,11 @@ const onRestore = (setList) => {
   showRestoreModal.value = true;
 };
 const onRestoreConfirm = (setList) => {
-  setListStore.restoreSetList(setList.id);
+  setListStore.restoreSetList(setList.id).then(() =>
+    toast.success(`Dziesmu saraksts "${setList.title}" ir atjaunots`),
+  ).catch(error => 
+    toast.error(`Kļūda atjaunojot dziesmu sarakstu: ${error.message}`)
+  );
   setListToRestore.value = null;
 };
 
@@ -83,7 +89,11 @@ const onDelete = (setList) => {
 };
 
 const onDeleteConfirm = (setList) => {
-  setListStore.deleteSetList(setList.id);
+  setListStore.deleteSetList(setList.id).then(() =>
+    toast.success(`Dziemsu saraksts "${setList.title}" ir izdzēsts`),
+  ).catch(error => 
+    toast.error(`Kļūda dzēšot dziesmu sarakstu: ${error.message}`)
+  );
   setListToDelete.value = null;
 };
 </script>
@@ -100,7 +110,7 @@ const onDeleteConfirm = (setList) => {
             <div class="spinner-border text-primary" role="status">
               <span class="visually-hidden">Ielādē...</span>
             </div>
-            <p class="mt-2">Ielādē arhivētos nošu sarakstus...</p>
+            <p class="mt-2">Ielādē arhivētos dziesmu sarakstus...</p>
           </div>
 
           <div
@@ -110,10 +120,10 @@ const onDeleteConfirm = (setList) => {
             <div class="alert alert-info">
               <i class="bi bi-archive me-2"></i>
               <span v-if="searchQuery"
-                >Pēc meklēšanas kritērijiem, nav atrasts atbilstošs nošu
+                >Pēc meklēšanas kritērijiem, nav atrasts atbilstošs dziesmu
                 saraksts</span
               >
-              <span v-else>Nav arhivētu nošu sarakstu</span>
+              <span v-else>Nav arhivētu dziesmu sarakstu</span>
             </div>
           </div>
 

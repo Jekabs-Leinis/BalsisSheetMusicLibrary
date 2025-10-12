@@ -31,12 +31,12 @@ function onRestoreConfirm() {
 <template>
   <VModal
     v-model:show="showModal"
-    title="Atjaunot nošu sarakstu"
+    title="Atjaunot dziesmu sarakstu"
     centered
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p>Vai tiešām vēlies atjaunot nošu sarakstu "{{ setList.title }}"?</p>
+      <p>Vai tiešām vēlies atjaunot dziesmu sarakstu "{{ setList.title }}"?</p>
     </template>
 
     <template #footer>

@@ -31,12 +31,12 @@ function onArchiveConfirm() {
 <template>
   <VModal
     v-model:show="showModal"
-    title="Arhivēt nošu sarakstu"
+    title="Arhivēt dziesmu sarakstu"
     centered
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p>Vai tiešām vēlies arhivēt nošu sarakstu "{{ setList.title }}"?</p>
+      <p>Vai tiešām vēlies arhivēt dziesmu sarakstu "{{ setList.title }}"?</p>
     </template>
 
     <template #footer>

@@ -7,10 +7,12 @@ import { VueDraggable } from "vue-draggable-plus";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import ConfirmSetListDelete from "@/components/Admin/EditSetLists/ConfirmSetListDelete.vue";
 import ConfirmSetListArchive from "@/components/Admin/EditSetLists/ConfirmSetListArchive.vue";
+import { useToast } from "vue-toastification";
 
 // Initialize stores
 const setListStore = useSetListStore();
 const noteSheetStore = useNoteSheetStore();
+const toast = useToast();
 
 const isInitializing = ref(true);
 
@@ -35,10 +37,16 @@ const createSetList = async () => {
   if (!newSetListTitle.value.trim()) return;
 
   isCreatingLoading.value = true;
-  await setListStore.createSetList(newSetListTitle.value.trim());
-  isCreatingLoading.value = false;
-  newSetListTitle.value = "";
-  isCreatingSetList.value = false;
+  try {
+    await setListStore.createSetList(newSetListTitle.value.trim());
+    toast.success(`Dziesmu saraksts "${newSetListTitle.value}" ir izveidots.`);
+    newSetListTitle.value = "";
+    isCreatingSetList.value = false;
+  } catch (error) {
+    toast.error(`Kļūda izveidojot dziesmu sarakstu: ${error.message}`);
+  } finally {
+    isCreatingLoading.value = false;
+  }
 };
 
 const cancelCreateSetList = () => {
@@ -58,7 +66,14 @@ const onDelete = (setList) => {
   showDeleteConfirm.value = true;
 };
 const onDeleteConfirmed = (setList) => {
-  setListStore.deleteSetList(setList.id);
+  setListStore
+    .deleteSetList(setList.id)
+    .then(() => {
+      toast.success(`Dziesmu saraksts "${setList.title}" ir izdzēsts.`);
+    })
+    .catch((error) =>
+      toast.error(`Kļūda dzēšot dziesmu sarakstu: ${error.message}`),
+    );
   setListToDelete.value = null;
 };
 
@@ -70,13 +85,20 @@ const onArchive = (setList) => {
   showArchiveConfirm.value = true;
 };
 const onArchiveConfirmed = (setList) => {
-  setListStore.archiveSetList(setList.id);
+  setListStore
+    .archiveSetList(setList.id)
+    .then(() => {
+      toast.success(`Dziesmu saraksts "${setList.title}" ir arhivēts.`);
+    })
+    .catch((error) =>
+      toast.error(`Kļūda arhivējot dziesmu sarakstu: ${error.message}`),
+    );
   setListToArchive.value = null;
 };
 </script>
 
 <template>
-  <div class="bg-secondary-subtle min-vh-100">
+  <div class="bg-secondary-subtle min-vh-100 footer-padding">
     <AdminHeader />
     <div class="container container-fluid py-4">
       <!-- Loading state -->
@@ -191,3 +213,9 @@ const onArchiveConfirmed = (setList) => {
     @close="setListToArchive = null"
   />
 </template>
+
+<style scoped>
+.footer-padding {
+  padding-bottom: 12.5rem;
+}
+</style>

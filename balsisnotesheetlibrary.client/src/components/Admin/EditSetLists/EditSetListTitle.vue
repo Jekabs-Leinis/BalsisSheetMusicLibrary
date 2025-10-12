@@ -134,14 +134,14 @@ const saveTitle = async () => {
       </button>
       <button
         class="btn btn-action btn-sm btn-outline-secondary"
-        title="Arhivēt nošu sarakstu"
+        title="Arhivēt dziesmu sarakstu"
         @click.stop="emit('archive', setList)"
       >
         <i class="bi bi-archive" />
       </button>
       <button
         class="btn btn-action btn-sm btn-outline-danger"
-        title="Dzēst nošu sarakstu"
+        title="Dzēst dziesmu sarakstu"
         @click.stop="emit('delete', setList)"
       >
         <i class="bi bi-trash" />

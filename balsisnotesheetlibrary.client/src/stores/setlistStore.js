@@ -74,6 +74,8 @@ export const useSetListStore = defineStore("setlist", () => {
     } catch (err) {
       console.error("Error creating setlist:", err);
       error.value = err.message || "Failed to create setlist";
+      
+      throw new Error(error.value);
     } finally {
       isLoading.value = false;
     }

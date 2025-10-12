@@ -43,14 +43,14 @@ const formatDate = (dateString) => {
         <div class="flex-grow-1" />
         <button
           class="btn btn-action btn-sm btn-outline-secondary me-1"
-          title="Atjaunot nošu sarakstu"
+          title="Atjaunot dziesmu sarakstu"
           @click.stop="emit('restore', setList)"
         >
           <i class="bi bi-arrow-counterclockwise" />
         </button>
         <button
           class="btn btn-action btn-sm btn-outline-danger"
-          title="Dzēst nošu sarakstu"
+          title="Dzēst dziesmu sarakstu"
           @click.stop="emit('remove', setList)"
         >
           <i class="bi bi-trash" />
@@ -74,7 +74,7 @@ const formatDate = (dateString) => {
           </tbody>
         </table>
       </div>
-      <div v-else class="text-muted">Šajā nošu sarakstā nav dziesmu</div>
+      <div v-else class="text-muted">Šajā dziesmu sarakstā nav dziesmu</div>
     </div>
   </div>
 </template>

@@ -4,50 +4,53 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 
-public abstract class BaseRepository<T>(AppDbContext dbContext) : IBaseRepository<T> where T : class
+public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<T>
+    where T : class
 {
+    protected readonly AppDbContext DbContext = context;
+
     public ValueTask<T?> GetByIdAsync(uint id)
     {
-        return dbContext.Set<T>().FindAsync(id);
+        return DbContext.Set<T>().FindAsync(id);
     }
     
     public ValueTask<T?> GetByKeysAsync(params object[] keyValues)
     {
-        return dbContext.Set<T>().FindAsync(keyValues);
+        return DbContext.Set<T>().FindAsync(keyValues);
     }
     
     public Task<List<T>> GetAllAsync()
     {
-        return dbContext.Set<T>().ToListAsync();
+        return DbContext.Set<T>().ToListAsync();
     }
     
     public void Add(T entity)
     {
-        dbContext.Set<T>().Add(entity);
+        DbContext.Set<T>().Add(entity);
     }
     
     public void AddRange(List<T> entities)
     {
-        dbContext.Set<T>().AddRange(entities);
+        DbContext.Set<T>().AddRange(entities);
     }
     
     public void Update(T entity)
     {
-        dbContext.Set<T>().Update(entity);
+        DbContext.Set<T>().Update(entity);
     }
     
     public void UpdateRange(List<T> entities)
     {
-        dbContext.Set<T>().UpdateRange(entities);
+        DbContext.Set<T>().UpdateRange(entities);
     }
     
     public void Remove(T entity)
     {
-        dbContext.Set<T>().Remove(entity);
+        DbContext.Set<T>().Remove(entity);
     }
     
     public void RemoveRange(List<T> entities)
     {
-        dbContext.Set<T>().RemoveRange(entities);
+        DbContext.Set<T>().RemoveRange(entities);
     }
 }

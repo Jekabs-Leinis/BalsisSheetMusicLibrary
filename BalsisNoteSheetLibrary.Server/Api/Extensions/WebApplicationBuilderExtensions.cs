@@ -4,7 +4,7 @@ using BalsisNoteSheetLibrary.Server.Application.Services;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.UnitOfWork;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -69,6 +69,8 @@ public static class WebApplicationBuilderExtensions
         // Repositories
         builder.Services.AddScoped<INoteSheetRepository, NoteSheetRepository>();
         builder.Services.AddScoped<ISetListRepository, SetListRepository>();
+        builder.Services.AddScoped<ISetListItemRepository, SetListItemRepository>();
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         // Application services
         builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
         builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();

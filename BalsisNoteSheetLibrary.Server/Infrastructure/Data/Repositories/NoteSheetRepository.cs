@@ -10,7 +10,7 @@ public class NoteSheetRepository(AppDbContext context) : BaseRepository<NoteShee
 {
     public async Task<List<NoteSheet>> GetAllOrderedByTitleAsync()
     {
-        return await context.Set<NoteSheet>()
+        return await DbContext.NoteSheets
             .AsNoTracking()
             .OrderBy(sheet => EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation))
             .ToListAsync();

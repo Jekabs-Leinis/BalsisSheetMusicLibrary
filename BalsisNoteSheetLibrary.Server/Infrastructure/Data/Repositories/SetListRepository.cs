@@ -9,14 +9,14 @@ public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(c
 {
     public new async Task<SetList?> GetByIdAsync(uint id)
     {
-        return await context.SetLists
+        return await DbContext.SetLists
             .Include(list => list.Items)
             .FirstOrDefaultAsync(list => list.Id == id);
     }
 
     public new async Task<List<SetList>> GetAllAsync()
     {
-        return await context.SetLists
+        return await DbContext.SetLists
             .Include(list => list.Items)
             .Where(list => list.ArchivedAt == null)
             .OrderBy(list => list.Order)
@@ -26,7 +26,7 @@ public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(c
 
     public async Task<List<SetList>> GetAllWithNoteSheetsAsync()
     {
-        return await context.SetLists
+        return await DbContext.SetLists
             .Include(list => list.Items)
             .ThenInclude(item => item.NoteSheet)
             .Where(list => list.ArchivedAt == null)
@@ -37,7 +37,7 @@ public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(c
 
     public async Task<List<SetList>> GetAllArchivedAsync()
     {
-        return await context.SetLists
+        return await DbContext.SetLists
             .Include(list => list.Items)
             .ThenInclude(item => item.NoteSheet)
             .Where(list => list.ArchivedAt != null)
@@ -48,7 +48,7 @@ public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(c
 
     public async Task<List<SetList>> GetAllWithTrackingAsync()
     {
-        return await context.SetLists
+        return await DbContext.SetLists
             .Where(list => list.ArchivedAt == null)
             .OrderBy(sl => sl.Order)
             .ToListAsync();
@@ -56,6 +56,6 @@ public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(c
 
     public async Task<uint> GetMaxOrderAsync()
     {
-        return await context.SetLists.Where(sl => sl.Order != null).MaxAsync(sl => sl.Order) ?? 0;
+        return await DbContext.SetLists.Where(sl => sl.Order != null).MaxAsync(sl => sl.Order) ?? 0;
     }
 }

@@ -32,7 +32,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task<SetListDto?> GetSetListByIdAsync(uint id)
     {
-        var setList = await unitOfWork.SetLists.GetByKeysAsync(id);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(id);
 
         return setList == null ? null : SetListDto.FromEntity(setList);
     }
@@ -52,7 +52,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task<SetListDto> UpdateSetListAsync(UpdateSetListDto dto)
     {
-        var setList = await unitOfWork.SetLists.GetByKeysAsync(dto.Id);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(dto.Id);
 
         if (setList == null)
         {
@@ -74,7 +74,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         }
 
         // Update existing items and add new ones
-        // Use a for loop to reorder the remaining and new items
+        // Have to use a for loop to reorder the remaining and new items
         // We cannot rely on the Order property from the DTO,
         // as two clients editing at the same time could cause gaps or duplicates
         for (var i = 0; i < updatedItems.Count; i++)
@@ -165,7 +165,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task RestoreSetListAsync(uint id)
     {
-        var setList = await unitOfWork.SetLists.GetByKeysAsync(id);
+        var setList = await unitOfWork.SetLists.GetByIdAsync(id);
 
         if (setList == null)
         {

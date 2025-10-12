@@ -1,6 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 
-namespace BasisNoteSheetLibrary.Tests.Unit;
+namespace BalsisNoteSheetLibrary.Tests.Unit;
 
 public class SanitizeFileNameTests
 {

@@ -1,6 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 
-namespace BasisNoteSheetLibrary.Tests.Integration.NoteSheet;
+namespace BalsisNoteSheetLibrary.Tests.Integration.NoteSheet;
 
 public class NoteSheetRepositoryTests : IntegrationTestBase
 {

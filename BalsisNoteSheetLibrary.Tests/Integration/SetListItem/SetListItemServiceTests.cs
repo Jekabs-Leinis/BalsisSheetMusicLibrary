@@ -2,7 +2,7 @@ using BalsisNoteSheetLibrary.Server.Application.DTOs.SetList;
 using BalsisNoteSheetLibrary.Server.Application.Services;
 using Entities = BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BasisNoteSheetLibrary.Tests.Integration.SetListItem;
+namespace BalsisNoteSheetLibrary.Tests.Integration.SetListItem;
 
 public class SetListItemServiceTests : IntegrationTestBase
 {

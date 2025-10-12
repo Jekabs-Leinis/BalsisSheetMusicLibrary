@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Entities = BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BasisNoteSheetLibrary.Tests.Integration.NoteSheet;
+namespace BalsisNoteSheetLibrary.Tests.Integration.NoteSheet;
 
 public class NoteSheetRenameServiceTests : IntegrationTestBase
 {

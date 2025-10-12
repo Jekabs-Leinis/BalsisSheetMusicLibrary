@@ -3,7 +3,7 @@ using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 
-namespace BasisNoteSheetLibrary.Tests.Integration;
+namespace BalsisNoteSheetLibrary.Tests.Integration;
 
 public abstract class IntegrationTestBase : IDisposable
 {

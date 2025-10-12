@@ -4,7 +4,7 @@ using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Moq;
 using Entities = BalsisNoteSheetLibrary.Server.Domain.Entities;
 
-namespace BasisNoteSheetLibrary.Tests.Integration.NoteSheet;
+namespace BalsisNoteSheetLibrary.Tests.Integration.NoteSheet;
 
 public class NoteSheetServiceTests : IntegrationTestBase
 {

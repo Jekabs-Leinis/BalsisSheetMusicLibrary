@@ -9,10 +9,12 @@ Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "balsisnotesheetlibrary.clie
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Docs", "Docs\Docs.esproj", "{CC2DA39F-3DDE-4CA5-AF63-35A5C26B5366}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasisNoteSheetLibrary.Tests", "BasisNoteSheetLibrary.Tests\BasisNoteSheetLibrary.Tests.csproj", "{297C72EE-9E8B-4EE0-B1B7-760E8C921810}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalsisNoteSheetLibrary.Tests", "BalsisNoteSheetLibrary.Tests\BalsisNoteSheetLibrary.Tests.csproj", "{297C72EE-9E8B-4EE0-B1B7-760E8C921810}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6C325501-1DE6-470E-9379-FAC9AE2A8249} = {6C325501-1DE6-470E-9379-FAC9AE2A8249}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalsisNoteSheetLibrary.Seeder", "BalsisNoteSheetLibrary.Seeder\BalsisNoteSheetLibrary.Seeder.csproj", "{F9189006-DCB6-4890-9537-5500C58BC071}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9189006-DCB6-4890-9537-5500C58BC071}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9189006-DCB6-4890-9537-5500C58BC071}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9189006-DCB6-4890-9537-5500C58BC071}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9189006-DCB6-4890-9537-5500C58BC071}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

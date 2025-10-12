@@ -1,5 +1,5 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView } from "vue-router";
 import VBackToTop from "@/components/Common/VBackToTop.vue";
 </script>
 
@@ -7,7 +7,3 @@ import VBackToTop from "@/components/Common/VBackToTop.vue";
   <RouterView />
   <VBackToTop />
 </template>
-
-<style>
-@import "bootstrap-icons/font/bootstrap-icons.css";
-</style>

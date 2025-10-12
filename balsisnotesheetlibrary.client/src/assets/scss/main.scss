@@ -1,5 +1,7 @@
-﻿@import "vue-toastification/dist/index.css";
+﻿/* Library imports */
+@import "vue-toastification/dist/index.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 @import "bootstrap.scss";
-
+/* Custom imports */
 @import "base";
 @import "loading.css";

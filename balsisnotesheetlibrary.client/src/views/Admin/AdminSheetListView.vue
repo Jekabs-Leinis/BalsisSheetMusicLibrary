@@ -37,19 +37,6 @@ const openDeleteModal = (sheet) => {
   showDeleteModal.value = true;
 };
 
-const deleteSheet = async (sheetId) => {
-  try {
-    await noteSheetStore.deleteNoteSheet(sheetId);
-  } catch (error) {
-    console.error("Kļūda dzēšot notis:", error);
-  }
-};
-
-const handleCloseDeleteModal = () => {
-  showDeleteModal.value = false;
-  sheetToDelete.value = null;
-};
-
 const sortField = ref("title");
 
 const handleSort = (field) => {
@@ -63,23 +50,17 @@ const getSortIcon = () => {
     : "bi-sort-down-alt";
 };
 
-
 const showEditModal = ref(false);
 const sheetToEdit = ref(null);
 
 const openEditModal = (sheetId) => {
-  const sheet = noteSheetStore.noteSheets.find(s => s.id === sheetId);
+  const sheet = noteSheetStore.noteSheets.find((s) => s.id === sheetId);
   sheetToEdit.value = new NoteSheet(sheet);
   showEditModal.value = true;
 };
 
-const handleCloseEditModal = () => {
-  showEditModal.value = false;
-  sheetToEdit.value = null;
-};
-
 const saveSheet = async (sheet) => {
-  const index = noteSheetStore.noteSheets.findIndex(s => s.id === sheet.id);
+  const index = noteSheetStore.noteSheets.findIndex((s) => s.id === sheet.id);
   if (index === -1) {
     // New sheet, new ID, add it
     noteSheetStore.noteSheets.push(sheet);
@@ -109,8 +90,10 @@ const saveSheet = async (sheet) => {
           />
         </div>
       </div>
-      <div class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 d-flex justify-content-end gap-2">
-          <CreateNewSheet @sheet-created="saveSheet" />
+      <div
+        class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 d-flex justify-content-end gap-2"
+      >
+        <CreateNewSheet @sheet-created="saveSheet" />
       </div>
     </div>
 
@@ -209,7 +192,15 @@ const saveSheet = async (sheet) => {
             </td>
           </tr>
           <tr v-if="noteSheetStore.filteredNoteSheets.length === 0">
-            <td colspan="7" class="text-center py-3">Notis nav atrastas</td>
+            <td
+              colspan="7"
+              class="text-center py-3"
+              v-loading="noteSheetStore.isLoading"
+            >
+              <template v-if="!noteSheetStore.isLoading">
+                Notis nav atrastas
+              </template>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -217,18 +208,18 @@ const saveSheet = async (sheet) => {
   </div>
 
   <!-- Delete confirmation modal -->
-  <DeleteSheet 
-    :sheet="sheetToDelete" 
+  <DeleteSheet
+    :sheet="sheetToDelete"
     v-model:show="showDeleteModal"
-    @close="handleCloseDeleteModal"
-    @confirm="deleteSheet"
+    @close="sheetToDelete = null"
+    @deleted="sheetToDelete = null"
   />
 
   <!-- Edit sheet modal -->
-  <EditSheet 
-    :sheet="sheetToEdit" 
+  <EditSheet
+    :sheet="sheetToEdit"
     v-model:show="showEditModal"
-    @close="handleCloseEditModal"
+    @close="sheetToEdit = null"
     @save="saveSheet"
   />
 </template>
@@ -236,7 +227,7 @@ const saveSheet = async (sheet) => {
 <style scoped lang="scss">
 .table {
   vertical-align: middle;
-  
+
   th {
     --bs-table-bg: var(--color-bluegray);
   }

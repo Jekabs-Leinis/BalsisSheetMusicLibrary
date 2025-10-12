@@ -2,9 +2,12 @@
 export default function (el, binding) {
   if (binding.value) {
     el.classList.add("state-loading");
+    if (binding.modifiers.bg) {
+      el.classList.add("state-loading-bg");
+    }
     el.setAttribute("disabled", "disabled");
   } else {
-    el.classList.remove("state-loading");
+    el.classList.remove("state-loading", "state-loading-bg");
     el.removeAttribute("disabled");
   }
 }

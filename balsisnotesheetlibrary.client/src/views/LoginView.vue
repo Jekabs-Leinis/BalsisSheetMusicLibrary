@@ -23,7 +23,7 @@ async function attemptLogin() {
 
     userStore.setUser(user);
 
-    router.push({ name: "SheetList" });
+        router.push({ name: "SheetListView" });
   } catch (error) {
     console.error("Login error:", error);
     errorMessage.value = "An error occurred while logging in: " + error.message;
@@ -61,11 +61,13 @@ async function attemptLogin() {
         @keydown.enter="attemptLogin"
       />
 
-      <div class="info mt-3 text-white" v-if="errorMessage">{{ errorMessage }}</div>
+      <div class="info mt-3 text-white" v-if="errorMessage">
+        {{ errorMessage }}
+      </div>
 
       <div class="w-100">
         <button
-          v-loading="loading"
+          v-loading.bg="loading"
           class="mt-3"
           id="submit"
           name="submit"
@@ -100,7 +102,9 @@ async function attemptLogin() {
 }
 
 #submit {
-  font-family: Courier New, sans-serif;
+  font-family:
+    Courier New,
+    sans-serif;
   color: black;
   background: white;
   text-decoration: none;

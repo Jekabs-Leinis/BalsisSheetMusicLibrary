@@ -31,31 +31,29 @@ const toggleExpand = (setListId) => {
 
 const filteredSetLists = computed(() => {
   expandedSetLists.value.clear();
-  
+
   if (!searchQuery.value) {
     return setListStore.archivedSetLists;
   }
 
   const query = searchQuery.value.toLowerCase().trim();
   const fuzzyQuery = new RegExp(query.replace(/\s+/g, ".*"));
-  const filteredSetLists = setListStore.archivedSetLists
-    .filter((setList) => {
-      if (!query) return true;
+  const filteredSetLists = setListStore.archivedSetLists.filter((setList) => {
+    if (!query) return true;
 
-      // Check if title matches
-      if (setList.title.toLowerCase().includes(query)) return true;
-      
-      // Fuzzy search for song data
-      return setList.items.some(
-        (item) =>
-          item.noteSheet?.getFormattedTitle().toLowerCase().match(fuzzyQuery),
-      );
-    });
-  
+    // Check if title matches
+    if (setList.title.toLowerCase().includes(query)) return true;
+
+    // Fuzzy search for song data
+    return setList.items.some((item) =>
+      item.noteSheet?.getFormattedTitle().toLowerCase().match(fuzzyQuery),
+    );
+  });
+
   filteredSetLists.forEach((setList) => {
     expandedSetLists.value.add(setList.id);
   });
-  
+
   return filteredSetLists;
 });
 
@@ -65,13 +63,11 @@ const handleSearch = (query) => {
 </script>
 
 <template>
+  <AdminHeader />
   <div class="bg-light min-vh-100">
-    <AdminHeader />
-
     <div class="container py-4">
       <div class="row justify-content-center">
         <div class="col-12 col-lg-10 col-xl-8">
-
           <ArchiveSearchBar @search="handleSearch" class="mb-4" />
 
           <div v-if="isInitializing" class="text-center py-5">
@@ -88,7 +84,8 @@ const handleSearch = (query) => {
             <div class="alert alert-info">
               <i class="bi bi-archive me-2"></i>
               <span v-if="searchQuery"
-                >Pēc meklēšanas kritērijiem, nav atrasts atbilstošs nošu saraksts</span
+                >Pēc meklēšanas kritērijiem, nav atrasts atbilstošs nošu
+                saraksts</span
               >
               <span v-else>Nav arhivētu nošu sarakstu</span>
             </div>

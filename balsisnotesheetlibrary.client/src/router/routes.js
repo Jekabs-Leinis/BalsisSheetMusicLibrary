@@ -5,7 +5,7 @@ const router = createRouter({
   routes: [
     {
       path: "/",
-      name: "SheetList",
+      name: "SheetListView",
       component: () => import("@/views/SheetListView.vue"),
     },
     {
@@ -20,7 +20,7 @@ const router = createRouter({
     },
     {
       path: "/admin/sheets",
-      name: "Admin",
+      name: "AdminSheetList",
       component: () => import("@/views/Admin/AdminSheetListView.vue"),
     },
     {

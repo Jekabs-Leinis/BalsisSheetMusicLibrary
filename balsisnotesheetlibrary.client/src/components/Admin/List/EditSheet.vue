@@ -48,7 +48,7 @@ watch(
 function handleFileChange(event) {
   const file = event.target?.files?.[0];
   if (file) {
-    if (file.type !== 'application/pdf') {
+    if (file.type !== "application/pdf") {
       fileError.value = "Tikai PDF faili ir atbalstīti.";
       selectedFile.value = null;
       return;
@@ -101,7 +101,7 @@ function validateForm() {
   return true;
 }
 
-const loading = ref(false);
+const isSaving = ref(false);
 async function handleSave() {
   if (!validateForm()) {
     return;
@@ -109,13 +109,13 @@ async function handleSave() {
 
   let savedSheet;
 
-  loading.value = true;
+  isSaving.value = true;
   if (isCreateMode.value) {
     savedSheet = await createNoteSheet(formData.value, selectedFile.value);
   } else {
     savedSheet = await updateNoteSheet(formData.value, selectedFile.value);
   }
-  loading.value = false;
+  isSaving.value = false;
   showModal.value = false;
   emit("save", savedSheet);
 
@@ -215,10 +215,17 @@ function handleInputBlur(field) {
         <label for="file-input" class="form-label">
           PDF fails{{ isCreateMode ? " *" : "" }}
         </label>
-        <div v-if="formData.fileName && !selectedFile" class="d-flex align-items-center mb-2">
+        <div
+          v-if="formData.fileName && !selectedFile"
+          class="d-flex align-items-center mb-2"
+        >
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
           <span>{{ formData.fileName }}</span>
-          <a :href="`/api/download/${formData.id}/${formData.fileName}`" target="_blank" class="ms-2 text-decoration-none">
+          <a
+            :href="`/api/download/${formData.id}/${formData.fileName}`"
+            target="_blank"
+            class="ms-2 text-decoration-none"
+          >
             <i class="bi bi-download"></i>
           </a>
         </div>
@@ -226,7 +233,11 @@ function handleInputBlur(field) {
         <div v-if="selectedFile" class="d-flex align-items-center mb-2">
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
           <span>{{ selectedFile.name }}</span>
-          <button type="button" class="btn btn-sm text-danger" @click="clearFileSelection">
+          <button
+            type="button"
+            class="btn btn-sm text-danger"
+            @click="clearFileSelection"
+          >
             <i class="bi bi-x-circle"></i>
           </button>
         </div>
@@ -250,10 +261,19 @@ function handleInputBlur(field) {
 
     <template #footer>
       <div class="w-100 d-flex justify-content-between">
-        <button type="button" class="btn btn-secondary" @click="showModal = false">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="showModal = false"
+        >
           Atcelt
         </button>
-        <button type="button" class="btn btn-primary" @click="handleSave">
+        <button
+          type="button"
+          v-loading.bg="isSaving"
+          class="btn btn-primary"
+          @click="handleSave"
+        >
           Saglabāt
         </button>
       </div>

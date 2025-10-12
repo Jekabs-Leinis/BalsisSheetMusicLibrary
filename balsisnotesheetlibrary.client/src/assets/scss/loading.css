@@ -27,7 +27,6 @@
 }
 
 .state-loading:after {
-  background-color: rgba(204, 204, 204, 0.7);
   border-radius: 3px;
   content: "";
   height: 100%;
@@ -36,6 +35,10 @@
   top: 0;
   width: 100%;
   z-index: 4;
+}
+
+.state-loading-bg:after {
+  background-color: rgba(204, 204, 204, 0.7);
 }
 
 @keyframes loader {

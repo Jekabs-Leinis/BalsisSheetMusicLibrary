@@ -1,6 +1,9 @@
 <script setup>
 import { computed } from "vue";
 import VModal from "@/components/Common/VModal.vue";
+import { useNoteSheetStore } from "@/stores/notesheetStore.js";
+
+const noteSheetStore = useNoteSheetStore();
 
 const props = defineProps({
   sheet: {
@@ -13,21 +16,26 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["close", "confirm", "update:show"]);
+const emit = defineEmits(["close", "update:show", "deleted"]);
 
 const showModal = computed({
   get: () => props.show,
-  set: (value) => emit("update:show", value)
+  set: (value) => emit("update:show", value),
 });
 
-function handleConfirmDelete() {
-  if (props.sheet) {
-    emit("confirm", props.sheet.id);
-    showModal.value = false; 
+async function handleConfirmDelete() {
+  if (!props.sheet) {
+    throw new Error("Sheet is required to confirm deletion.");
   }
+
+  await noteSheetStore.deleteNoteSheet(props.sheet.id);
+
+  emit("deleted");
+  showModal.value = false;
 }
 
 function handleClose() {
+  showModal.value = false;
   emit("close");
 }
 </script>
@@ -45,13 +53,21 @@ function handleClose() {
         <strong>Šī darbība ir neatgriezeniska.</strong>
       </p>
     </template>
-    
+
     <template #footer>
       <div class="w-100 d-flex justify-content-between">
-        <button type="button" class="btn btn-secondary" @click="showModal = false">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="showModal = false"
+        >
           Atcelt
         </button>
-        <button type="button" class="btn btn-danger" @click="handleConfirmDelete">
+        <button
+          type="button"
+          class="btn btn-danger"
+          @click="handleConfirmDelete"
+        >
           Dzēst
         </button>
       </div>

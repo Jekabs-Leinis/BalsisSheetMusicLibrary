@@ -1,40 +1,40 @@
-:root{
-    --color-dark: rgba(55, 55, 55, 1);
-    --color-darker: rgba(44, 44, 44, 1);
-    --balsis-red: #c0392b;
-    --color-light: #f0f0f0;
-    --color-light-darker: #dcddd8;
-    --color-bluegray: #343a40;
+:root {
+  --color-dark: rgba(55, 55, 55, 1);
+  --color-darker: rgba(44, 44, 44, 1);
+  --balsis-red: #c0392b;
+  --color-light: #f0f0f0;
+  --color-light-darker: #dcddd8;
+  --color-bluegray: #343a40;
 }
 
 body {
-    font-family: "Nimbus Mono", "Courier New", monospace;
+  font-family: "Nimbus Mono", "Courier New", monospace;
 }
 
 h2 {
-    text-decoration: underline;
-    font-size: 18px;
-    padding-top: 30px;
+  text-decoration: underline;
+  font-size: 18px;
+  padding-top: 30px;
 }
 
 h3 {
-    color: var(--color-light);
-    text-decoration: none !important;
-    font-weight: normal;
+  color: var(--color-light);
+  text-decoration: none !important;
+  font-weight: normal;
 }
 
 @font-face {
-    font-family: 'Nimbus Mono';
-    src: url('@/static/fonts/NimbusMono-Regular.otf') format('opentype');
+  font-family: "Nimbus Mono";
+  src: url("@/static/fonts/NimbusMono-Regular.otf") format("opentype");
 }
 
 @font-face {
-    font-family: 'Nimbus Mono';
-    src: url('@/static/fonts/NimbusMono-Bold.otf') format('opentype');
-    font-weight: bold;
+  font-family: "Nimbus Mono";
+  src: url("@/static/fonts/NimbusMono-Bold.otf") format("opentype");
+  font-weight: bold;
 }
 
-/* Provides italics. Not used currently, so no point in loading */
+/* Provides italics. Not used currently, so no point in loading, but kept as comment to signal availability future use */
 /*
 @font-face {
     font-family: 'Nimbus Mono';

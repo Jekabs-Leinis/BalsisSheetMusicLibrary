@@ -54,8 +54,8 @@ const setListToDelete = ref(null);
 </script>
 
 <template>
+  <AdminHeader />
   <div class="bg-secondary-subtle min-vh-100">
-    <AdminHeader />
     <div class="container container-fluid py-4">
       <!-- Loading state -->
       <div v-if="isInitializing" class="row">

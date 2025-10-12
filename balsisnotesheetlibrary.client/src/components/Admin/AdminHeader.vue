@@ -45,43 +45,61 @@ const route = useRoute();
         <div class="offcanvas-body">
           <ul class="navbar-nav j mb-2 mb-lg-0 d-flex h-100">
             <li class="nav-item">
-              <a
+              <RouterLink
+                :to="{ name: 'AdminFunctions' }"
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin"
-                :class="{ 'text-decoration-underline': route.path === '/admin' }"
-                >Funkcijas</a
+                :class="{
+                  'text-decoration-underline': route.path === '/admin',
+                }"
               >
+                Funkcijas
+              </RouterLink>
             </li>
             <li class="nav-item">
-              <a
+              <RouterLink
+                :to="{ name: 'AdminSheetList' }"
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/sheets"
-                :class="{ 'text-decoration-underline': route.path === '/admin/sheets' }"
-                >Notis</a
+                :class="{
+                  'text-decoration-underline': route.path === '/admin/sheets',
+                }"
               >
+                Notis
+              </RouterLink>
             </li>
             <li class="nav-item">
-              <a
+              <RouterLink
+                :to="{ name: 'EditSetLists' }"
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/edit-set-lists"
-                :class="{ 'text-decoration-underline': route.path === '/admin/edit-set-lists' }"
-                >Dziesmu saraksti</a
+                :class="{
+                  'text-decoration-underline':
+                    route.path === '/admin/edit-set-lists',
+                }"
               >
+                Dziesmu saraksti
+              </RouterLink>
             </li>
             <li class="nav-item">
-              <a
+              <RouterLink
+                :to="{ name: 'Archive' }"
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/admin/archive"
-                :class="{ 'text-decoration-underline': route.path === '/admin/archive' }"
-                >Arhīvs</a
+                :class="{
+                  'text-decoration-underline': route.path === '/admin/archive',
+                }"
               >
+                Arhīvs
+              </RouterLink>
             </li>
             <li class="nav-item flex-grow-1 ms-0" />
             <li class="nav-item">
-              <a
+              <RouterLink
+                :to="{ name: 'SheetListView' }"
                 class="nav-link text-nowrap text-end pe-2 pe-lg-0 text-light"
                 href="/"
-                >Uz vietni</a
+                >Uz vietni</RouterLink
               >
             </li>
           </ul>

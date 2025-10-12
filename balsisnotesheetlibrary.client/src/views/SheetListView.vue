@@ -11,8 +11,10 @@ const noteSheetStore = useNoteSheetStore();
 const setListStore = useSetListStore();
 
 onMounted(async () => {
-  await noteSheetStore.fetchNoteSheets();
-  await setListStore.fetchSetLists();
+  await Promise.all([
+    noteSheetStore.fetchNoteSheets(),
+    setListStore.fetchSetLists(),
+  ]);
 
   // Reset sorting to default as user might navigate here from admin view with different sorting
   noteSheetStore.setSortField("title", false);
@@ -24,11 +26,12 @@ onMounted(async () => {
   <SheetListHeader />
   <SetListNoteList
     id="active-sheets"
+    v-loading="setListStore.isLoading"
     :note-sheets="noteSheetStore.filteredNoteSheets"
     :set-lists="setListStore.setLists"
   />
   <div class="invert" id="lv-sheets">
-    <div class="container">
+    <div class="container" v-loading="noteSheetStore.isLoading">
       <NoteSheetList
         title="Latviešu skaņdarbi"
         :note-sheets="noteSheetStore.filteredLatvianNoteSheets"
@@ -36,7 +39,7 @@ onMounted(async () => {
     </div>
   </div>
   <div id="foreign-sheets">
-    <div class="container">
+    <div class="container" v-loading="noteSheetStore.isLoading">
       <NoteSheetList
         title="Ārzemju skaņdarbi"
         :note-sheets="noteSheetStore.filteredForeignNoteSheets"

@@ -3,6 +3,8 @@ import { ref, computed } from "vue";
 import {
   getAllNoteSheets,
   deleteNoteSheet as deleteNoteSheetApi,
+  createNoteSheet as createNoteSheetApi,
+  updateNoteSheet as updateNoteSheetApi,
 } from "@/api/noteSheetApi";
 import { SortDirection } from "@/models/utilModels";
 import {
@@ -85,6 +87,36 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
       error.value = "Failed to delete note sheet";
     }
   }
+  
+  async function createNoteSheet(noteSheet, file) {
+    try {
+      const newNoteSheet = await createNoteSheetApi(noteSheet, file);
+      noteSheets.value.push(newNoteSheet);
+      
+      return newNoteSheet;
+    } catch (err) {
+      console.error("Error creating note sheet:", err);
+      error.value = "Failed to create note sheet";
+    }
+  }
+  
+  async function updateNoteSheet(noteSheet, file) {
+    try {
+      const updatedNoteSheet = await updateNoteSheetApi(noteSheet, file);
+      const index = noteSheets.value.findIndex(sheet => sheet.id === updatedNoteSheet.id);
+      if (index !== -1) {
+        noteSheets.value[index] = updatedNoteSheet;
+      } else {
+        noteSheets.value.push(updatedNoteSheet);
+      }
+      
+      return updatedNoteSheet;
+    }
+    catch (err) {
+      console.error("Error updating note sheet:", err);
+      error.value = "Failed to update note sheet";
+    }
+  }
 
   return {
     noteSheets,
@@ -101,5 +133,7 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
     setSortField,
     setSortDirection,
     deleteNoteSheet,
+    createNoteSheet,
+    updateNoteSheet,
   };
 });

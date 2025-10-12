@@ -2,7 +2,8 @@
 import { computed, ref, watch } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 import { NoteSheet } from "@/models/sheetModels";
-import { updateNoteSheet, createNoteSheet } from "@/api/noteSheetApi";
+import { useToast } from "vue-toastification";
+import { useNoteSheetStore } from "@/stores/notesheetStore.js";
 
 const props = defineProps({
   sheet: {
@@ -16,6 +17,9 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close", "save", "update:show"]);
+
+const toast = useToast();
+const noteSheetStore = useNoteSheetStore();
 
 const showModal = computed({
   get: () => props.show,
@@ -110,12 +114,23 @@ async function onSave() {
   let savedSheet;
 
   isSaving.value = true;
-  if (isCreateMode.value) {
-    savedSheet = await createNoteSheet(formData.value, selectedFile.value);
-  } else {
-    savedSheet = await updateNoteSheet(formData.value, selectedFile.value);
+  
+  try {
+    if (isCreateMode.value) {
+      savedSheet = await noteSheetStore.createNoteSheet(formData.value, selectedFile.value);
+    } else {
+      savedSheet = await noteSheetStore.updateNoteSheet(formData.value, selectedFile.value);
+    }
+    toast.success(`Notis "${savedSheet.title}" ir veiksmīgi saglabātas.`);
+  } catch (e) {
+    console.error("Error saving note sheet:", e);
+    toast.error(`Notu saglabāšana neizdevās: ${e.message}`);
+    
+    return;
+  } finally {
+    isSaving.value = false;
   }
-  isSaving.value = false;
+  
   showModal.value = false;
   emit("save", savedSheet);
 

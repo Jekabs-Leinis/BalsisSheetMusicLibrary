@@ -58,19 +58,6 @@ const openEditModal = (sheetId) => {
   sheetToEdit.value = new NoteSheet(sheet);
   showEditModal.value = true;
 };
-
-const saveSheet = async (sheet) => {
-  const index = noteSheetStore.noteSheets.findIndex((s) => s.id === sheet.id);
-  if (index === -1) {
-    // New sheet, new ID, add it
-    noteSheetStore.noteSheets.push(sheet);
-  } else {
-    noteSheetStore.noteSheets[index] = sheet;
-  }
-
-  showEditModal.value = false;
-  sheetToEdit.value = null;
-};
 </script>
 
 <template>
@@ -93,7 +80,7 @@ const saveSheet = async (sheet) => {
       <div
         class="col-6 offset-md-0 offset-lg-2 offset-xl-3 col-md-6 d-flex justify-content-end gap-2"
       >
-        <CreateNewSheet @sheet-created="saveSheet" />
+        <CreateNewSheet @sheet-created="sheetToEdit = null" />
       </div>
     </div>
 
@@ -220,7 +207,7 @@ const saveSheet = async (sheet) => {
     :sheet="sheetToEdit"
     v-model:show="showEditModal"
     @close="sheetToEdit = null"
-    @save="saveSheet"
+    @save="sheetToEdit = null"
   />
 </template>
 

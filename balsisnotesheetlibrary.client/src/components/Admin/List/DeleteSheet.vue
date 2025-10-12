@@ -2,8 +2,10 @@
 import { computed } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore.js";
+import { useToast } from "vue-toastification";
 
 const noteSheetStore = useNoteSheetStore();
+const toast = useToast();
 
 const props = defineProps({
   sheet: {
@@ -28,7 +30,14 @@ async function onDeleteConfirm() {
     throw new Error("Sheet is required to confirm deletion.");
   }
 
-  await noteSheetStore.deleteNoteSheet(props.sheet.id);
+  try {
+    await noteSheetStore.deleteNoteSheet(props.sheet.id);
+
+    toast.success(`Notis "${props.sheet.title}" ir veiksmīgi izdzēstas.`);
+  } catch (e) {
+    console.error("Error deleting note sheet:", e);
+    toast.error(`Notu dzēšana neizdevās: ${e.message}`);
+  }
 
   emit("deleted");
   showModal.value = false;
@@ -63,11 +72,7 @@ function onClose() {
         >
           Atcelt
         </button>
-        <button
-          type="button"
-          class="btn btn-danger"
-          @click="onDeleteConfirm"
-        >
+        <button type="button" class="btn btn-danger" @click="onDeleteConfirm">
           Dzēst
         </button>
       </div>

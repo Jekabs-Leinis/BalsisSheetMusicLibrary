@@ -6,7 +6,7 @@ export const useUserStore = defineStore("user", () => {
   const localUser = localStorage.getItem("currentUser");
 
   const currentUser = ref(new User(localUser ? JSON.parse(localUser) : {}));
-  const isLoggedIn = computed(() => Boolean(currentUser.value?.id));
+  const isLoggedIn = computed(() => Boolean(currentUser.value?.userName));
 
   const setUser = (user) => {
     currentUser.value = user;

@@ -15,6 +15,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalsisNoteSheetLibrary.Test
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalsisNoteSheetLibrary.Seeder", "BalsisNoteSheetLibrary.Seeder\BalsisNoteSheetLibrary.Seeder.csproj", "{F9189006-DCB6-4890-9537-5500C58BC071}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6C325501-1DE6-470E-9379-FAC9AE2A8249} = {6C325501-1DE6-470E-9379-FAC9AE2A8249}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

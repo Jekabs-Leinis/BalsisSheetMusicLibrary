@@ -1,12 +1,14 @@
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Seeders;
+namespace BalsisNoteSheetLibrary.Seeder.Seeders;
 
 public static class RoleSeeder
 {
     public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
     {
+        Console.WriteLine("Seeding roles...");
         using var scope = serviceProvider.CreateScope();
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -23,5 +25,7 @@ public static class RoleSeeder
                 await roleManager.CreateAsync(new IdentityRole(roleName));
             }
         }
+        
+        Console.WriteLine("Seeding roles completed!");
     }
 }

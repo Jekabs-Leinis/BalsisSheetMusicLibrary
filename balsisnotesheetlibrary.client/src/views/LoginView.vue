@@ -23,10 +23,9 @@ async function attemptLogin() {
 
     userStore.setUser(user);
 
-        router.push({ name: "SheetListView" });
+    router.push({ name: "SheetListView" });
   } catch (error) {
-    console.error("Login error:", error);
-    errorMessage.value = "An error occurred while logging in: " + error.message;
+    errorMessage.value = error.message;
   } finally {
     loading.value = false;
   }

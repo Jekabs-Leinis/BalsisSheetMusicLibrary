@@ -11,14 +11,17 @@ import "@/assets/js/bootstrap";
 
 import "@/assets/scss/main.scss";
 
-
 // Redirect to login page if the user is not authenticated for XHR requests
 axios.interceptors.response.use(
   (response) => response,
   (request) => {
-      //TODO: remove
-      console.log(request);
-    if (request.response.status === 401 && request.response.headers.location.includes("login")) {
+    //TODO: remove
+    console.log(request);
+    if (
+      request.response.status === 401 &&
+      window.location.pathname !== "/login" &&
+      request.response.headers?.location?.includes("login")
+    ) {
       window.location.href = "/login";
     }
 
@@ -54,8 +57,6 @@ if (getCsrfToken()) {
     });
 }
 
-
-
 const app = createApp(App);
 const pinia = createPinia();
 
@@ -71,7 +72,6 @@ router.beforeEach((to) => {
 
   return { name: "Login" };
 });
-
 
 app.use(router);
 app.use(Toast, {

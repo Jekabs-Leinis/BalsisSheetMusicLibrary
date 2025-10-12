@@ -10,6 +10,10 @@ export async function login(userName, password) {
 
     return new User(response.data);
   } catch (e) {
+    if (e.response && e.response.status === 401) {
+      throw new Error("Nepareizi ievadīts lietotājvārds vai parole");
+    }
+    
     throw new Error(e.message || "Login failed");
   }
 }

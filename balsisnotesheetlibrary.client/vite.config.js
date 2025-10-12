@@ -59,7 +59,7 @@ export default defineConfig({
       dirs: ["src"],
       version: 3,
     }),
-    visualizer({ open: true }),
+    // visualizer({ open: true }),
   ],
   resolve: {
     alias: {

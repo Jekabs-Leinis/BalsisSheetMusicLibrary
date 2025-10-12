@@ -3,7 +3,7 @@ import axios from "axios";
 axios.defaults.withCredentials = true;
 
 // Initial request to get the anti-forgery token cookie
-await axios.get("api/antiforgery/token");
+axios.get("api/antiforgery/token");
 
 // Redirect to login page if 401 response is received and not already on the login page
 axios.interceptors.response.use(

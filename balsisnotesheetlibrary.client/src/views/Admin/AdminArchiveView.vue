@@ -4,6 +4,8 @@ import { useSetListStore } from "@/stores/setlistStore";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import ArchiveSetList from "@/components/Admin/Archive/ArchiveSetList.vue";
 import ArchiveSearchBar from "@/components/Admin/Archive/ArchiveSearchBar.vue";
+import ConfirmSetListDelete from "@/components/Admin/EditSetLists/ConfirmSetListDelete.vue";
+import ConfirmSetListRestore from "@/components/Admin/Archive/ConfirmSetListRestore.vue";
 
 const setListStore = useSetListStore();
 const searchQuery = ref("");
@@ -20,7 +22,7 @@ onMounted(async () => {
   }
 });
 
-// Expand state is stored in parent component to allow expanding search results
+// Expand state is stored in this component to allow expanding search results
 const toggleExpand = (setListId) => {
   if (expandedSetLists.value.has(setListId)) {
     expandedSetLists.value.delete(setListId);
@@ -59,6 +61,30 @@ const filteredSetLists = computed(() => {
 
 const onSearch = (query) => {
   searchQuery.value = query;
+};
+
+const setListToRestore = ref(null);
+const showRestoreModal = ref(false);
+
+const onRestore = (setList) => {
+  setListToRestore.value = setList;
+  showRestoreModal.value = true;
+};
+const onRestoreConfirm = (setList) => {
+  setListStore.restoreSetList(setList.id);
+  setListToRestore.value = null;
+};
+
+const setListToDelete = ref(null);
+const showDeleteModal = ref(false);
+const onDelete = (setList) => {
+  setListToDelete.value = setList;
+  showDeleteModal.value = true;
+};
+
+const onDeleteConfirm = (setList) => {
+  setListStore.deleteSetList(setList.id);
+  setListToDelete.value = null;
 };
 </script>
 
@@ -99,6 +125,8 @@ const onSearch = (query) => {
               :set-list="setList"
               :is-expanded="expandedSetLists.has(setList.id)"
               @toggle-expand="toggleExpand"
+              @restore="onRestore"
+              @remove="onDelete"
               class="mb-3"
             />
           </div>
@@ -106,6 +134,18 @@ const onSearch = (query) => {
       </div>
     </div>
   </div>
+  <ConfirmSetListRestore
+    v-model:show="showRestoreModal"
+    :set-list="setListToRestore"
+    @close="setListToRestore = null"
+    @confirm="onRestoreConfirm"
+  />
+  <ConfirmSetListDelete
+    v-model:show="showDeleteModal"
+    :set-list="setListToDelete"
+    @close="setListToDelete = null"
+    @confirm="onDeleteConfirm"
+  />
 </template>
 
 <style scoped>

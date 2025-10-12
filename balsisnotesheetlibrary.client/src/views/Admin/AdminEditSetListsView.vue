@@ -5,7 +5,8 @@ import { useNoteSheetStore } from "@/stores/notesheetStore";
 import EditSetList from "@/components/Admin/EditSetLists/EditSetList.vue";
 import { VueDraggable } from "vue-draggable-plus";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
-import DeleteSetList from "@/components/Admin/EditSetLists/DeleteSetList.vue";
+import ConfirmSetListDelete from "@/components/Admin/EditSetLists/ConfirmSetListDelete.vue";
+import ConfirmSetListArchive from "@/components/Admin/EditSetLists/ConfirmSetListArchive.vue";
 
 // Initialize stores
 const setListStore = useSetListStore();
@@ -49,8 +50,29 @@ const onDraggableListMove = ({ oldIndex, newIndex }) => {
   setListStore.moveSetList(oldIndex, newIndex);
 };
 
-const showDeleteModal = ref(false);
+const showDeleteConfirm = ref(false);
 const setListToDelete = ref(null);
+
+const onDelete = (setList) => {
+  setListToDelete.value = setList;
+  showDeleteConfirm.value = true;
+};
+const onDeleteConfirmed = (setList) => {
+  setListStore.deleteSetList(setList.id);
+  setListToDelete.value = null;
+};
+
+const showArchiveConfirm = ref(false);
+const setListToArchive = ref(null);
+
+const onArchive = (setList) => {
+  setListToArchive.value = setList;
+  showArchiveConfirm.value = true;
+};
+const onArchiveConfirmed = (setList) => {
+  setListStore.archiveSetList(setList.id);
+  setListToArchive.value = null;
+};
 </script>
 
 <template>
@@ -96,6 +118,8 @@ const setListToDelete = ref(null);
               :set-list="setList"
               :set-list-count="setListStore.setLists.length"
               class="mb-3"
+              @archive="onArchive"
+              @delete="onDelete"
             />
           </VueDraggable>
 
@@ -154,11 +178,16 @@ const setListToDelete = ref(null);
       </div>
     </div>
   </div>
-
-  <DeleteSetList
-    v-model:show="showDeleteModal"
+  <ConfirmSetListDelete
     :set-list="setListToDelete"
-    @close="showDeleteModal = false"
-    @confirm="setListStore.removeSetList"
+    v-model:show="showDeleteConfirm"
+    @confirm="onDeleteConfirmed"
+    @close="setListToDelete = null"
+  />
+  <ConfirmSetListArchive
+    :set-list="setListToArchive"
+    v-model:show="showArchiveConfirm"
+    @confirm="onArchiveConfirmed"
+    @close="setListToArchive = null"
   />
 </template>

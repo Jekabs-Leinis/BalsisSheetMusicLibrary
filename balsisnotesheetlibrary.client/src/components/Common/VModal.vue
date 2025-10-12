@@ -87,33 +87,35 @@ const sizeClass = computed(() => {
 </script>
 
 <template>
-  <div ref="modalRef" class="modal fade" tabindex="-1" aria-hidden="true">
-    <div
-      :class="[
+  <Teleport to="body">
+    <div ref="modalRef" class="modal fade" tabindex="-1" aria-hidden="true">
+      <div
+        :class="[
         'modal-dialog',
         { 'modal-dialog-centered': centered },
         sizeClass,
       ]"
-    >
-      <div class="modal-content">
-        <div v-if="title" class="modal-header">
-          <h5 class="modal-title">{{ title }}</h5>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
-        <div class="modal-body">
-          <slot />
-        </div>
-        <div v-if="$slots.footer" class="modal-footer">
-          <slot name="footer" />
+      >
+        <div class="modal-content">
+          <div v-if="title" class="modal-header">
+            <h5 class="modal-title">{{ title }}</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <slot />
+          </div>
+          <div v-if="$slots.footer" class="modal-footer">
+            <slot name="footer" />
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <style scoped lang="scss"></style>

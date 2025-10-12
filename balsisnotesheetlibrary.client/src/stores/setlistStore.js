@@ -3,7 +3,7 @@ import { ref } from "vue";
 import {
   addSetList,
   archiveSetList as archiveSetListApi,
-  deleteSetList,
+  deleteSetList as deleteSetListApi,
   getAllArchivedSetLists,
   getAllSetLists,
   moveSetList as updateSetListOrderApi,
@@ -116,14 +116,17 @@ export const useSetListStore = defineStore("setlist", () => {
     }
   }
 
-  async function removeSetList(setListId) {
+  async function deleteSetList(setListId) {
     isLoading.value = true;
     error.value = null;
 
     try {
-      await deleteSetList(setListId);
+      await deleteSetListApi(setListId);
 
       setLists.value = setLists.value.filter((list) => list.id !== setListId);
+      archivedSetLists.value = archivedSetLists.value.filter(
+        (list) => list.id !== setListId,
+      );
     } catch (err) {
       console.error("Error deleting setlist:", err);
       error.value = "Failed to delete setlist";
@@ -232,7 +235,7 @@ export const useSetListStore = defineStore("setlist", () => {
     fetchArchivedSetLists,
     createSetList,
     saveSetList,
-    removeSetList,
+    deleteSetList,
     moveSetList,
     moveSetListItem,
     archiveSetList,

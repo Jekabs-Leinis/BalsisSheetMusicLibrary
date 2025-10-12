@@ -15,6 +15,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["archive", "delete"]);
+
 const setListStore = useSetListStore();
 const isEditing = ref(false);
 const editedTitle = ref("");
@@ -133,14 +135,14 @@ const saveTitle = async () => {
       <button
         class="btn btn-action btn-sm btn-outline-secondary"
         title="Arhivēt nošu sarakstu"
-        @click.stop="setListStore.archiveSetList(setList.id)"
+        @click.stop="emit('archive', setList)"
       >
         <i class="bi bi-archive" />
       </button>
       <button
         class="btn btn-action btn-sm btn-outline-danger"
         title="Dzēst nošu sarakstu"
-        @click.stop="setListStore.removeSetList(setList.id)"
+        @click.stop="emit('delete', setList)"
       >
         <i class="bi bi-trash" />
       </button>

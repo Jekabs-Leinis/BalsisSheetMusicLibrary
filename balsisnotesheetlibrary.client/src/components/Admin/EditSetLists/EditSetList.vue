@@ -20,6 +20,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["archive", "delete"]);
+
 const { setList } = toRefs(props);
 
 const noteSheetStore = useNoteSheetStore();
@@ -65,7 +67,8 @@ const onDraggableItemMove = ({ newIndex }) => {
     <div
       class="card-header d-flex justify-content-between align-items-center setlist-header"
     >
-      <EditSetListTitle :set-list="setList" :set-list-count="setListCount" />
+      <EditSetListTitle :set-list="setList" :set-list-count="setListCount" 
+      @archive="emit('archive', $event)" @delete="emit('delete', $event)"/>
     </div>
     <div class="card-body">
       <VueDraggable

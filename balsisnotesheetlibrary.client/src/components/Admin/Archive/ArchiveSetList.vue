@@ -1,7 +1,6 @@
 <script setup>
-import { useSetListStore } from "@/stores/setlistStore.js";
-
 defineProps({
+  /** @type {SetList} */
   setList: {
     type: Object,
     required: true,
@@ -12,9 +11,7 @@ defineProps({
   },
 });
 
-defineEmits(["toggleExpand"]);
-
-const setListStore = useSetListStore();
+const emit = defineEmits(["toggleExpand", "restore", "remove"]);
 const formatDate = (dateString) => {
   if (!dateString) return "N/A";
   const date = new Date(dateString);
@@ -32,7 +29,7 @@ const formatDate = (dateString) => {
   <div class="setlist-item card mb-3">
     <div
       class="card-header d-flex justify-content-between align-items-center"
-      @click="$emit('toggleExpand', setList.id)"
+      @click="emit('toggleExpand', setList.id)"
     >
       <i
         class="bi"
@@ -43,18 +40,18 @@ const formatDate = (dateString) => {
         <span class="badge text-bg-secondary">
           Arhivēts: {{ formatDate(setList.archivedAt) }}
         </span>
-        <div class="flex-grow-1"/>
+        <div class="flex-grow-1" />
         <button
           class="btn btn-action btn-sm btn-outline-secondary me-1"
           title="Atjaunot nošu sarakstu"
-          @click.stop="setListStore.restoreSetList(setList.id)"
+          @click.stop="emit('restore', setList)"
         >
           <i class="bi bi-arrow-counterclockwise" />
         </button>
         <button
           class="btn btn-action btn-sm btn-outline-danger"
           title="Dzēst nošu sarakstu"
-          @click.stop="setListStore.removeSetList(setList.id)"
+          @click.stop="emit('remove', setList)"
         >
           <i class="bi bi-trash" />
         </button>
@@ -66,9 +63,7 @@ const formatDate = (dateString) => {
           <thead>
             <tr>
               <th>#</th>
-              <th>
-                Nosaukums
-              </th>
+              <th>Nosaukums</th>
             </tr>
           </thead>
           <tbody>

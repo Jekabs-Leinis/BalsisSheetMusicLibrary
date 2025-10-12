@@ -45,21 +45,20 @@ public static class WebApplicationBuilderExtensions
     {
         builder.Services.AddAntiforgery(options =>
         {
-            options.Cookie.Name = "XSRF-TOKEN";
             options.HeaderName = "X-CSRF-TOKEN";
         });
 
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("DisableCSRFAndAuthForLocalhost",
-                b =>
-                {
-                    b.WithOrigins("https://localhost:7171")
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
-                });
-        });
+        // builder.Services.AddCors(options =>
+        // {
+        //     options.AddPolicy("DisableCSRFAndAuthForLocalhost",
+        //         b =>
+        //         {
+        //             b.WithOrigins("https://localhost:7171")
+        //                 .AllowAnyHeader()
+        //                 .AllowAnyMethod()
+        //                 .AllowCredentials();
+        //         });
+        // });
     }
 
     private static void RegisterAppServices(WebApplicationBuilder builder)

@@ -6,16 +6,13 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class CsrfController(IAntiforgery antiforgery) : Controller
+public class AntiforgeryController(IAntiforgery antiforgery) : Controller
 {
     [HttpGet]
     [AllowAnonymous]
     [IgnoreAntiforgeryToken]
-    public IActionResult GetToken()
+    public IActionResult Token()
     {
-        var tokenSet = antiforgery.GetAndStoreTokens(HttpContext);
-        HttpContext.Response.Cookies.Append("CSRF-TOKEN", tokenSet.RequestToken!,
-            new CookieOptions { HttpOnly = false });
         return Ok();
     }
 }

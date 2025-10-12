@@ -10,6 +10,7 @@ public static class ApplicationBuilderExtensions
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseAntiforgery();
 
         var env = app.ApplicationServices.GetService<IHostEnvironment>();
 
@@ -22,7 +23,6 @@ public static class ApplicationBuilderExtensions
         else
         {
             app.UseHttpsRedirection();
-            app.UseAntiforgery();
         }
 
         app.UseMiddleware<RequestLoggingMiddleware>();

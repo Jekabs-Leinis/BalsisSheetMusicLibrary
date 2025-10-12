@@ -29,7 +29,6 @@ async function onConfirm() {
     await axios.post("/api/NoteSheet/RenameAllFilenames");
   } catch (err) {
     const message = err?.response?.data?.error || err.message;
-    //TODO: log error to somewhere
 
     showToastMessage(`Kļūda, nevar sākt pārsaukšanu: ${message}`, TYPE.ERROR);
   }

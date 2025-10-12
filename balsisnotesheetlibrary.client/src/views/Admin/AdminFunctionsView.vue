@@ -5,9 +5,11 @@ import AdminHeader from "@/components/Admin/AdminHeader.vue";
 
 <template>
   <AdminHeader />
-  <div class="container mt-5">
-    <h1>Administrēšanas darbības</h1>
-    <hr />
-    <RenameFilenames />
+  <div class=" bg-secondary-subtle">
+    <div class="container container-fluid min-vh-100 pt-5">
+      <h1>Administrēšanas darbības</h1>
+      <hr />
+      <RenameFilenames />
+    </div>
   </div>
 </template>

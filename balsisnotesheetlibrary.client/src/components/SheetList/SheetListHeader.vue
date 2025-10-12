@@ -111,11 +111,13 @@ async function attemptLogout() {
               >
             </li>
             <li class="nav-item text-end" v-if="isAdmin">
-              <a
+              <RouterLink
+                :to="{ name: 'AdminFunctions' }"
                 class="nav-link text-nowrap pe-2 pe-lg-0 text-light"
                 href="/admin"
-                >Admin</a
               >
+                Admin
+              </RouterLink>
             </li>
             <li class="nav-item flex-grow-1" />
             <li class="m-0">

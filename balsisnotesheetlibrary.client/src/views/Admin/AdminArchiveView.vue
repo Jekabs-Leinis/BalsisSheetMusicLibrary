@@ -63,8 +63,8 @@ const handleSearch = (query) => {
 </script>
 
 <template>
-  <AdminHeader />
-  <div class="bg-light min-vh-100">
+  <div class="bg-secondary-subtle min-vh-100">
+    <AdminHeader />
     <div class="container py-4">
       <div class="row justify-content-center">
         <div class="col-12 col-lg-10 col-xl-8">

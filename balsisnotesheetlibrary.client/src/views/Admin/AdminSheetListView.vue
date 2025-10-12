@@ -75,7 +75,7 @@ const saveSheet = async (sheet) => {
 
 <template>
   <AdminHeader />
-  <div class="mt-4 mx-3">
+  <div class="pt-4 px-3 bg-secondary-subtle ">
     <div class="row mb-4">
       <div class="col-6 col-md-6 col-lg-4 col-xl-3">
         <div class="input-group">

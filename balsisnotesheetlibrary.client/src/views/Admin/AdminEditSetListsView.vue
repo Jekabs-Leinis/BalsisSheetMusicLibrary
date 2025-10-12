@@ -45,7 +45,7 @@ const cancelCreateSetList = () => {
   newSetListTitle.value = "";
 };
 
-const handleDraggableListMove = ({ oldIndex, newIndex }) => {
+const onDraggableListMove = ({ oldIndex, newIndex }) => {
   setListStore.moveSetList(oldIndex, newIndex);
 };
 
@@ -87,7 +87,7 @@ const setListToDelete = ref(null);
             group="setlists"
             handle=".setlist-header"
             item-key="id"
-            @sort="handleDraggableListMove"
+            @sort="onDraggableListMove"
           >
             <EditSetList
               v-for="setList in setListStore.setLists"

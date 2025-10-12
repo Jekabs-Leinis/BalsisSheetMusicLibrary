@@ -23,7 +23,7 @@ const showModal = computed({
   set: (value) => emit("update:show", value),
 });
 
-async function handleConfirmDelete() {
+async function onDeleteConfirm() {
   if (!props.sheet) {
     throw new Error("Sheet is required to confirm deletion.");
   }
@@ -34,7 +34,7 @@ async function handleConfirmDelete() {
   showModal.value = false;
 }
 
-function handleClose() {
+function onClose() {
   showModal.value = false;
   emit("close");
 }
@@ -45,7 +45,7 @@ function handleClose() {
     v-model:show="showModal"
     title="Dzēst notis"
     centered
-    @hidden="handleClose"
+    @hidden="onClose"
   >
     <template v-if="sheet">
       <p>Vai tiešām vēlaties dzēst notis "{{ sheet.title }}"?</p>
@@ -66,7 +66,7 @@ function handleClose() {
         <button
           type="button"
           class="btn btn-danger"
-          @click="handleConfirmDelete"
+          @click="onDeleteConfirm"
         >
           Dzēst
         </button>

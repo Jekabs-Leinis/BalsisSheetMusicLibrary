@@ -45,7 +45,7 @@ watch(
   { immediate: true, deep: true },
 );
 
-function handleFileChange(event) {
+function onFileChanged(event) {
   const file = event.target?.files?.[0];
   if (file) {
     if (file.type !== "application/pdf") {
@@ -102,7 +102,7 @@ function validateForm() {
 }
 
 const isSaving = ref(false);
-async function handleSave() {
+async function onSave() {
   if (!validateForm()) {
     return;
   }
@@ -122,12 +122,12 @@ async function handleSave() {
   clearFileSelection();
 }
 
-function handleClose() {
+function onClose() {
   isValid.value = true;
   emit("close");
 }
 
-function handleInputBlur(field) {
+function onInputBlur(field) {
   if (field === "title" && !formData.value.title.trim()) {
     isValid.value = false;
     validationMessage.value = "Nosaukums ir obligāts.";
@@ -144,9 +144,9 @@ function handleInputBlur(field) {
     :title="isCreateMode ? 'Pievienot notis' : 'Rediģēt notis'"
     centered
     size="lg"
-    @hidden="handleClose"
+    @hidden="onClose"
   >
-    <form @submit.prevent="handleSave">
+    <form @submit.prevent="onSave">
       <div v-if="!isValid" class="alert alert-danger" role="alert">
         {{ validationMessage }}
       </div>
@@ -160,7 +160,7 @@ function handleInputBlur(field) {
           class="form-control"
           placeholder="Ievadiet dziesmas nosaukumu"
           required
-          @blur="handleInputBlur('title')"
+          @blur="onInputBlur('title')"
           :class="{ 'is-invalid': !formData.title.trim() }"
         />
       </div>
@@ -248,7 +248,7 @@ function handleInputBlur(field) {
             class="form-control"
             id="file-input"
             accept="application/pdf"
-            @change="handleFileChange"
+            @change="onFileChanged"
             :class="{ 'is-invalid': fileError }"
           />
         </div>
@@ -272,7 +272,7 @@ function handleInputBlur(field) {
           type="button"
           v-loading.bg="isSaving"
           class="btn btn-primary"
-          @click="handleSave"
+          @click="onSave"
         >
           Saglabāt
         </button>

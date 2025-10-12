@@ -49,7 +49,7 @@ const removeItem = async (noteSheetId) => {
   await setListStore.saveSetList(setList.value);
 };
 
-const handleDraggableItemMove = ({ newIndex }) => {
+const onDraggableItemMove = ({ newIndex }) => {
   // VueDraggable has already swapped the items in setList.value.items
   // However we still have to update the order field and call api with error handling
   // To avoid creating a separate store action for this,
@@ -74,7 +74,7 @@ const handleDraggableItemMove = ({ newIndex }) => {
         class="list-group sheets-list mb-3"
         handle=".sheet-drag-handle"
         item-key="noteSheetId"
-        @sort="handleDraggableItemMove"
+        @sort="onDraggableItemMove"
       >
         <div
           v-for="item in setList.items"

@@ -20,14 +20,14 @@ const showModal = computed({
   set: (value) => emit("update:show", value)
 });
 
-function handleConfirmDelete() {
+function onConfirmDelete() {
   if (props.setList) {
     emit("confirm", props.setList.id);
     showModal.value = false;
   }
 }
 
-function handleClose() {
+function onClose() {
   emit("close");
 }
 </script>
@@ -37,7 +37,7 @@ function handleClose() {
     v-model:show="showModal"
     title="Dzēst nošu sarakstu"
     centered
-    @hidden="handleClose"
+    @hidden="onClose"
   >
     <template v-if="setList">
       <p>Vai tiešām vēlaties dzēst nošu sarakstu "{{ setList.title }}"?</p>
@@ -51,7 +51,7 @@ function handleClose() {
         <button type="button" class="btn btn-secondary" @click="showModal = false">
           Atcelt
         </button>
-        <button type="button" class="btn btn-danger" @click="handleConfirmDelete">
+        <button type="button" class="btn btn-danger" @click="onConfirmDelete">
           Dzēst
         </button>
       </div>

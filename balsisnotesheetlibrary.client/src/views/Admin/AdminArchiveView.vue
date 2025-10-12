@@ -57,7 +57,7 @@ const filteredSetLists = computed(() => {
   return filteredSetLists;
 });
 
-const handleSearch = (query) => {
+const onSearch = (query) => {
   searchQuery.value = query;
 };
 </script>
@@ -68,7 +68,7 @@ const handleSearch = (query) => {
     <div class="container py-4">
       <div class="row justify-content-center">
         <div class="col-12 col-lg-10 col-xl-8">
-          <ArchiveSearchBar @search="handleSearch" class="mb-4" />
+          <ArchiveSearchBar @search="onSearch" class="mb-4" />
 
           <div v-if="isInitializing" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">

@@ -6,7 +6,7 @@ let lastScrollY = window.scrollY
 let fadeTimeout = null
 
 // Handles scroll direction and button visibility
-function handleScroll() {
+function onScroll() {
   const currentY = window.scrollY
   const direction = currentY < lastScrollY ? 'up' : 'down'
 
@@ -31,11 +31,11 @@ function scrollToTop() {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll, { passive: true })
+  window.addEventListener('scroll', onScroll, { passive: true })
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('scroll', onScroll)
   if (fadeTimeout) clearTimeout(fadeTimeout)
 })
 </script>

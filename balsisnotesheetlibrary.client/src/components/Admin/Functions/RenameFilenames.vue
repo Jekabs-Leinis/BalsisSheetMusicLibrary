@@ -11,7 +11,7 @@ function openModal() {
   showModal.value = true;
 }
 
-function handleCancel() {
+function onCancel() {
   showModal.value = false;
 }
 
@@ -20,7 +20,7 @@ const toast = useToast();
 // instead of creating new toasts
 const infoToastId = ref(null);
 
-async function handleConfirm() {
+async function onConfirm() {
   toast.clear();
   infoToastId.value = null;
 
@@ -92,7 +92,7 @@ onUnmounted(() => {
       v-model:show="showModal"
       title="Apstiprināt pārsaukšanu"
       centered
-      @hidden="handleCancel"
+      @hidden="onCancel"
     >
       <div class="alert alert-warning" role="alert">
         Šī darbība pārsauks visus failus, lai tie atbilstu shēmai
@@ -101,8 +101,8 @@ onUnmounted(() => {
       </div>
       <template #footer>
         <div class="w-100 d-flex justify-content-between">
-          <button type="button" class="btn btn-secondary" @click="handleCancel">Atcelt</button>
-          <button type="button" class="btn btn-danger" @click="handleConfirm">Pārsaukt</button>
+          <button type="button" class="btn btn-secondary" @click="onCancel">Atcelt</button>
+          <button type="button" class="btn btn-danger" @click="onConfirm">Pārsaukt</button>
         </div>
       </template>
     </VModal>

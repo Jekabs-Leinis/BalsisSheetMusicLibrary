@@ -10,7 +10,7 @@ function openModal() {
   showModal.value = true;
 }
 
-function handleSaved(sheet) {
+function onSaved(sheet) {
   showModal.value = false;
   emit("sheet-created", sheet);
   emptySheet.value = new NoteSheet(); 
@@ -29,7 +29,7 @@ const emit = defineEmits(["sheet-created"]);
     <EditSheet
       v-model:show="showModal"
       :sheet="emptySheet"
-      @save="handleSaved"
+      @save="onSaved"
     />
   </div>
 </template>

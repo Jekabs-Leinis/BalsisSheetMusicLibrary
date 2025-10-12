@@ -34,18 +34,18 @@ const selectItem = (item) => {
   showDropdown.value = false;
 };
 
-const handleClickOutside = (event) => {
+const onClickOutside = (event) => {
   if (!event.target.closest(".sheet-search-dropdown")) {
     showDropdown.value = false;
   }
 };
 
 onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
+  document.addEventListener("click", onClickOutside);
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener("click", onClickOutside);
 });
 </script>
 

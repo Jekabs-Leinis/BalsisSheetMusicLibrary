@@ -17,11 +17,11 @@ onMounted(async () => {
 
 const searchInput = ref("");
 
-function handleSearch(query) {
+function onSearch(query) {
   noteSheetStore.setSearchQuery(query);
 }
 
-const debouncedSearch = _debounce(handleSearch, 300);
+const debouncedSearch = _debounce(onSearch, 300);
 
 watch(searchInput, (query) => debouncedSearch(query));
 
@@ -39,7 +39,7 @@ const openDeleteModal = (sheet) => {
 
 const sortField = ref("title");
 
-const handleSort = (field) => {
+const onSort = (field) => {
   sortField.value = field;
   noteSheetStore.setSortField(field);
 };
@@ -102,28 +102,28 @@ const saveSheet = async (sheet) => {
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th @click="handleSort('title')" class="sort-header">
+            <th @click="onSort('title')" class="sort-header">
               Nosaukums
               <i
                 v-if="sortField === 'title'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="handleSort('author')" class="sort-header">
+            <th @click="onSort('author')" class="sort-header">
               Mūzikas autors
               <i
                 v-if="sortField === 'author'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="handleSort('lyricist')" class="sort-header">
+            <th @click="onSort('lyricist')" class="sort-header">
               Vārdu autors
               <i
                 v-if="sortField === 'lyricist'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="handleSort('year')" class="sort-header">
+            <th @click="onSort('year')" class="sort-header">
               Gads
               <i
                 v-if="sortField === 'year'"
@@ -131,7 +131,7 @@ const saveSheet = async (sheet) => {
               ></i>
             </th>
             <th
-              @click="handleSort('isLatvian')"
+              @click="onSort('isLatvian')"
               class="sort-header text-center"
             >
               Valoda
@@ -140,7 +140,7 @@ const saveSheet = async (sheet) => {
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="handleSort('filename')" class="sort-header">
+            <th @click="onSort('filename')" class="sort-header">
               Faila nosaukums
               <i
                 v-if="sortField === 'filename'"

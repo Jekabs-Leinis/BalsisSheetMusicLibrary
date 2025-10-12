@@ -12,11 +12,11 @@ const noteSheetStore = useNoteSheetStore();
 const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
 const searchInput = ref("");
 
-function handleSearch(query) {
+function onSearch(query) {
   noteSheetStore.setSearchQuery(query);
 }
 
-const debouncedSearch = _debounce(handleSearch, 300);
+const debouncedSearch = _debounce(onSearch, 300);
 
 watch(searchInput, (query) => debouncedSearch(query));
 

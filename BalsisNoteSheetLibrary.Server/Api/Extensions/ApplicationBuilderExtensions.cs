@@ -1,21 +1,24 @@
 using BalsisNoteSheetLibrary.Server.Api.Middleware;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
+using Serilog;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
 {
-    public static async Task ConfigurePipeline(this IApplicationBuilder app)
+    public static async Task ConfigurePipeline(this WebApplication app)
     {
+        app.UseDefaultFiles();
+        app.UseStaticFiles();
+        
         app.UseRouting();
+        
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseAntiforgery();
-
-        var env = app.ApplicationServices.GetService<IHostEnvironment>();
-
-        if (env != null && env.IsDevelopment())
+        
+        if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
@@ -29,22 +32,32 @@ public static class ApplicationBuilderExtensions
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-        app.UseEndpoints(endpoints =>
+        app.MapControllers().RequireAuthorization();
+        
+        app.MapHub<StatusHub>("/api/statusHub");
+        
+        // Return 404 for any /api/* requests that don't match a controller
+        // This prevents serving index.html for unknown API routes
+        // which would otherwise result in a 200 OK with HTML content
+        app.MapFallback(context =>
         {
-            endpoints.MapControllers();
-            endpoints.MapHub<StatusHub>("/api/statusHub");
-            endpoints.MapFallback(context =>
+            if (context.Request.Path.StartsWithSegments("/api"))
             {
                 context.Response.StatusCode = 404;
 
                 return context.Response.CompleteAsync();
-            });
+            }
+            
+            context.Response.StatusCode = 200;
+            context.Response.ContentType = "text/html";
+            
+            return context.Response.SendFileAsync("wwwroot/index.html");
         });
 
         if (Environment.GetEnvironmentVariable("LIB_ENABLE_SEEDERS") == "1")
         {
-            await RoleSeeder.SeedRolesAsync(app.ApplicationServices);
-            await UserSeeder.SeedUsersAsync(app.ApplicationServices);
+            await RoleSeeder.SeedRolesAsync(app.Services);
+            await UserSeeder.SeedUsersAsync(app.Services);
         }
     }
 }

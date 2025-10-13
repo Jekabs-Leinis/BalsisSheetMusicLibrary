@@ -17,11 +17,11 @@ namespace BalsisNoteSheetLibrary.Server.Api.Extensions;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static WebApplicationBuilder AddApplicationServices(this WebApplicationBuilder builder)
+    public static void AddApplicationServices(this WebApplicationBuilder builder)
     {
         RegisterDb(builder);
         RegisterAuthentication(builder);
-        RegisterAuthorization(builder);
+        builder.Services.AddAuthorizationBuilder();
         RegisterAntiforgery(builder);
 
         builder.Services.AddControllers();
@@ -37,8 +37,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddSwaggerGen();
 
         RegisterAppServices(builder);
-
-        return builder;
     }
 
     private static void RegisterAntiforgery(WebApplicationBuilder builder)
@@ -47,18 +45,6 @@ public static class WebApplicationBuilderExtensions
         {
             options.HeaderName = "X-CSRF-TOKEN";
         });
-
-        // builder.Services.AddCors(options =>
-        // {
-        //     options.AddPolicy("DisableCSRFAndAuthForLocalhost",
-        //         b =>
-        //         {
-        //             b.WithOrigins("https://localhost:7171")
-        //                 .AllowAnyHeader()
-        //                 .AllowAnyMethod()
-        //                 .AllowCredentials();
-        //         });
-        // });
     }
 
     private static void RegisterAppServices(WebApplicationBuilder builder)
@@ -77,14 +63,6 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ISetListItemService, SetListItemService>();
         builder.Services.AddScoped<IUserService, UserService>();
-    }
-
-    private static void RegisterAuthorization(WebApplicationBuilder builder)
-    {
-        builder.Services.AddAuthorizationBuilder()
-            .SetFallbackPolicy(new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build());
     }
 
     private static void RegisterAuthentication(WebApplicationBuilder builder)

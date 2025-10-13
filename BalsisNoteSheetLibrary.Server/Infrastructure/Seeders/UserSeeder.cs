@@ -1,27 +1,28 @@
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
 
 public static class UserSeeder
 {
+    private static readonly ILogger Logger = Log.ForContext(typeof(UserSeeder));
     public static async Task SeedUsersAsync(IServiceProvider serviceProvider)
     {
-        Console.WriteLine("Seeding users...");
+        Logger.Information("Seeding users...");
         using var scope = serviceProvider.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
         var adminPassword = Environment.GetEnvironmentVariable("LIB_ADMIN_PASS") ?? throw new InvalidOperationException("LIB_ADMIN_PASS environment variable is not set");
         var userPassword = Environment.GetEnvironmentVariable("LIB_USER_PASS") ?? throw new InvalidOperationException("LIB_USER_PASS environment variable is not set");
         
-        var allowPasswordReset = Environment.GetEnvironmentVariable("ALLOW_USER_PASSWORD_RESET") == "1";
-
-        await SeedUserAsync(userManager, "admin@balsis.lv", Role.Admin, adminPassword, allowPasswordReset);
-        await SeedUserAsync(userManager, "daudzasbalsis", Role.User, userPassword, allowPasswordReset);
-        Console.WriteLine("Seeding users completed!");
+        await SeedUserAsync(userManager, "admin@balsis.lv", Role.Admin, adminPassword);
+        await SeedUserAsync(userManager, "daudzasbalsis", Role.User, userPassword);
+        Logger.Information("Seeding users completed!");
     }
 
-    private static async Task SeedUserAsync(UserManager<IdentityUser> userManager, string userName, string role, string password, bool allowPasswordReset)
+    private static async Task SeedUserAsync(UserManager<IdentityUser> userManager, string userName, string role, string password)
     {
         var user = await userManager.FindByNameAsync(userName);
 
@@ -35,42 +36,42 @@ public static class UserSeeder
 
             if (result.Succeeded)
             {
-                Console.WriteLine($"Created user: {newUser.UserName}");
+                Logger.Information("Created user: {NewUserUserName}", newUser.UserName);
                 await userManager.AddToRoleAsync(newUser, role);
-                Console.WriteLine($"Assigned role '{role}' to user: {newUser.UserName}");
+                Logger.Information("Assigned role '{Role}' to user: {NewUserUserName}", role, newUser.UserName);
             }
             else
             {
-                Console.WriteLine(
-                    $"Error creating user {newUser.UserName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                Logger.Information(
+                    "Error creating user {NewUserUserName}: {Join}", newUser.UserName, string.Join(", ", result.Errors.Select(e => e.Description)));
             }
         }
         else
         {
-            if (allowPasswordReset)
+            if (Environment.GetEnvironmentVariable("LIB_ALLOW_SEEDER_PASSWORD_RESET") == "1")
             {
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await userManager.ResetPasswordAsync(user, token, password);
                 
                 if (result.Succeeded)
                 {
-                    Console.WriteLine($"Updated password for user: {user.UserName}");
+                    Logger.Information("Updated password for user: {UserUserName}", user.UserName);
                 }
                 else
                 {
-                    Console.WriteLine($"Failed to update password for user {user.UserName}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                                        Logger.Error("Failed to update password for user {UserUserName}: {Join}", user.UserName, string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
             }
             else
             {
-                Console.WriteLine($"Skipping password reset for user {user.UserName} in production environment.");
+                Logger.Information("Skipping password reset for user {UserUserName} in production environment.", user.UserName);
             }
             
             // Ensure user has the role if they already exist
             if (!await userManager.IsInRoleAsync(user, role))
             {
                 await userManager.AddToRoleAsync(user, role);
-                Console.WriteLine($"Assigned role '{role}' to existing user: {user.UserName}");
+                Logger.Information("Assigned role '{Role}' to existing user: {UserUserName}", role, user.UserName);
             }
         }    
     }

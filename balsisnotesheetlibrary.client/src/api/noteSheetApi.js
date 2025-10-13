@@ -7,7 +7,7 @@ export async function getAllNoteSheets() {
 
     return response.data.map((noteSheet) => new NoteSheet(noteSheet));
   } catch (e) {
-    throw new Error(e.message || "Failed to get all note sheets");
+    throw new Error(e.response?.data || e.message || "Failed to get all note sheets");
   }
 }
 
@@ -35,7 +35,7 @@ export async function createNoteSheet(noteSheet, file) {
 
     return new NoteSheet(response.data);
   } catch (e) {
-    throw new Error(e.message || "Failed to create note sheet");
+    throw new Error(e.response?.data || e.message || "Failed to create note sheet");
   }
 }
 
@@ -64,7 +64,7 @@ export async function updateNoteSheet(noteSheet, file) {
 
     return new NoteSheet(response.data);
   } catch (e) {
-    throw new Error(e.message || "Failed to update note sheet");
+    throw new Error(e.response?.data || e.message || "Failed to update note sheet");
   }
 }
 
@@ -72,6 +72,6 @@ export async function deleteNoteSheet(noteSheetId) {
   try {
     await axios.delete(`/api/noteSheet/delete/${noteSheetId}`);
   } catch (e) {
-    throw new Error(e.message || "Failed to delete note sheet");
+    throw new Error(e.response?.data || e.message || "Failed to delete note sheet");
   }
 }

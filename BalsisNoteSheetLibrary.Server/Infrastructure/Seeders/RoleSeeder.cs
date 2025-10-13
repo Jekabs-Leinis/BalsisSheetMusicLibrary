@@ -1,13 +1,16 @@
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
+using ILogger = Serilog.ILogger;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
 
 public static class RoleSeeder
 {
+        private static readonly ILogger Logger = Log.ForContext(typeof(RoleSeeder));
     public static async Task SeedRolesAsync(IServiceProvider serviceProvider)
     {
-        Console.WriteLine("Seeding roles...");
+        Logger.Information("Seeding roles...");
         using var scope = serviceProvider.CreateScope();
 
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -20,11 +23,11 @@ public static class RoleSeeder
 
             if (!roleExists)
             {
-                Console.WriteLine($"Creating role: {roleName}");
+                Logger.Information("Creating role: {RoleName}", roleName);
                 await roleManager.CreateAsync(new IdentityRole(roleName));
             }
         }
         
-        Console.WriteLine("Seeding roles completed!");
+        Logger.Information("Seeding roles completed!");
     }
 }

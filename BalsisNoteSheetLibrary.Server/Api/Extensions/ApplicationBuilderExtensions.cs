@@ -1,11 +1,12 @@
 using BalsisNoteSheetLibrary.Server.Api.Middleware;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Extensions;
 
 public static class ApplicationBuilderExtensions
 {
-    public static IApplicationBuilder ConfigurePipeline(this IApplicationBuilder app)
+    public static async Task ConfigurePipeline(this IApplicationBuilder app)
     {
         app.UseRouting();
         app.UseAuthentication();
@@ -40,6 +41,10 @@ public static class ApplicationBuilderExtensions
             });
         });
 
-        return app;
+        if (Environment.GetEnvironmentVariable("LIB_ENABLE_SEEDERS") == "1")
+        {
+            await RoleSeeder.SeedRolesAsync(app.ApplicationServices);
+            await UserSeeder.SeedUsersAsync(app.ApplicationServices);
+        }
     }
 }

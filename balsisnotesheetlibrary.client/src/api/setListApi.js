@@ -9,7 +9,7 @@ export async function getAllSetLists(withNoteSheets = false) {
 
     return response.data.map((setList) => new SetList(setList));
   } catch (e) {
-    throw new Error(e.message || "Failed to get all set lists");
+    throw new Error(e.response?.data || e.message || "Failed to get all set lists");
   }
 }
 
@@ -19,7 +19,7 @@ export async function getAllArchivedSetLists() {
 
     return response.data.map((setList) => new SetList(setList));
   } catch (e) {
-    throw new Error(e.message || "Failed to get all set lists");
+    throw new Error(e.response?.data || e.message || "Failed to get all set lists");
   }
 }
 
@@ -29,7 +29,7 @@ export async function addSetList(setList) {
 
     return new SetList(response.data);
   } catch (e) {
-    throw new Error(e.message || "Failed to add set list");
+    throw new Error(e.response?.data || e.message || "Failed to add set list");
   }
 }
 
@@ -40,7 +40,7 @@ export async function updateSetList(setList) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to update set list");
+    throw new Error(e.response?.data || e.message || "Failed to update set list");
   }
 }
 
@@ -50,7 +50,7 @@ export async function moveSetList(id, newOrder) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to update set list order");
+    throw new Error(e.response?.data || e.message || "Failed to update set list order");
   }
 }
 
@@ -60,7 +60,7 @@ export async function deleteSetList(setListId) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to delete set list");
+    throw new Error(e.response?.data || e.message || "Failed to delete set list");
   }
 }
 
@@ -70,7 +70,7 @@ export async function archiveSetList(setListId) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to archive set list");
+    throw new Error(e.response?.data || e.message || "Failed to archive set list");
   }
 }
 
@@ -80,6 +80,6 @@ export async function restoreSetList(setListId) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to restore set list");
+    throw new Error(e.response?.data || e.message || "Failed to restore set list");
   }
 }

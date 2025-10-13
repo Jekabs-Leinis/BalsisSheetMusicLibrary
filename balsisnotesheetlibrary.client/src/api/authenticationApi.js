@@ -14,7 +14,7 @@ export async function login(userName, password) {
       throw new Error("Nepareizi ievadīts lietotājvārds vai parole");
     }
     
-    throw new Error(e.message || "Login failed");
+    throw new Error(e.response?.data || e.message || "Login failed");
   }
 }
 
@@ -24,6 +24,6 @@ export async function logout() {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Logout failed");
+    throw new Error(e.response?.data || e.message || "Logout failed");
   }
 }

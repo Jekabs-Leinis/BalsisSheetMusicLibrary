@@ -44,7 +44,7 @@ async function onConfirm() {
 <template>
   <div>
     <button class="btn btn-warning" @click="showModal = true">
-      <i class="bi bi-pencil-square me-2"></i>
+      <i class="bi bi-person-fill-gear me-2"></i>
       Mainīt lietotāja paroli
     </button>
     <VModal

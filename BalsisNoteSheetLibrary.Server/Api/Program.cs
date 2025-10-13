@@ -1,6 +1,7 @@
 using BalsisNoteSheetLibrary.Server.Api.Extensions;
 using Serilog;
 using Serilog.Events;
+using dotenv.net;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -10,6 +11,8 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    DotEnv.Load();
+    
     var builder = WebApplication.CreateBuilder(args);
 
     builder.Services.Configure<RouteOptions>(options =>
@@ -22,7 +25,7 @@ try
 
     var app = builder.Build();
 
-    app.ConfigurePipeline();
+    await app.ConfigurePipeline();
 
     app.Run();
 }

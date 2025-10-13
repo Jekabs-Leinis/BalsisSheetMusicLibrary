@@ -10,6 +10,6 @@ export async function moveSetListItem(setListId, noteSheetId, newOrder) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.message || "Failed to update set list item order");
+    throw new Error(e.response?.data || e.message || "Failed to update set list item order");
   }
 }

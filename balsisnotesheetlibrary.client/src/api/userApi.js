@@ -7,7 +7,7 @@ export async function getAllUsers() {
 
     return response.data.map((setList) => new User(setList));
   } catch (e) {
-    throw new Error(e.message || "Failed to get all users");
+    throw new Error(e.response?.data || e.message || "Failed to get all users");
   }
 }
 
@@ -18,6 +18,6 @@ export async function changeUserPassword(userName, newPassword) {
       newPassword,
     });
   } catch (e) {
-    throw new Error(e.message || "Failed to change user password");
+    throw new Error(e.response?.data || e.message || "Failed to change user password");
   }
 }

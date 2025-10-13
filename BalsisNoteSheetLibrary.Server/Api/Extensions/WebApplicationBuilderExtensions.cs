@@ -76,6 +76,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<ISetListService, SetListService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ISetListItemService, SetListItemService>();
+        builder.Services.AddScoped<IUserService, UserService>();
     }
 
     private static void RegisterAuthorization(WebApplicationBuilder builder)

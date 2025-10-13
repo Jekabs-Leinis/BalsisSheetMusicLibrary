@@ -7,14 +7,6 @@ import axios from "axios";
 
 const showModal = ref(false);
 
-function openModal() {
-  showModal.value = true;
-}
-
-function onCancel() {
-  showModal.value = false;
-}
-
 const toast = useToast();
 // For info messages we want to update the toast contents with progress
 // instead of creating new toasts
@@ -83,7 +75,7 @@ onUnmounted(() => {
 
 <template>
   <div>
-    <button class="btn btn-warning" @click="openModal">
+    <button class="btn btn-warning" @click="showModal = true">
       <i class="bi bi-pencil-square me-2"></i>
       Pārsaukt failus
     </button>
@@ -91,7 +83,7 @@ onUnmounted(() => {
       v-model:show="showModal"
       title="Apstiprināt pārsaukšanu"
       centered
-      @hidden="onCancel"
+      @hidden="showModal = false"
     >
       <div class="alert alert-warning" role="alert">
         Šī darbība pārsauks visus failus, lai tie atbilstu shēmai
@@ -100,8 +92,16 @@ onUnmounted(() => {
       </div>
       <template #footer>
         <div class="w-100 d-flex justify-content-between">
-          <button type="button" class="btn btn-secondary" @click="onCancel">Atcelt</button>
-          <button type="button" class="btn btn-danger" @click="onConfirm">Pārsaukt</button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            @click="showModal = false"
+          >
+            Atcelt
+          </button>
+          <button type="button" class="btn btn-danger" @click="onConfirm">
+            Pārsaukt
+          </button>
         </div>
       </template>
     </VModal>

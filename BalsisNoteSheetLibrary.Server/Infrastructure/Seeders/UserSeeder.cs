@@ -1,8 +1,7 @@
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace BalsisNoteSheetLibrary.Seeder.Seeders;
+namespace BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
 
 public static class UserSeeder
 {

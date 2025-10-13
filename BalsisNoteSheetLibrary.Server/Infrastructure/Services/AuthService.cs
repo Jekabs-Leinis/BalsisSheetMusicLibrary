@@ -48,7 +48,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager)
 
         if (user == null)
         {
-            throw new InvalidOperationException("Invalid username or password.");
+            throw new InvalidOperationException("Invalid username");
         }
 
         var token = await signInManager.UserManager.GeneratePasswordResetTokenAsync(user);
@@ -57,6 +57,8 @@ public class AuthService(SignInManager<IdentityUser> signInManager)
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => e.Description).ToList();
+            
+            throw new InvalidOperationException($"Failed to change password: {string.Join(", ", errors)}");
         }
     }
 }

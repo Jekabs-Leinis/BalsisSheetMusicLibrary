@@ -39,4 +39,25 @@ public class AuthenticationController(IAuthService authService) : ControllerBase
 
         return Ok("User logged out successfully");
     }
+
+    [HttpPost]
+    [Authorize(Roles = $"{Role.Admin}")]
+    public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto changePasswordDto)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            await authService.ChangePasswordAsync(changePasswordDto);
+
+            return Ok("Password changed successfully.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest($"Failed to change password: {ex.Message}");
+        }
+    }
 }

@@ -1,5 +1,5 @@
-using BalsisNoteSheetLibrary.Seeder.Seeders;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

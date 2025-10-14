@@ -64,6 +64,7 @@ onMounted(async () => {
 #lv-sheets,
 #foreign-sheets {
   scroll-margin-top: 80px;
+  font-family: "Courier New", monospace;
 }
 </style>
 

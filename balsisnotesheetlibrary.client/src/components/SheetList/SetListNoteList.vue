@@ -17,11 +17,11 @@ const props = defineProps({
         <div
           v-for="setList in setLists"
           :key="setList.title"
-          class="col-12"
+          class="col-12 mt-4"
         >
           <ul>
             <li>
-              <h2 class="pt-0">{{ setList.title }}</h2>
+              <h2 class="pt-0 my-3"><b>{{ setList.title }}</b></h2>
             </li>
             <li
               v-for="sheet in setList.getNoteSheets(props.noteSheets)"
@@ -41,6 +41,7 @@ const props = defineProps({
 <style lang="scss" scoped>
 .list-container {
   background-color: #dcddd8;
+  font-family: "Courier New", monospace;
 }
 
 a {

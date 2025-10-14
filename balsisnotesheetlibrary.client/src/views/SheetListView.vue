@@ -57,7 +57,7 @@ onMounted(async () => {
   &,
   :deep(a) {
     color: var(--color-light) !important;
-    background-color: var(--text-color) !important;
+    background-color: var(--color-dark) !important;
   }
 }
 

@@ -18,7 +18,7 @@ const showDropdown = ref(false);
 const filteredSheets = computed(() => {
   if (!searchQuery.value.trim()) return props.sheets;
 
-  // Fuzzy search - "Lan sep" will match "Landscape with Sheperds"
+  // Fuzzy search - "Lan she" will match "Landscape with Shepherds"
   const query = new RegExp(
     searchQuery.value.toLowerCase().replace(/\s+/g, ".*"),
   );

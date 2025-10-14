@@ -365,3 +365,4 @@ FodyWeavers.xsd
 /BalsisNoteSheetLibrary.Server/Static/Sheets/*
 /BalsisNoteSheetLibrary.Server/app.db
 .env
+/BalsisNoteSheetLibrary.Server/Static/*

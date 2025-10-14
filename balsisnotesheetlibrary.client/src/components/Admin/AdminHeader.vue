@@ -1,6 +1,14 @@
 <script setup>
+import { onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 const route = useRoute();
+
+onUnmounted(() => {
+  // BS offcanvas doesn't restore body scroll on route change, so we do it manually
+  if (document.body.style.overflow === "hidden") {
+    document.body.style.overflow = "auto";
+  }
+})
 </script>
 
 <template>

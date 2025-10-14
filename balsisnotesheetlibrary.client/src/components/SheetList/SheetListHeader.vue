@@ -3,7 +3,7 @@ import { useUserStore } from "@/stores/userStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { logout } from "@/api/authenticationApi";
 import router from "@/router/routes";
-import { ref, watch, onBeforeUnmount } from "vue";
+import { ref, watch, onBeforeUnmount, onUnmounted } from "vue";
 import _debounce from "lodash.debounce";
 
 const userStore = useUserStore();
@@ -23,6 +23,13 @@ watch(searchInput, (query) => debouncedSearch(query));
 onBeforeUnmount(() => {
   noteSheetStore.setSearchQuery("");
 });
+
+onUnmounted(() => {
+  // BS offcanvas doesn't restore body scroll on route change, so we do it manually
+  if (document.body.style.overflow === "hidden") {
+    document.body.style.overflow = "auto";
+  }
+})
 
 async function attemptLogout() {
   try {

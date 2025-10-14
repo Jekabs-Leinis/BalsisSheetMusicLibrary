@@ -28,6 +28,11 @@ public class LocalFileStorageService : IFileStorageService
 
         return File.Exists(filePath);
     }
+    
+    public string GetFilePath(string fileName)
+    {
+        return Path.Combine(_basePath, fileName);
+    }
 
     public Task DeleteFileAsync(string fileName)
     {

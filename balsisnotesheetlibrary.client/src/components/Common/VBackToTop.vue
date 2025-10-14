@@ -63,6 +63,7 @@ onUnmounted(() => {
   opacity: 0.65;
   min-width: 2.5rem;
   min-height: 2.5rem;
+  font-size: 1rem;
   padding: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 1050;

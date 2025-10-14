@@ -67,11 +67,15 @@ export class SetList {
    * @returns {NoteSheet[]}
    */
   getNoteSheets(allNoteSheets) {
-    const noteSheetIds = new Set(this.items.map((item) => item.noteSheetId));
-
-    return allNoteSheets.filter((noteSheet) =>
-      noteSheetIds.has(noteSheet.id),
-    );
+    // Create a map for quick lookup of NoteSheet by id
+    const noteSheetMap = new Map(allNoteSheets.map(ns => [ns.id, ns]));
+    
+    // Return NoteSheets in the order of this.items by their order property
+    return this.items
+      .slice() // avoid mutating original array
+      .sort((a, b) => a.order - b.order)
+      .map(item => noteSheetMap.get(item.noteSheetId))
+      .filter(Boolean);
   }
   
   reorderItems() {

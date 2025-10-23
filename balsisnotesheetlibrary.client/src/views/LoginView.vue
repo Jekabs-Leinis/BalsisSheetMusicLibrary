@@ -33,9 +33,9 @@ async function attemptLogin() {
 </script>
 
 <template>
-  <div class="login-bg">
+  <div class="login-bg flex-column h-100">
     <div
-      class="d-flex justify-content-center flex-column align-items-baseline login-form mx-auto h-100"
+      class="d-flex justify-content-center flex-column align-items-baseline login-form mx-auto"
     >
       <div class="info mb-3">Please log in to access this page.</div>
       <h1 class="fw-normal">Nošu arhīvs</h1>
@@ -78,12 +78,14 @@ async function attemptLogin() {
         </button>
       </div>
     </div>
+    <div class="flex-grow-1" />
   </div>
 </template>
 
 <style scoped>
 .login-form {
   max-width: 300px;
+  height: 100%;
 }
 
 .login-bg {
@@ -110,5 +112,39 @@ async function attemptLogin() {
   border: none;
   padding: 8px 12px;
   float: right;
+}
+
+/** Mobile styles to handle on-screen keyboard reducing viewport height */
+@media (max-width: 767px) {
+  /* Make the background container allow scrolling if the viewport is reduced by the keyboard */
+  .login-bg {
+    position: absolute; 
+    display: flex; 
+    align-items: flex-start; 
+    overflow: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scrolling for iOS Safari */
+    padding-top: 5vh;
+    height: calc(100vh - 5vh);
+  }
+  
+  .login-form {
+    position: relative;
+    margin: 0 auto;
+    max-width: 320px;
+    width: calc(100% - 32px);
+    height: auto;
+    max-height: 100vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .login-form input,
+  .login-form button {
+    scroll-margin-top: 10vh;
+  }
+  
+  .login-form .info {
+    margin-left: 0;
+  }
 }
 </style>

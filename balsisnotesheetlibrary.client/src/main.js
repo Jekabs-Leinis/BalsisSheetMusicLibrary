@@ -29,6 +29,14 @@ router.beforeEach((to) => {
   return { name: "Login" };
 });
 
+router.afterEach(() => {
+  // Bootstrap offcanvas doesn't restore body scroll on route change,
+  // so we have do it manually, otherwise the page remains unscrollable
+  if (document.body.style.overflow === "hidden") {
+    document.body.style.overflow = "";
+  }
+});
+
 app.use(router);
 app.use(Toast, {
   position: POSITION.TOP_RIGHT,

@@ -1,56 +1,57 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted } from "vue";
 
-const showButton = ref(false)
-let lastScrollY = window.scrollY
-let fadeTimeout = null
+const showButton = ref(false);
+let lastScrollY = window.scrollY;
+let fadeTimeout = null;
 
 // Handles scroll direction and button visibility
 function onScroll() {
-  const currentY = window.scrollY
-  const direction = currentY < lastScrollY ? 'up' : 'down'
+  const currentY = window.scrollY;
+  const direction = currentY < lastScrollY ? "up" : "down";
 
-  if (direction === 'up') {
-    showButton.value = true
+  if (direction === "up") {
+    showButton.value = true;
     // Reset fade timeout on upward scroll
-    if (fadeTimeout) clearTimeout(fadeTimeout)
+    if (fadeTimeout) clearTimeout(fadeTimeout);
     fadeTimeout = setTimeout(() => {
-      showButton.value = false
-    }, 3000)
-  } else if (direction === 'down') {
+      showButton.value = true;
+    }, 3000);
+  } else if (direction === "down") {
     // Hide button immediately on downward scroll
-    showButton.value = false
-    if (fadeTimeout) clearTimeout(fadeTimeout)
+    showButton.value = false;
+    if (fadeTimeout) clearTimeout(fadeTimeout);
   }
 
-  lastScrollY = currentY
+  lastScrollY = currentY;
 }
 
 function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' })
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', onScroll, { passive: true })
-})
+  window.addEventListener("scroll", onScroll, { passive: true });
+});
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', onScroll)
-  if (fadeTimeout) clearTimeout(fadeTimeout)
-})
+  window.removeEventListener("scroll", onScroll);
+  if (fadeTimeout) clearTimeout(fadeTimeout);
+});
 </script>
 
 <template>
   <div>
     <transition name="fade">
-      <button
-        v-if="showButton"
-        class="btn btn-secondary position-fixed back-to-top d-flex align-items-center justify-content-center"
-        @click="scrollToTop"
-        aria-label="Back to top"
-      >
-        <i class="bi bi-arrow-up"></i>
-      </button>
+      <div v-if="showButton" class="position-fixed d-block back-to-top">
+        <a
+          class="btn btn-secondary d-flex justify-content-center align-items-center btn__scroll"
+          @click="scrollToTop"
+          aria-label="Back to top"
+        >
+          <i class="bi bi-arrow-up" />
+        </a>
+      </div>
     </transition>
   </div>
 </template>
@@ -59,19 +60,25 @@ onUnmounted(() => {
 .back-to-top {
   bottom: 1rem;
   right: 1rem;
-  border-radius: 0.3rem;
   opacity: 0.65;
-  min-width: 2.5rem;
-  min-height: 2.5rem;
-  font-size: 1rem;
-  padding: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   z-index: 1050;
 }
-.fade-enter-active, .fade-leave-active {
+
+.btn__scroll {
+  line-height: 1 !important;
+  padding: 0;
+  width: 2.5rem;
+  aspect-ratio: 1;
+}
+
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.2s;
 }
-.fade-enter-from, .fade-leave-to {
+
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
 }
+
 </style>

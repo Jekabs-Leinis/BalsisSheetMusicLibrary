@@ -62,6 +62,9 @@ const saveTitle = async () => {
 
 <template>
   <div class="editable-title d-flex align-items-center w-100">
+    <span class="list-drag-handle me-2">
+      <i class="bi bi-grip-vertical text-muted"></i>
+    </span>
     <div v-if="!isEditing" class="d-flex align-items-center flex-grow-1">
       <h5 class="mb-0 me-2">{{ setList.title }}</h5>
       <button

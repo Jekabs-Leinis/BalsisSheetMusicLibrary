@@ -129,7 +129,7 @@ const onArchiveConfirmed = (setList) => {
             v-model="setListStore.setLists"
             class="setlists-container"
             group="setlists"
-            handle=".setlist-header"
+            handle=".list-drag-handle"
             item-key="id"
             @sort="onDraggableListMove"
           >

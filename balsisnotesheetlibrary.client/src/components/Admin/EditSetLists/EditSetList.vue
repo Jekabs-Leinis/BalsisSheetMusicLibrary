@@ -84,7 +84,7 @@ const onDraggableItemMove = ({ newIndex }) => {
           :key="`${setList.id}-${item.noteSheetId}`"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
-          <div class="d-flex align-items-center flex-grow-1">
+          <div class="d-flex text-break align-items-center flex-grow-1">
             <span class="sheet-drag-handle me-2">
               <i class="bi bi-grip-vertical text-muted"></i>
             </span>

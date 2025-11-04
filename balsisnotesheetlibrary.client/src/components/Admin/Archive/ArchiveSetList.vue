@@ -28,7 +28,7 @@ const formatDate = (dateString) => {
 <template>
   <div class="setlist-item card mb-3">
     <div
-      class="card-header d-flex justify-content-between align-items-center"
+      class="card-header d-flex text-break justify-content-between align-items-center"
       @click="emit('toggleExpand', setList.id)"
     >
       <i
@@ -42,7 +42,7 @@ const formatDate = (dateString) => {
         </span>
         <div class="flex-grow-1" />
         <button
-          class="btn btn-icon btn-action btn-sm btn-outline-secondary me-1"
+          class="btn btn-icon btn-action btn-sm btn-outline-secondary mx-1"
           title="Atjaunot dziesmu sarakstu"
           @click.stop="emit('restore', setList)"
         >
@@ -69,7 +69,7 @@ const formatDate = (dateString) => {
           <tbody>
             <tr v-for="item in setList.items" :key="item.noteSheetId">
               <td>{{ item.order + 1 }}</td>
-              <td>{{ item.noteSheet?.getFormattedTitle() || "N/A" }}</td>
+              <td class="text-break">{{ item.noteSheet?.getFormattedTitle() || "N/A" }}</td>
             </tr>
           </tbody>
         </table>

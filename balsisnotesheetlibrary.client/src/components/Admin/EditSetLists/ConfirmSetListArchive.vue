@@ -36,7 +36,7 @@ function onArchiveConfirm() {
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p>Vai tiešām vēlies arhivēt dziesmu sarakstu "{{ setList.title }}"?</p>
+      <p class="text-break">Vai tiešām vēlies arhivēt dziesmu sarakstu "{{ setList.title }}"?</p>
     </template>
 
     <template #footer>

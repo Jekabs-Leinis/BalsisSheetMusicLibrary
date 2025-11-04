@@ -141,6 +141,7 @@ const openEditModal = (sheetId) => {
           <tr
             v-for="sheet in noteSheetStore.filteredNoteSheets"
             :key="sheet.id"
+            class="text-break"
           >
             <td>{{ sheet.title }}</td>
             <td>{{ sheet.author || "-" }}</td>
@@ -150,7 +151,8 @@ const openEditModal = (sheetId) => {
               class="text-center"
               :title="sheet.isLatvian ? 'Latviešu' : 'Ārzemju'"
             >
-              {{ sheet.isLatvian ? "🇱🇻" : "🌍" }}
+<!-- Flag: Latvia Emoji or Globe Showing Europe-Africa Emoji -->
+              {{ sheet.isLatvian ? "&#127473;&#127483;" : "&#127757;" }}
             </td>
             <td>
               <a

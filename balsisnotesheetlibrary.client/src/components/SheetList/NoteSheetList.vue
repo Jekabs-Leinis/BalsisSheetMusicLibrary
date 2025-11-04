@@ -14,7 +14,7 @@ defineProps({
 
 <template>
   <div class="pt-4 row">
-    <div class="col-12">
+    <div class="col-12 text-break">
       <h1 class="list-title fw-bold pb-2">{{ title }}</h1>
       <ul class="mb-0 pb-4">
         <li v-for="sheet in noteSheets" :key="sheet.id">

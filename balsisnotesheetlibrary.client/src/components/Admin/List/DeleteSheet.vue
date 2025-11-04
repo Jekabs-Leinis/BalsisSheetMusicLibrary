@@ -57,7 +57,7 @@ function onClose() {
     @hidden="onClose"
   >
     <template v-if="sheet">
-      <p>Vai tiešām vēlaties dzēst notis "{{ sheet.title }}"?</p>
+      <p class="text-break">Vai tiešām vēlaties dzēst notis "{{ sheet.title }}"?</p>
       <p class="text-danger">
         <strong>Šī darbība ir neatgriezeniska.</strong>
       </p>

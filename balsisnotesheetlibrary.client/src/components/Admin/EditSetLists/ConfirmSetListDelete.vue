@@ -37,7 +37,7 @@ function onDeleteConfirm() {
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p>Vai tiešām vēlaties dzēst dziesmu sarakstu "{{ setList.title }}"?</p>
+      <p class="text-break">Vai tiešām vēlaties dzēst dziesmu sarakstu "{{ setList.title }}"?</p>
       <p class="text-danger">
         <strong>Šī darbība ir neatgriezeniska.</strong>
       </p>

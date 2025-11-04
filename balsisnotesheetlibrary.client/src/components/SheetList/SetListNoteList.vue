@@ -17,7 +17,7 @@ const props = defineProps({
         <div
           v-for="setList in setLists"
           :key="setList.title"
-          class="col-12 mt-4"
+          class="col-12 mt-4 text-break"
         >
           <ul>
             <li>

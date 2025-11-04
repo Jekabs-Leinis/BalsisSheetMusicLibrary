@@ -36,7 +36,7 @@ function onRestoreConfirm() {
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p>Vai tiešām vēlies atjaunot dziesmu sarakstu "{{ setList.title }}"?</p>
+      <p class="text-break">Vai tiešām vēlies atjaunot dziesmu sarakstu "{{ setList.title }}"?</p>
     </template>
 
     <template #footer>

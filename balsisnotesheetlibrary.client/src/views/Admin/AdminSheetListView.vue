@@ -164,13 +164,13 @@ const openEditModal = (sheetId) => {
             <td>
               <div class="btn-group">
                 <button
-                  class="btn btn-sm btn-primary me-1"
+                  class="btn btn-icon btn-sm btn-primary me-1"
                   @click="openEditModal(sheet.id)"
                 >
                   <i class="bi bi-pencil"></i>
                 </button>
                 <button
-                  class="btn btn-sm btn-danger"
+                  class="btn btn-icon btn-sm btn-danger"
                   @click="openDeleteModal(sheet)"
                 >
                   <i class="bi bi-trash"></i>

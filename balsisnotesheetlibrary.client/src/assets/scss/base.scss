@@ -23,6 +23,16 @@ h3 {
   font-weight: normal;
 }
 
+/* 
+ Fixes centering for bootstrap buttons that only have an icon inside
+ as mobile devices tend to shift the icon off-center downwards
+*/
+.btn-icon {
+  line-height: 1 !important;
+  padding: 0.375rem;
+  aspect-ratio: 1;
+}
+
 @font-face {
   font-family: "Nimbus Mono";
   src: url("@/static/fonts/NimbusMono-Regular.otf") format("opentype");

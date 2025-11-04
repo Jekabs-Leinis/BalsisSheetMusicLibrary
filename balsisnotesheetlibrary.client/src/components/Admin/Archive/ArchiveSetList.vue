@@ -42,14 +42,14 @@ const formatDate = (dateString) => {
         </span>
         <div class="flex-grow-1" />
         <button
-          class="btn btn-action btn-sm btn-outline-secondary me-1"
+          class="btn btn-icon btn-action btn-sm btn-outline-secondary me-1"
           title="Atjaunot dziesmu sarakstu"
           @click.stop="emit('restore', setList)"
         >
           <i class="bi bi-arrow-counterclockwise" />
         </button>
         <button
-          class="btn btn-action btn-sm btn-outline-danger"
+          class="btn btn-icon btn-action btn-sm btn-outline-danger"
           title="Dzēst dziesmu sarakstu"
           @click.stop="emit('remove', setList)"
         >

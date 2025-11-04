@@ -70,7 +70,7 @@ const saveTitle = async () => {
       <button
         :disabled="isLoading"
         aria-label="Edit title"
-        class="btn btn-action btn-sm ms-1"
+        class="btn btn-icon btn-action btn-sm ms-1"
         title="Rediģēt"
         @click="startEditing"
       >
@@ -93,7 +93,7 @@ const saveTitle = async () => {
           <button
             :disabled="isLoading"
             aria-label="Cancel editing"
-            class="btn btn-action btn-sm btn-secondary"
+            class="btn btn-icon btn-action btn-sm btn-secondary"
             title="Atcelt rediģēšanu"
             type="button"
             @click="cancelEditing"
@@ -103,7 +103,7 @@ const saveTitle = async () => {
           <button
             :disabled="!isValid || isLoading"
             aria-label="Save changes"
-            class="btn btn-action btn-sm btn-primary"
+            class="btn btn-icon btn-action btn-sm btn-primary"
             title="Saglabāt izmaiņas"
             type="button"
             @click="saveTitle"
@@ -136,14 +136,14 @@ const saveTitle = async () => {
         <i class="bi bi-arrow-down movement-arrows" />
       </button>
       <button
-        class="btn btn-action btn-sm btn-outline-secondary"
+        class="btn btn-icon btn-action btn-sm btn-outline-secondary"
         title="Arhivēt dziesmu sarakstu"
         @click.stop="emit('archive', setList)"
       >
         <i class="bi bi-archive" />
       </button>
       <button
-        class="btn btn-action btn-sm btn-outline-danger"
+        class="btn btn-icon btn-action btn-sm btn-outline-danger"
         title="Dzēst dziesmu sarakstu"
         @click.stop="emit('delete', setList)"
       >

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { User } from "@/models/userModels.js";
+import { ResponseError } from "@/models/errorModels.js";
 
 export async function getAllUsers() {
   try {
@@ -7,7 +8,7 @@ export async function getAllUsers() {
 
     return response.data.map((setList) => new User(setList));
   } catch (e) {
-    throw new Error(e.response?.data || e.message || "Failed to get all users");
+    throw new ResponseError(e, "Failed to get all users");
   }
 }
 
@@ -18,6 +19,6 @@ export async function changeUserPassword(userName, newPassword) {
       newPassword,
     });
   } catch (e) {
-    throw new Error(e.response?.data || e.message || "Failed to change user password");
+    throw new ResponseError(e, "Failed to change user password");
   }
 }

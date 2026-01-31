@@ -16,7 +16,7 @@ export async function login(userName, password) {
       throw new Error("Nepareizi ievadīts lietotājvārds vai parole");
     }
     
-    throw new ResponseError("Login failed", e);
+    throw new ResponseError(e, "Login failed");
   }
 }
 
@@ -26,7 +26,7 @@ export async function logout() {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.response?.data || e.message || "Logout failed");
+    throw new ResponseError(e, "Logout failed");
   }
 }
 
@@ -41,6 +41,6 @@ export async function getCurrentUser() {
       return null; // Not logged in
     }
 
-    throw new Error(e.response?.data || e.message || "Failed to get current user");
+    throw new ResponseError(e, "Failed to get current user");
   }
 }

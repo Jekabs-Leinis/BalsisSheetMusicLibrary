@@ -1,4 +1,5 @@
 import axios from "axios";
+import { ResponseError } from "@/models/errorModels.js";
 
 export async function moveSetListItem(setListId, noteSheetId, newOrder) {
   try {
@@ -10,6 +11,6 @@ export async function moveSetListItem(setListId, noteSheetId, newOrder) {
 
     return response.data;
   } catch (e) {
-    throw new Error(e.response?.data || e.message || "Failed to update set list item order");
+    throw new ResponseError(e, "Failed to update set list item order");
   }
 }

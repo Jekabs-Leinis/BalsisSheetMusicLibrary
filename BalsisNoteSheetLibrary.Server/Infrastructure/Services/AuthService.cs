@@ -42,6 +42,26 @@ public class AuthService(SignInManager<IdentityUser> signInManager)
         await signInManager.SignOutAsync();
     }
 
+    public async Task<CurrentUserDto?> GetCurrentUserAsync()
+    {
+        if (!signInManager.IsSignedIn(signInManager.Context.User))
+        {
+            return null;
+        }
+
+        var currentUser = await signInManager.UserManager.GetUserAsync(signInManager.Context.User);
+            
+        if (currentUser == null)
+        {
+            return null;
+        }
+            
+        var isAdmin = await signInManager.UserManager.IsInRoleAsync(currentUser, Role.Admin);
+            
+        return new CurrentUserDto(currentUser.UserName, isAdmin);
+
+    }
+
     public async Task ChangePasswordAsync(ChangePasswordRequestDto changePasswordDto)
     {
         var user = await signInManager.UserManager.FindByNameAsync(changePasswordDto.UserName);

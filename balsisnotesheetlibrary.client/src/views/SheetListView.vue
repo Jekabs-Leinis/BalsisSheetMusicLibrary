@@ -30,7 +30,7 @@ onMounted(async () => {
     :note-sheets="noteSheetStore.filteredNoteSheets"
     :set-lists="setListStore.setLists"
   />
-  <div class="invert" id="lv-sheets">
+  <div id="lv-sheets">
     <div class="container" v-loading="noteSheetStore.isLoading">
       <NoteSheetList
         title="Latviešu skaņdarbi"

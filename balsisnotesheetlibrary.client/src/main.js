@@ -4,7 +4,7 @@ import Toast, { POSITION } from "vue-toastification";
 
 import App from "@/App.vue";
 import router from "@/router/routes";
-import { useUserStore } from "@/stores/userStore";
+import { useAuthStore } from "@/stores/authStore.js";
 import vLoading from "@/directives/vLoading";
 
 // JS configurations
@@ -16,22 +16,19 @@ import "@/assets/scss/main.scss";
 const app = createApp(App);
 const pinia = createPinia();
 
-// Make the store available for router hook setup
+// Make auth store available for router hook setup
 app.use(pinia);
 
-const userStore = useUserStore();
-
-router.beforeEach((to) => {
-  if (userStore.isLoggedIn || to.name === "Login") {
-    return;
+const authStore = useAuthStore();
+router.beforeEach(async (to) => {
+  if (to.name !== "Login" && !authStore.isAuthenticated) {
+    return { name: "Login" };
   }
-
-  return { name: "Login" };
 });
 
 router.afterEach(() => {
-  // Bootstrap offcanvas doesn't restore body scroll on route change,
-  // so we have do it manually, otherwise the page remains unscrollable
+  // Bootstrap offcanvas component doesn't restore body scroll on route change,
+  // so we have to do it manually, otherwise the page remains unscrollable
   if (document.body.style.overflow === "hidden") {
     document.body.style.overflow = "";
   }
@@ -49,3 +46,4 @@ app.use(Toast, {
 app.directive("loading", vLoading);
 
 app.mount("#app");
+

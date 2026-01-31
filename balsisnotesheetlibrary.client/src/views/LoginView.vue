@@ -2,13 +2,13 @@
 import { login } from "@/api/authenticationApi";
 import { ref } from "vue";
 import router from "@/router/routes";
-import { useUserStore } from "@/stores/userStore";
+import { useAuthStore } from "@/stores/authStore.js";
 
 let userName = ref("");
 let password = ref("");
 let errorMessage = ref("");
 let loading = ref(false);
-let userStore = useUserStore();
+let authStore = useAuthStore();
 
 async function attemptLogin() {
   if (loading.value) {
@@ -21,7 +21,7 @@ async function attemptLogin() {
   try {
     let user = await login(userName.value, password.value);
 
-    userStore.setUser(user);
+    authStore.setUser(user);
 
     router.push({ name: "SheetListView" });
   } catch (error) {
@@ -100,6 +100,7 @@ async function attemptLogin() {
   list-style: none;
   margin-left: -40px;
   color: black;
+  white-space: pre-wrap;
 }
 
 #submit {

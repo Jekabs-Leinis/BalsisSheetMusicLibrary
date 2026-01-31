@@ -40,6 +40,15 @@ public class AuthenticationController(IAuthService authService) : ControllerBase
         return Ok("User logged out successfully");
     }
 
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        return await authService.GetCurrentUserAsync() is { } user
+            ? Ok(user)
+            : Unauthorized("No user is currently logged in.");
+    }
+
     [HttpPost]
     [Authorize(Roles = $"{Role.Admin}")]
     public async Task<IActionResult> ChangePassword(ChangePasswordRequestDto changePasswordDto)

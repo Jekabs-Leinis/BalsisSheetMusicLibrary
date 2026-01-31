@@ -1,15 +1,14 @@
 <script setup>
-import { useUserStore } from "@/stores/userStore";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
-import { logout } from "@/api/authenticationApi";
 import router from "@/router/routes";
 import { ref, watch, onBeforeUnmount } from "vue";
 import _debounce from "lodash.debounce";
+import { useAuthStore } from "@/stores/authStore.js";
 
-const userStore = useUserStore();
+const authStore = useAuthStore();
 const noteSheetStore = useNoteSheetStore();
 
-const isAdmin = userStore.isLoggedIn && userStore.currentUser.isAdmin;
+const isAdmin = authStore.isAuthenticated && authStore.user.isAdmin;
 const searchInput = ref("");
 
 function onSearch(query) {
@@ -26,8 +25,7 @@ onBeforeUnmount(() => {
 
 async function attemptLogout() {
   try {
-    await logout();
-    userStore.logout();
+    await authStore.logout();
     router.push({ name: "Login" });
   } catch (error) {
     console.error("Logout error:", error);

@@ -71,38 +71,45 @@ function clearFileSelection() {
 function validateForm() {
   isValid.value = true;
   validationMessage.value = "";
+  let errors = [];
 
   if (!formData.value.title.trim()) {
-    isValid.value = false;
-    validationMessage.value = "Nosaukums ir obligāts.";
-    return false;
+    errors.push("Nosaukums ir obligāts.");
   }
 
   if (formData.value.year !== null && formData.value.year !== "") {
     const yearNum = Number(formData.value.year);
     if (isNaN(yearNum)) {
-      isValid.value = false;
-      validationMessage.value = "Gadam jābūt skaitlim.";
-      return false;
+      errors.push("Gadam jābūt skaitlim.");
+    } else if (yearNum <= 0) {
+      errors.push("Gadam jābūt lielākam par 0.");
+    } else {
+      formData.value.year = yearNum;
     }
-    if (yearNum <= 0) {
-      isValid.value = false;
-      validationMessage.value = "Gadam jābūt lielākam par 0.";
-      return false;
-    }
-
-    formData.value.year = yearNum;
   } else {
     formData.value.year = null;
   }
 
   if (isCreateMode.value && !selectedFile.value) {
-    isValid.value = false;
-    validationMessage.value = "Nepieciešams pievienot failu.";
-    return false;
+    errors.push("Nepieciešams pievienot failu.");
   }
-
-  return true;
+  
+  if (formData.value.title.length >= 200) {
+    errors.push("Nosaukums nedrīkst pārsniegt 200 rakstzīmes.");
+  }
+  
+  if (formData.value.author.length >= 200) {
+    errors.push("Mūzikas autors nedrīkst pārsniegt 200 rakstzīmes.");
+  }
+  
+  if (formData.value.lyricist.length >= 200) {
+    errors.push("Vārdu autors nedrīkst pārsniegt 200 rakstzīmes.");
+  }
+  
+  validationMessage.value = errors.join("\n");
+  isValid.value = errors.length === 0;
+  
+  return errors.length === 0;
 }
 
 const isSaving = ref(false);
@@ -235,7 +242,7 @@ function onInputBlur(field) {
           class="d-flex align-items-center mb-2"
         >
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-          <span>{{ formData.fileName }}</span>
+          <span class="text-break">{{ formData.fileName }}</span>
           <a
             :href="`/api/download/${formData.id}/${formData.fileName}`"
             target="_blank"
@@ -247,7 +254,7 @@ function onInputBlur(field) {
 
         <div v-if="selectedFile" class="d-flex align-items-center mb-2">
           <i class="bi bi-file-earmark-pdf text-danger fs-4 me-2"></i>
-          <span>{{ selectedFile.name }}</span>
+          <span class="text-break">{{ selectedFile.name }}</span>
           <button
             type="button"
             class="btn btn-sm text-danger"
@@ -300,5 +307,9 @@ function onInputBlur(field) {
 .modal-body {
   max-height: 70vh;
   overflow-y: auto;
+}
+
+.alert {
+  white-space: pre-line;
 }
 </style>

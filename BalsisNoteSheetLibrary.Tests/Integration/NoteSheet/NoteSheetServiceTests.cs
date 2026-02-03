@@ -1,6 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 using BalsisNoteSheetLibrary.Server.Application.Services;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
+using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using Moq;
 using Entities = BalsisNoteSheetLibrary.Server.Domain.Entities;
 

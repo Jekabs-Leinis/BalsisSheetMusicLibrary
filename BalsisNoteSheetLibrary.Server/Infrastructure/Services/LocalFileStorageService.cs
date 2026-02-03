@@ -1,4 +1,4 @@
-using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
+using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Services;
 

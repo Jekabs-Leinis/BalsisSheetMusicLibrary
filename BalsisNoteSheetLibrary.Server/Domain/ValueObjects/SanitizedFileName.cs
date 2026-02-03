@@ -52,7 +52,7 @@ public record SanitizedFileName
         // Remove trailing and leading dots and spaces to avoid issues on Windows
         fileName = fileName.Trim('.', ' ');
 
-        // Prevent directory traversal
+        // Another check against directory traversal
         fileName = Path.GetFileName(fileName);
 
         // Prevent reserved names on Windows 

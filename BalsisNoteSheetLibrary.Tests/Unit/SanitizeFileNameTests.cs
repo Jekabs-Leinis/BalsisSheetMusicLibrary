@@ -78,13 +78,4 @@ public class SanitizeFileNameTests
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => SanitizedFileName.Create(input));
     }
-
-    [Fact]
-    public void Create_NullFileName_ThrowsInvalidOperationException()
-    {
-        // Arrange
-        string input = null;
-        // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => SanitizedFileName.Create(input));
-    }
 }

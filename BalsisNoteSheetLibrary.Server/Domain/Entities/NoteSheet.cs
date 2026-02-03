@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 
 namespace BalsisNoteSheetLibrary.Server.Domain.Entities;
@@ -14,7 +13,7 @@ public class NoteSheet
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
 
-    [JsonIgnore] public IEnumerable<SetListItem>? SetListItems { get; set; }
+   public IEnumerable<SetListItem>? SetListItems { get; set; }
 
     public string GetFileName()
     {
@@ -61,7 +60,7 @@ public class NoteSheet
             throw new InvalidOperationException("Sheet id cannot be null.");
         }
 
-        // If filename has already been set, trust it
+        // Minor optimisation, if filename has already been set, trust it to be valid
         return string.IsNullOrWhiteSpace(FileName)
             ? $"{Id}_{GetFileName()}"
             : $"{Id}_{FileName}";

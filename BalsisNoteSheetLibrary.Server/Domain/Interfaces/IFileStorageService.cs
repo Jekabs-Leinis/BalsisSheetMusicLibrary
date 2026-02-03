@@ -1,4 +1,4 @@
-namespace BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
+namespace BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 
 public interface IFileStorageService
 {

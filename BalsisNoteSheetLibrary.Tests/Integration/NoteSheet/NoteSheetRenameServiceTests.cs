@@ -1,7 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Application.Services;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;

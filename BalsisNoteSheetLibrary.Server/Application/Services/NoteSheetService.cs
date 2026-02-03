@@ -1,7 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 

@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using BalsisNoteSheetLibrary.Server.Domain.Entities;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Configurations;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
@@ -46,6 +47,11 @@ public class AppDbContext : IdentityDbContext
     public DbSet<NoteSheet> NoteSheets { get; set; } = null!;
     public DbSet<SetList> SetLists { get; set; } = null!;
     public DbSet<SetListItem> SetListItems { get; set; } = null!;
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfiguration(new SetListItemConfiguration());
+    }
 
     private static void OnSqliteConnectionStateChange(object? sender, StateChangeEventArgs e)
     {

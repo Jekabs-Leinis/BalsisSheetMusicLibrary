@@ -33,32 +33,4 @@
         </ProjectReference>
     </ItemGroup>
 
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="publish\appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="publish\appsettings.json" />
-      <_ContentIncludedByDefault Remove="publish\BalsisNoteSheetLibrary.Server.deps.json" />
-      <_ContentIncludedByDefault Remove="publish\BalsisNoteSheetLibrary.Server.runtimeconfig.json" />
-      <_ContentIncludedByDefault Remove="publish\BalsisNoteSheetLibrary.Server.staticwebassets.endpoints.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\appsettings.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\BalsisNoteSheetLibrary.Server.deps.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\BalsisNoteSheetLibrary.Server.runtimeconfig.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\BalsisNoteSheetLibrary.Server.staticwebassets.endpoints.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\appsettings.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\BalsisNoteSheetLibrary.Server.deps.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\BalsisNoteSheetLibrary.Server.runtimeconfig.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\BalsisNoteSheetLibrary.Server.staticwebassets.endpoints.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\appsettings.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\BalsisNoteSheetLibrary.Server.deps.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\BalsisNoteSheetLibrary.Server.runtimeconfig.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\BalsisNoteSheetLibrary.Server.staticwebassets.endpoints.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\publish\appsettings.Development.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\publish\appsettings.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\publish\BalsisNoteSheetLibrary.Server.deps.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\publish\BalsisNoteSheetLibrary.Server.runtimeconfig.json" />
-      <_ContentIncludedByDefault Remove="publish\publish\publish\publish\publish\BalsisNoteSheetLibrary.Server.staticwebassets.endpoints.json" />
-    </ItemGroup>
-
 </Project>

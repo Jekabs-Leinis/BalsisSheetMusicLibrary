@@ -1,6 +1,6 @@
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
+using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,7 +15,7 @@ public class DownloadController(
     ILogger<DownloadController> logger) : ControllerBase
 {
     /**
-     * We don't really care about the filename, but we include it in the URL to ensure readability.
+     * We don't really care about the filename, but we include it in the URL to ensure human readability.
      */
     [HttpGet("{id:int}/{filename}")]
     public async Task<IActionResult> Index(uint id, string filename)

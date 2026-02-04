@@ -7,7 +7,6 @@ using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.UnitOfWork;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;

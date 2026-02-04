@@ -13,11 +13,12 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
         if (withNoteSheets)
         {
-            setLists = await unitOfWork.SetLists.GetAllWithNoteSheetsAsync();
+            setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order, includeProperties: "Items.NoteSheet", withTracking: false);
         }
         else
         {
-            setLists = await unitOfWork.SetLists.GetAllAsync();
+            setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order,
+                withTracking: false);
         }
 
         return setLists.Select(SetListDto.FromEntity);
@@ -25,7 +26,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task<IEnumerable<SetListDto>> GetAllArchivedSetListsAsync()
     {
-        var setLists = await unitOfWork.SetLists.GetAllArchivedAsync();
+        var setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt != null, list => list.ArchivedAt, includeProperties: "Items.NoteSheet", withTracking: false);
 
         return setLists.Select(SetListDto.FromEntity);
     }
@@ -132,7 +133,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
         // Have to reorder all set lists to ensure no gaps or duplicates
         // Otherwise updating from two different clients without either reloading causes issues
-        var reorderableLists = await unitOfWork.SetLists.GetAllWithTrackingAsync();
+        var reorderableLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order);
         reorderableLists.RemoveAll(sl => sl.Id == setList.Id);
         reorderableLists.Insert((int)dto.NewOrder, setList);
         ReorderSetLists(reorderableLists);
@@ -154,7 +155,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         setList.Order = null;
         unitOfWork.SetLists.Update(setList);
 
-        var reorderableLists = await unitOfWork.SetLists.GetAllWithTrackingAsync();
+        var reorderableLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order);
         reorderableLists.RemoveAll(sl => sl.Id == setList.Id);
 
         ReorderSetLists(reorderableLists);
@@ -174,7 +175,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
         setList.ArchivedAt = null;
 
-        var reorderableLists = await unitOfWork.SetLists.GetAllWithTrackingAsync();
+        var reorderableLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order);
         reorderableLists.Add(setList);
 
         ReorderSetLists(reorderableLists);

@@ -1,6 +1,6 @@
 ﻿using System.Data;
 using BalsisNoteSheetLibrary.Server.Domain.Entities;
-using BalsisNoteSheetLibrary.Server.Infrastructure.Configurations;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext.Configurations;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
@@ -50,6 +50,8 @@ public class AppDbContext : IdentityDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+        
         modelBuilder.ApplyConfiguration(new SetListItemConfiguration());
     }
 

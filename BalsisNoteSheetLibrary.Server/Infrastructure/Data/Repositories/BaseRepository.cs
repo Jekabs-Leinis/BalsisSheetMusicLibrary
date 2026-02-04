@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -7,50 +8,86 @@ namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<T>
     where T : class
 {
-    protected readonly AppDbContext DbContext = context;
+    protected readonly DbSet<T> DbSet = context.Set<T>();
 
     public ValueTask<T?> GetByIdAsync(uint id)
     {
-        return DbContext.Set<T>().FindAsync(id);
+        return DbSet.FindAsync(id);
     }
     
     public ValueTask<T?> GetByKeysAsync(params object[] keyValues)
     {
-        return DbContext.Set<T>().FindAsync(keyValues);
+        return DbSet.FindAsync(keyValues);
     }
+
+    public Task<List<T>> GetAsync(
+        Expression<Func<T, bool>>? filter = null,
+        Expression<Func<T, object?>>? orderBy = null,
+        bool orderByDescending = false,
+        string includeProperties = "",
+        bool withTracking = true)
+    {
+        IQueryable<T> query = DbSet;
+
+        if (filter != null)
+        {
+            query = query.Where(filter);
+        }
+
+        foreach (var includeProperty in includeProperties.Split
+                     ([','], StringSplitOptions.RemoveEmptyEntries))
+        {
+            query = query.Include(includeProperty);
+        }
+
+        if (orderBy != null)
+        {
+            query = orderByDescending 
+                ? query.OrderByDescending(orderBy) 
+                : query.OrderBy(orderBy);
+        }
+
+        if (!withTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return query.ToListAsync();
+    }
+
     
     public Task<List<T>> GetAllAsync()
     {
-        return DbContext.Set<T>().ToListAsync();
+        return DbSet.ToListAsync();
     }
     
     public void Add(T entity)
     {
-        DbContext.Set<T>().Add(entity);
+        DbSet.Add(entity);
     }
     
     public void AddRange(List<T> entities)
     {
-        DbContext.Set<T>().AddRange(entities);
+        DbSet.AddRange(entities);
     }
     
     public void Update(T entity)
     {
-        DbContext.Set<T>().Update(entity);
+        DbSet.Update(entity);
     }
     
     public void UpdateRange(List<T> entities)
     {
-        DbContext.Set<T>().UpdateRange(entities);
+        DbSet.UpdateRange(entities);
     }
     
     public void Remove(T entity)
     {
-        DbContext.Set<T>().Remove(entity);
+        DbSet.Remove(entity);
     }
     
     public void RemoveRange(List<T> entities)
     {
-        DbContext.Set<T>().RemoveRange(entities);
+        DbSet.RemoveRange(entities);
     }
 }

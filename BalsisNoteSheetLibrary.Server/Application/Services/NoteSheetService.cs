@@ -1,6 +1,8 @@
 using BalsisNoteSheetLibrary.Server.Application.DTOs.NoteSheet;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
+using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
@@ -18,7 +20,9 @@ public class NoteSheetService(
 
     public async Task<List<NoteSheetDto>> GetAllNoteSheetsAsync()
     {
-        var noteSheets = await unitOfWork.NoteSheets.GetAllOrderedByTitleAsync();
+        var noteSheets = await unitOfWork.NoteSheets.GetAsync(
+            orderBy: sheet => EF.Functions.Collate(sheet.Title, SqliteExtensions.InsensitiveCollation)!
+        );
 
         return noteSheets.Select(NoteSheetDto.FromEntity).ToList();
     }

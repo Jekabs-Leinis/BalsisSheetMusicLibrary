@@ -15,7 +15,7 @@ public class SetListItemServiceTests : IntegrationTestBase
         _service = new SetListItemService(UnitOfWork);
         // Clean up test data
         UnitOfWork.SetListItems.RemoveRange(UnitOfWork.SetListItems.GetAllAsync().Result);
-        UnitOfWork.SetLists.RemoveRange(UnitOfWork.SetLists.GetAllAsync().Result);
+        UnitOfWork.SetLists.RemoveRange(UnitOfWork.SetLists.GetAsync().Result);
         UnitOfWork.SaveChangesAsync().Wait();
     }
 

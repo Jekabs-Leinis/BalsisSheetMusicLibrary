@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /BalsisNoteSheetLibrary.Server/app.db
 .env
 /BalsisNoteSheetLibrary.Server/Static/*
+.kiro/

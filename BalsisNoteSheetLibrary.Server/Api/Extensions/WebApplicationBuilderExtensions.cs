@@ -61,6 +61,8 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ISetListItemService, SetListItemService>();
         builder.Services.AddScoped<IUserService, UserService>();
+        
+        builder.Services.AddHttpContextAccessor();
     }
 
     private static void RegisterAuthentication(WebApplicationBuilder builder)

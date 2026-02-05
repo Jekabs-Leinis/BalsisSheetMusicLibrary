@@ -22,7 +22,11 @@ app.use(pinia);
 const authStore = useAuthStore();
 router.beforeEach(async (to) => {
   if (to.name !== "Login" && !authStore.isAuthenticated) {
-    return { name: "Login" };
+    await authStore.checkAuthStatus();
+
+    if (!authStore.isAuthenticated) {
+      return { name: "Login" };
+    }
   }
 });
 
@@ -46,4 +50,3 @@ app.use(Toast, {
 app.directive("loading", vLoading);
 
 app.mount("#app");
-

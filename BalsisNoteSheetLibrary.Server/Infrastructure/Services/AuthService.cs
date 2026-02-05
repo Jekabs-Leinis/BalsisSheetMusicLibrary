@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Services;
 
-public class AuthService(SignInManager<IdentityUser> signInManager)
+public class AuthService(SignInManager<IdentityUser> signInManager, IHttpContextAccessor httpContextAccessor)
     : IAuthService
 {
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto loginDto)
@@ -44,22 +44,21 @@ public class AuthService(SignInManager<IdentityUser> signInManager)
 
     public async Task<CurrentUserDto?> GetCurrentUserAsync()
     {
-        if (!signInManager.IsSignedIn(signInManager.Context.User))
+        var httpContext = httpContextAccessor.HttpContext;
+        if (httpContext?.User.Identity is not { IsAuthenticated: true })
         {
             return null;
         }
-
-        var currentUser = await signInManager.UserManager.GetUserAsync(signInManager.Context.User);
-            
+        
+        var currentUser = await signInManager.UserManager.GetUserAsync(httpContext.User);
         if (currentUser == null)
         {
             return null;
-        }
+        }   
             
         var isAdmin = await signInManager.UserManager.IsInRoleAsync(currentUser, Role.Admin);
             
         return new CurrentUserDto(currentUser.UserName, isAdmin);
-
     }
 
     public async Task ChangePasswordAsync(ChangePasswordRequestDto changePasswordDto)

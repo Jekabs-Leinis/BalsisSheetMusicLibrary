@@ -2,6 +2,7 @@ export class ResponseError extends Error {
   constructor(err, fallbackMessage) {
     if (err.response?.data?.errors) {
       //Assuming .net core style error response
+      //This will appear on return BadRequest(ModelState)
       const errorMessages = [];
       for (const key in err.response.data.errors) {
         if (
@@ -11,9 +12,12 @@ export class ResponseError extends Error {
         }
       }
       super(errorMessages.join("\n"));
-    } else if (err.response.data.title) {
+    } else if (err.response?.data?.title) {
       //Assuming .net core style response
       super(err.response.data.title);
+    } else if (err.response?.data) {
+      // Probably a string message
+      super(err.response.data);
     } else {
       super(err.message || fallbackMessage);
     }

@@ -18,7 +18,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         else
         {
             setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order,
-                withTracking: false);
+                includeProperties: "Items", withTracking: false);
         }
 
         return setLists.Select(SetListDto.FromEntity);

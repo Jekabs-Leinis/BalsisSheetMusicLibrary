@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
-import { getCurrentUser, logout as apiLogout } from "@/api/authenticationApi.js";
+import {
+  getCurrentUser,
+  logout as apiLogout,
+} from "@/api/authenticationApi.js";
 import { User } from "@/models/userModels.js";
 import { ref } from "vue";
 
@@ -7,23 +10,24 @@ export const useAuthStore = defineStore("auth", () => {
   /** @type {import('@/models/userModels').User|null} */
   const user = ref(null);
   const isAuthenticated = ref(false);
-  const isLoading = ref(true);
+  const isLoading = ref(false);
 
   async function checkAuthStatus() {
     try {
-      const response = await getCurrentUser();
-      this.user = new User(response.data);
+      this.isLoading = true;
+      const user = await getCurrentUser();
+      this.user = new User(user);
       this.isAuthenticated = true;
     } catch (error) {
       this.user = null;
       this.isAuthenticated = false;
-      
+
       throw error;
     } finally {
       this.isLoading = false;
     }
   }
-  
+
   function setUser(user) {
     this.user = user;
     this.isAuthenticated = Boolean(user);

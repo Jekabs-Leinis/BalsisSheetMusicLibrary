@@ -41,7 +41,6 @@ public class AuthenticationController(IAuthService authService) : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
     public async Task<IActionResult> GetCurrentUser()
     {
         return await authService.GetCurrentUserAsync() is { } user

@@ -57,7 +57,7 @@ public class NoteSheetService(
         {
             if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
             {
-                await fileStorageService.DeleteFileAsync(noteSheet.SystemFileName);
+                await fileStorageService.DeleteFile(noteSheet.SystemFileName);
             }
 
             noteSheet.FileName = noteSheet.GetFileName();
@@ -72,7 +72,7 @@ public class NoteSheetService(
             {
                 noteSheet.FileName = noteSheet.GetFileName();
                 noteSheet.SystemFileName = noteSheet.GetSystemFileName();
-                fileStorageService.MoveFile(oldFileName, noteSheet.SystemFileName);
+                fileStorageService.RenameFile(oldFileName, noteSheet.SystemFileName);
             }
             else
             {
@@ -97,7 +97,7 @@ public class NoteSheetService(
 
         if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
         {
-            await fileStorageService.DeleteFileAsync(noteSheet.SystemFileName);
+            await fileStorageService.DeleteFile(noteSheet.SystemFileName);
         }
 
         unitOfWork.NoteSheets.Remove(noteSheet);

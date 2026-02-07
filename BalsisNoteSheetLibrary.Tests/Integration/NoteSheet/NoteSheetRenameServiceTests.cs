@@ -54,7 +54,7 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
 
-        _fileStorageServiceMock.Setup(f => f.MoveFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+        _fileStorageServiceMock.Setup(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
         // Act
         await _service.RenameAllFilenamesAsync();
@@ -62,7 +62,7 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
         await Task.Delay(500);
 
         // Assert
-        _fileStorageServiceMock.Verify(f => f.MoveFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        _fileStorageServiceMock.Verify(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         var updatedSheet = await UnitOfWork.NoteSheets.GetByIdAsync(noteSheet.Id!.Value);
         Assert.Equal(updatedSheet!.FileName, updatedSheet.GetFileName());
     }
@@ -79,7 +79,7 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
 
-        _fileStorageServiceMock.Setup(f => f.MoveFile(It.IsAny<string>(), It.IsAny<string>()))
+        _fileStorageServiceMock.Setup(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()))
             .Throws<FileNotFoundException>();
 
         // Act
@@ -87,7 +87,7 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
         await Task.Delay(500);
 
         // Assert
-        _fileStorageServiceMock.Verify(f => f.MoveFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        _fileStorageServiceMock.Verify(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
         var updatedSheet = await UnitOfWork.NoteSheets.GetByIdAsync(noteSheet.Id!.Value);
         // Should not update FileName/SystemFileName if file is missing
         Assert.Equal("Missing.pdf", updatedSheet!.FileName);

@@ -103,7 +103,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
 
         try
         {
-            fileStorage.MoveFile(oldPath, newPath);
+            fileStorage.RenameFile(oldPath, newPath);
         }
         catch (FileNotFoundException ex)
         {

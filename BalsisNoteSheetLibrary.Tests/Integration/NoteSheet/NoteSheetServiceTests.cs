@@ -108,7 +108,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
-        _fileStorageServiceMock.Setup(x => x.DeleteFileAsync(It.IsAny<string>())).Returns(Task.CompletedTask);
+        _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>())).Returns(Task.CompletedTask);
 
         // Act
         await _service.DeleteNoteSheetAsync(1);
@@ -116,7 +116,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Assert
         var deletedNoteSheet = await UnitOfWork.NoteSheets.GetByIdAsync(1);
         Assert.Null(deletedNoteSheet);
-        _fileStorageServiceMock.Verify(x => x.DeleteFileAsync("testfile.txt"), Times.Once);
+        _fileStorageServiceMock.Verify(x => x.DeleteFile("testfile.txt"), Times.Once);
     }
 
     [Fact]
@@ -172,7 +172,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync();
         var updateDto = new UpdateNoteSheetDto { Id = 2, Title = "Updated Title" };
-        _fileStorageServiceMock.Setup(x => x.MoveFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+        _fileStorageServiceMock.Setup(x => x.RenameFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
         // Act
         var result = await _service.UpdateNoteSheetAsync(updateDto, null);
@@ -181,7 +181,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         Assert.Equal(updateDto.Title, result.Title);
         // FileStorageService should not be called
         _fileStorageServiceMock.Verify(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()), Times.Never);
-        _fileStorageServiceMock.Verify(x => x.MoveFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+        _fileStorageServiceMock.Verify(x => x.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
     }
 
     [Fact]

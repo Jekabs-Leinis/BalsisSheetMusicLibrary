@@ -3,6 +3,7 @@ using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
@@ -12,6 +13,7 @@ public class AuthenticationController(IAuthService authService) : ControllerBase
 {
     [HttpPost]
     [AllowAnonymous]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> Login(LoginRequestDto loginDto)
     {
         if (!ModelState.IsValid)
@@ -41,6 +43,7 @@ public class AuthenticationController(IAuthService authService) : ControllerBase
     }
 
     [HttpGet]
+    [EnableRateLimiting("auth")]
     public async Task<IActionResult> GetCurrentUser()
     {
         return await authService.GetCurrentUserAsync() is { } user

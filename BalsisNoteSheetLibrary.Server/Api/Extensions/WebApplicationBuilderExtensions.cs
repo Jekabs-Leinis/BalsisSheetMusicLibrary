@@ -1,4 +1,5 @@
 using System.Net;
+using System.Threading.RateLimiting;
 using BalsisNoteSheetLibrary.Server.Application.Interfaces;
 using BalsisNoteSheetLibrary.Server.Application.Services;
 using BalsisNoteSheetLibrary.Server.Domain.Interfaces;
@@ -8,6 +9,7 @@ using BalsisNoteSheetLibrary.Server.Infrastructure.Data.UnitOfWork;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -21,6 +23,7 @@ public static class WebApplicationBuilderExtensions
         RegisterAuthentication(builder);
         builder.Services.AddAuthorizationBuilder();
         RegisterAntiforgery(builder);
+        RegisterRateLimiting(builder);
 
         builder.Services.AddControllers();
         builder.Services.AddSignalR();
@@ -39,10 +42,7 @@ public static class WebApplicationBuilderExtensions
 
     private static void RegisterAntiforgery(WebApplicationBuilder builder)
     {
-        builder.Services.AddAntiforgery(options =>
-        {
-            options.HeaderName = "X-CSRF-TOKEN";
-        });
+        builder.Services.AddAntiforgery(options => { options.HeaderName = "X-CSRF-TOKEN"; });
     }
 
     private static void RegisterAppServices(WebApplicationBuilder builder)
@@ -61,7 +61,7 @@ public static class WebApplicationBuilderExtensions
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ISetListItemService, SetListItemService>();
         builder.Services.AddScoped<IUserService, UserService>();
-        
+
         builder.Services.AddHttpContextAccessor();
     }
 
@@ -111,5 +111,19 @@ public static class WebApplicationBuilderExtensions
         }
 
         builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(connectionString));
+    }
+
+    private static void RegisterRateLimiting(WebApplicationBuilder builder)
+    {
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.AddFixedWindowLimiter("auth", opt =>
+            {
+                opt.PermitLimit = 20;
+                opt.Window = TimeSpan.FromMinutes(1);
+                opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                opt.QueueLimit = 0;
+            });
+        });
     }
 }

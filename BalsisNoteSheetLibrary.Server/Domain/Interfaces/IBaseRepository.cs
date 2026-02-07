@@ -12,8 +12,9 @@ public interface IBaseRepository<T> where T : class
         Expression<Func<T, bool>>? filter = null,
         Expression<Func<T, object?>>? orderBy = null,
         bool orderByDescending = false,
-        string includeProperties = "",
-        bool withTracking = true);
+        Expression<Func<T, object>>[]? includeProperties = null,
+        bool withTracking = true
+        );
 
     public void Add(T entity);
     public void AddRange(List<T> entities);

@@ -24,7 +24,7 @@ public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<
         Expression<Func<T, bool>>? filter = null,
         Expression<Func<T, object?>>? orderBy = null,
         bool orderByDescending = false,
-        string includeProperties = "",
+        Expression<Func<T, object>>[]? includeProperties = null,
         bool withTracking = true)
     {
         IQueryable<T> query = DbSet;
@@ -34,10 +34,12 @@ public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<
             query = query.Where(filter);
         }
 
-        foreach (var includeProperty in includeProperties.Split
-                     ([','], StringSplitOptions.RemoveEmptyEntries))
+        if (includeProperties != null)
         {
-            query = query.Include(includeProperty);
+            foreach (var includeProperty in includeProperties)
+            {
+                query = query.Include(includeProperty);
+            }
         }
 
         if (orderBy != null)

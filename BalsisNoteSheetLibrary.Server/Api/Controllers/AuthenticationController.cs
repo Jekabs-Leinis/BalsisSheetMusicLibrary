@@ -57,7 +57,7 @@ public class AuthenticationController(IAuthService authService) : ControllerBase
             return BadRequest(ModelState);
         }
 
-        if (Environment.GetEnvironmentVariable("LIB_ALLOW_MANUAL_PASSWORD_RESET") != "1")
+        if (Environment.GetEnvironmentVariable(EnvironmentVariables.AllowManualPasswordReset) != "1")
         {
             return BadRequest("Manuāla paroles nomaiņa ir izslēgta.");
         }

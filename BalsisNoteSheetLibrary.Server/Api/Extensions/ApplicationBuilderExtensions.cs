@@ -1,4 +1,5 @@
 using BalsisNoteSheetLibrary.Server.Api.Middleware;
+using BalsisNoteSheetLibrary.Server.Domain.ValueObjects;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Hubs;
 using BalsisNoteSheetLibrary.Server.Infrastructure.Seeders;
 using Serilog;
@@ -54,7 +55,7 @@ public static class ApplicationBuilderExtensions
             return context.Response.SendFileAsync("wwwroot/index.html");
         });
 
-        if (Environment.GetEnvironmentVariable("LIB_ENABLE_SEEDERS") == "1")
+        if (Environment.GetEnvironmentVariable(EnvironmentVariables.EnableSeeders) == "1")
         {
             await RoleSeeder.SeedRolesAsync(app.Services);
             await UserSeeder.SeedUsersAsync(app.Services);

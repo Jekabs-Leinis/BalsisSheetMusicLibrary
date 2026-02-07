@@ -1,5 +1,5 @@
-using System.Net;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace BalsisNoteSheetLibrary.Server.Api.Middleware;
 
@@ -18,19 +18,29 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         {
             logger.LogError(ex, "An unhandled exception has occurred. TraceId: {TraceId}", context.TraceIdentifier);
             
-            await HandleExceptionAsync(context);
+            await HandleExceptionAsync(context, ex);
         }
     }
-    private static async Task  HandleExceptionAsync(HttpContext context)
+    private static async Task  HandleExceptionAsync(HttpContext context, Exception ex)
     {
+        var (statusCode, message) = ex switch
+        {
+            UnauthorizedAccessException => (StatusCodes.Status403Forbidden, "Access denied"),
+            KeyNotFoundException or FileNotFoundException => (StatusCodes.Status404NotFound, "Resource not found"),
+            InvalidOperationException => (StatusCodes.Status400BadRequest, "Invalid operation"),
+            ArgumentException => (StatusCodes.Status400BadRequest, "Invalid argument"),
+            DbUpdateException => (StatusCodes.Status409Conflict, "Database conflict occurred"),
+            _ => (StatusCodes.Status500InternalServerError, "An unexpected internal server error has occurred")
+        };
+        
         var errorResponse = new ErrorResponse
         {
             TraceId = context.TraceIdentifier,
-            Message = "An unexpected internal server error has occurred. Please try again later.",
+            Message = message,
         };
 
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = statusCode;
         
         var jsonResponse = JsonSerializer.Serialize(errorResponse);
         

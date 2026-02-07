@@ -14,11 +14,15 @@ public static class UserSeeder
         using var scope = serviceProvider.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-        var adminPassword = Environment.GetEnvironmentVariable("LIB_ADMIN_PASS") ?? throw new InvalidOperationException("LIB_ADMIN_PASS environment variable is not set");
-        var userPassword = Environment.GetEnvironmentVariable("LIB_USER_PASS") ?? throw new InvalidOperationException("LIB_USER_PASS environment variable is not set");
+        var adminUserName = Environment.GetEnvironmentVariable(EnvironmentVariables.AdminUsername) ?? throw new InvalidOperationException(
+            $"{EnvironmentVariables.AdminUsername} environment variable must be set to seed users");
+        var adminPassword = Environment.GetEnvironmentVariable(EnvironmentVariables.AdminPassword) ?? throw new InvalidOperationException( $"{EnvironmentVariables.AdminPassword} environment variable must be set to seed users");
         
-        await SeedUserAsync(userManager, "admin@balsis.lv", Role.Admin, adminPassword);
-        await SeedUserAsync(userManager, "daudzasbalsis", Role.User, userPassword);
+        var userUserName = Environment.GetEnvironmentVariable(EnvironmentVariables.UserUsername) ?? throw new InvalidOperationException($"{EnvironmentVariables.UserUsername} environment variable must be set to seed users");
+        var userPassword = Environment.GetEnvironmentVariable(EnvironmentVariables.UserPassword) ?? throw new InvalidOperationException($"{EnvironmentVariables.UserPassword} environment variable must be set to seed users");
+        
+        await SeedUserAsync(userManager, adminUserName, Role.Admin, adminPassword);
+        await SeedUserAsync(userManager, userUserName, Role.User, userPassword);
         Logger.Information("Seeding users completed!");
     }
 
@@ -48,7 +52,7 @@ public static class UserSeeder
         }
         else
         {
-            if (Environment.GetEnvironmentVariable("LIB_ALLOW_SEEDER_PASSWORD_RESET") == "1")
+            if (Environment.GetEnvironmentVariable(EnvironmentVariables.AllowSeederPasswordReset) == "1")
             {
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
                 var result = await userManager.ResetPasswordAsync(user, token, password);

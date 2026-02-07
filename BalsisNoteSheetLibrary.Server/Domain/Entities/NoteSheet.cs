@@ -38,18 +38,6 @@ public class NoteSheet
 
         fileName = SanitizedFileName.Create(fileName);
 
-        // Windows paths have a maximum length of 260 characters,
-        // but filenames should be shorter to account for folder paths
-        if (fileName.Length > 200)
-        {
-            fileName = fileName[..200];
-        }
-
-        if (fileName.Length == 0)
-        {
-            throw new InvalidOperationException("File name cannot be empty.");
-        }
-
         return fileName + ".pdf";
     }
 

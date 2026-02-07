@@ -14,13 +14,12 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         if (withNoteSheets)
         {
             setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order,
-                includeProperties:
-                [list => list.Items.Select(i => i.NoteSheet)], withTracking: false);
+                includeProperties: ["Items.NoteSheet"], withTracking: false);
         }
         else
         {
             setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order,
-                includeProperties: [list => list.Items], withTracking: false);
+                includeProperties: ["Items"], withTracking: false);
         }
 
         return setLists.Select(SetListDto.FromEntity);
@@ -29,7 +28,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
     public async Task<IEnumerable<SetListDto>> GetAllArchivedSetListsAsync()
     {
         var setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt != null, list => list.ArchivedAt,
-            includeProperties: [list => list.Items.Select(i => i.NoteSheet)], withTracking: false);
+            includeProperties: ["Items.NoteSheet"], withTracking: false);
 
         return setLists.Select(SetListDto.FromEntity);
     }

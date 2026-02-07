@@ -24,7 +24,7 @@ public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<
         Expression<Func<T, bool>>? filter = null,
         Expression<Func<T, object?>>? orderBy = null,
         bool orderByDescending = false,
-        Expression<Func<T, object>>[]? includeProperties = null,
+        string[]? includeProperties = null,
         bool withTracking = true)
     {
         IQueryable<T> query = DbSet;

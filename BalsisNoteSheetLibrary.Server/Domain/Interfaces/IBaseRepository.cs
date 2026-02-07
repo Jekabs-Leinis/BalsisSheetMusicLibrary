@@ -12,7 +12,7 @@ public interface IBaseRepository<T> where T : class
         Expression<Func<T, bool>>? filter = null,
         Expression<Func<T, object?>>? orderBy = null,
         bool orderByDescending = false,
-        Expression<Func<T, object>>[]? includeProperties = null,
+        string[]? includeProperties = null,
         bool withTracking = true
         );
 

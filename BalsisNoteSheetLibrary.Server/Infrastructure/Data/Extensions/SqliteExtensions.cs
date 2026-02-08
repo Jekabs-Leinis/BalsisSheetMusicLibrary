@@ -1,11 +1,10 @@
 using System.Globalization;
 using BalsisNoteSheetLibrary.Server.Application.Extensions;
 using Microsoft.Data.Sqlite;
-using Serilog;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.Extensions;
 
-public abstract class SqliteExtensions()
+public abstract class SqliteExtensions
 {
     public const string InsensitiveCollation = "FOLD";
 

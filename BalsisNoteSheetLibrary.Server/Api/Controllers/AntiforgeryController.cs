@@ -5,7 +5,7 @@ namespace BalsisNoteSheetLibrary.Server.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
-public class AntiforgeryController() : Controller
+public class AntiforgeryController : Controller
 {
     [HttpGet]
     [AllowAnonymous]

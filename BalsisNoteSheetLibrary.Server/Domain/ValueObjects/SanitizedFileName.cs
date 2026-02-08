@@ -24,11 +24,6 @@ public record SanitizedFileName
 
     private static string SanitizeFileName(string input)
     {
-        if (string.IsNullOrEmpty(input))
-        {
-            return string.Empty;
-        }
-
         // Remove invalid filename characters
 
         // Path.GetInvalidFileNameChars() is not usable here as it is file system dependent,

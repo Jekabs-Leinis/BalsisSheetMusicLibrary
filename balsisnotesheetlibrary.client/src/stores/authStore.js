@@ -16,17 +16,25 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       this.isLoading = true;
       const user = await getCurrentUser();
-      this.user = new User(user);
-      this.isAuthenticated = true;
+
+      if (user) {
+        this.user = new User(user);
+        this.isAuthenticated = true;
+      } else {
+        // Not authenticated - this is expected, not an error
+        this.user = null;
+        this.isAuthenticated = false;
+      }
     } catch (error) {
+      // Only throw on unexpected errors (network issues, etc.)
       this.user = null;
       this.isAuthenticated = false;
-
       throw error;
     } finally {
       this.isLoading = false;
     }
   }
+
 
   function setUser(user) {
     this.user = user;

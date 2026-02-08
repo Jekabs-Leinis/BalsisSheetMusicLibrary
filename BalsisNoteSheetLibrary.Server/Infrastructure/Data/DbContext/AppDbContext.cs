@@ -10,6 +10,8 @@ namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.DbContext;
 
 public class AppDbContext : IdentityDbContext
 {
+    private bool _collationRegistered = false;
+    
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
         var connection = Database.GetDbConnection();
@@ -28,7 +30,7 @@ public class AppDbContext : IdentityDbContext
         // Relying on StateChange from Closed to Open is generally safer.
         // If issues persist with pooled connections, this part might need refinement
         // to check if collation is already defined before attempting to create.
-        if (sqliteConnection.State != ConnectionState.Open)
+        if (sqliteConnection.State != ConnectionState.Open || _collationRegistered)
         {
             return;
         }
@@ -37,10 +39,13 @@ public class AppDbContext : IdentityDbContext
         {
             SqliteExtensions.RegisterCaseInsensitiveCollation(sqliteConnection);
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("collation") &&
-                                         ex.Message.Contains("already exists"))
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 1)
         {
             // Collation already exists on this connection, ignore.
+        }
+        finally
+        {
+            _collationRegistered = true;
         }
     }
 
@@ -66,8 +71,7 @@ public class AppDbContext : IdentityDbContext
         {
             SqliteExtensions.RegisterCaseInsensitiveCollation(connection);
         }
-        catch (SqliteException ex) when (ex.SqliteErrorCode == 1 && ex.Message.Contains("collation") &&
-                                         ex.Message.Contains("already exists"))
+        catch (SqliteException ex) when (ex.SqliteErrorCode == 1)
         {
             // Collation already exists on this connection (e.g. if event fired multiple times for same open state), ignore.
         }

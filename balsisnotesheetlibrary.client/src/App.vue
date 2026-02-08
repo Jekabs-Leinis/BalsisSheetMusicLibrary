@@ -9,7 +9,7 @@ const authStore = useAuthStore();
 <template>
   <div
     v-if="authStore.isLoading"
-    v-loading="authStore.isLoading"
+    v-loading.bg="authStore.isLoading"
     class="loading-fullscreen"
   ></div>
   <template v-else>

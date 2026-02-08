@@ -6,15 +6,20 @@ import NoteSheetList from "@/components/SheetList/NoteSheetList.vue";
 import { useNoteSheetStore } from "@/stores/notesheetStore";
 import { SortDirection } from "@/models/utilModels";
 import { useSetListStore } from "@/stores/setlistStore.js";
+import { useToast } from "vue-toastification";
 
 const noteSheetStore = useNoteSheetStore();
 const setListStore = useSetListStore();
+const toast = useToast();
 
 onMounted(async () => {
   await Promise.all([
     noteSheetStore.fetchNoteSheets(),
     setListStore.fetchSetLists(),
-  ]);
+  ]).catch((error) => {
+    console.error("Error loading sheets or set lists:", error);
+    toast.error(`Kļūda ielādējot datus: ${error.message}`);
+  });
 
   // Reset sorting to default as user might navigate here from admin view with different sorting
   noteSheetStore.setSortField("title", false);

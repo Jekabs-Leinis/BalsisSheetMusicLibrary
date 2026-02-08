@@ -19,6 +19,7 @@ onMounted(async () => {
     await setListStore.fetchArchivedSetLists();
   } catch (error) {
     console.error("Error loading archived setlists:", error);
+    toast.error(`Error loading archived setlists: ${error.message}`);
   } finally {
     isInitializing.value = false;
   }
@@ -75,8 +76,10 @@ const onRestore = (setList) => {
 const onRestoreConfirm = (setList) => {
   setListStore.restoreSetList(setList.id).then(() =>
     toast.success(`Dziesmu saraksts "${setList.title}" ir atjaunots`),
-  ).catch(error => 
+  ).catch(error => {
+    console.error("Error restoring setlist:", error);
     toast.error(`Kļūda atjaunojot dziesmu sarakstu: ${error.message}`)
+  }
   );
   setListToRestore.value = null;
 };
@@ -91,9 +94,10 @@ const onDelete = (setList) => {
 const onDeleteConfirm = (setList) => {
   setListStore.deleteSetList(setList.id).then(() =>
     toast.success(`Dziemsu saraksts "${setList.title}" ir izdzēsts`),
-  ).catch(error => 
+  ).catch(error => {
+    console.error("Error deleting setlist:", error);
     toast.error(`Kļūda dzēšot dziesmu sarakstu: ${error.message}`)
-  );
+  });
   setListToDelete.value = null;
 };
 </script>

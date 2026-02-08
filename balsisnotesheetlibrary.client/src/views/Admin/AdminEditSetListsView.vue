@@ -26,6 +26,7 @@ onMounted(async () => {
     })
     .catch((error) => {
       console.error("Error initializing data:", error);
+      toast.error(`Kļūda ielādējot datus: ${error.message}`);
     });
 });
 
@@ -71,9 +72,10 @@ const onDeleteConfirmed = (setList) => {
     .then(() => {
       toast.success(`Dziesmu saraksts "${setList.title}" ir izdzēsts.`);
     })
-    .catch((error) =>
-      toast.error(`Kļūda dzēšot dziesmu sarakstu: ${error.message}`),
-    );
+    .catch((error) => {
+      console.error("Error deleting setlist:", error);
+      toast.error(`Kļūda dzēšot dziesmu sarakstu: ${error.message}`);
+    });
   setListToDelete.value = null;
 };
 
@@ -90,9 +92,10 @@ const onArchiveConfirmed = (setList) => {
     .then(() => {
       toast.success(`Dziesmu saraksts "${setList.title}" ir arhivēts.`);
     })
-    .catch((error) =>
-      toast.error(`Kļūda arhivējot dziesmu sarakstu: ${error.message}`),
-    );
+    .catch((error) => {
+      console.error("Error archiving setlist:", error);
+      toast.error(`Kļūda arhivējot dziesmu sarakstu: ${error.message}`);
+    });
   setListToArchive.value = null;
 };
 </script>

@@ -23,13 +23,9 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
 
   async function fetchNoteSheets() {
     isLoading.value = true;
-    error.value = null;
 
     try {
       noteSheets.value = await getAllNoteSheets();
-    } catch (err) {
-      console.error("Error fetching note sheets:", err);
-      error.value = "Failed to load note sheets";
     } finally {
       isLoading.value = false;
     }
@@ -79,49 +75,34 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
   );
 
   async function deleteNoteSheet(id) {
-    try {
-      await deleteNoteSheetApi(id);
-      noteSheets.value = noteSheets.value.filter((sheet) => sheet.id !== id);
-    } catch (err) {
-      error.value = "Failed to delete note sheet";
-      throw err;
-    }
+    await deleteNoteSheetApi(id);
+    noteSheets.value = noteSheets.value.filter((sheet) => sheet.id !== id);
   }
-  
+
   async function createNoteSheet(noteSheet, file) {
-    try {
-      const newNoteSheet = await createNoteSheetApi(noteSheet, file);
-      noteSheets.value.push(newNoteSheet);
-      
-      return newNoteSheet;
-    } catch (err) {
-      console.error("Error creating note sheet:", err);
-      error.value = "Failed to create note sheet";
-    }
+    const newNoteSheet = await createNoteSheetApi(noteSheet, file);
+    noteSheets.value.push(newNoteSheet);
+
+    return newNoteSheet;
   }
-  
+
   async function updateNoteSheet(noteSheet, file) {
-    try {
-      const updatedNoteSheet = await updateNoteSheetApi(noteSheet, file);
-      const index = noteSheets.value.findIndex(sheet => sheet.id === updatedNoteSheet.id);
-      if (index !== -1) {
-        noteSheets.value[index] = updatedNoteSheet;
-      } else {
-        noteSheets.value.push(updatedNoteSheet);
-      }
-      
-      return updatedNoteSheet;
+    const updatedNoteSheet = await updateNoteSheetApi(noteSheet, file);
+    const index = noteSheets.value.findIndex(
+      (sheet) => sheet.id === updatedNoteSheet.id,
+    );
+    if (index !== -1) {
+      noteSheets.value[index] = updatedNoteSheet;
+    } else {
+      noteSheets.value.push(updatedNoteSheet);
     }
-    catch (err) {
-      console.error("Error updating note sheet:", err);
-      error.value = "Failed to update note sheet";
-    }
+
+    return updatedNoteSheet;
   }
 
   return {
     noteSheets,
     isLoading,
-    error,
     searchQuery,
     sortField,
     sortDirection,

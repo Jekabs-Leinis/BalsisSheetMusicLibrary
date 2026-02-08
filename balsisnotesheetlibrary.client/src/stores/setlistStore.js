@@ -26,9 +26,6 @@ export const useSetListStore = defineStore("setlist", () => {
     try {
       const lists = await getAllSetLists(withNoteSheets);
       setLists.value = lists.sort((a, b) => a.order - b.order);
-    } catch (err) {
-      console.error("Error fetching setlists:", err);
-      error.value = "Failed to load setlists";
     } finally {
       isLoading.value = false;
     }
@@ -43,9 +40,6 @@ export const useSetListStore = defineStore("setlist", () => {
       archivedSetLists.value = lists.sort(
         (a, b) => a.archivedAt - b.archivedAt,
       );
-    } catch (err) {
-      console.error("Error fetching setlists:", err);
-      error.value = "Failed to load setlists";
     } finally {
       isLoading.value = false;
     }
@@ -71,11 +65,6 @@ export const useSetListStore = defineStore("setlist", () => {
 
       setLists.value.push(createdSetList);
       reorderSetLists(setLists.value);
-    } catch (err) {
-      console.error("Error creating setlist:", err);
-      error.value = err.message || "Failed to create setlist";
-      
-      throw new Error(error.value);
     } finally {
       isLoading.value = false;
     }
@@ -97,8 +86,8 @@ export const useSetListStore = defineStore("setlist", () => {
     } catch (err) {
       // Revert on save fail
       setLists.value[index] = oldSetList;
-      console.error("Error updating setlist:", err);
-      error.value = "Failed to update setlist";
+
+      throw err;
     } finally {
       isLoading.value = false;
     }
@@ -110,9 +99,6 @@ export const useSetListStore = defineStore("setlist", () => {
 
     try {
       await updateSetListOrderApi(setList.id, setList.order);
-    } catch (err) {
-      console.error("Error updating setlist order:", err);
-      error.value = "Failed to update setlist order";
     } finally {
       isLoading.value = false;
     }
@@ -129,9 +115,6 @@ export const useSetListStore = defineStore("setlist", () => {
       archivedSetLists.value = archivedSetLists.value.filter(
         (list) => list.id !== setListId,
       );
-    } catch (err) {
-      console.error("Error deleting setlist:", err);
-      error.value = "Failed to delete setlist";
     } finally {
       isLoading.value = false;
     }
@@ -150,12 +133,7 @@ export const useSetListStore = defineStore("setlist", () => {
 
     reorderSetLists(setLists.value);
 
-    try {
-      await updateSetListOrder(firstSetList);
-    } catch (err) {
-      console.error("Error updating setlist order:", err);
-      error.value = "Failed to update setlist order";
-    }
+    await updateSetListOrder(firstSetList);
   }
 
   async function moveSetListItem(setListId, oldIndex, newIndex) {
@@ -174,49 +152,30 @@ export const useSetListStore = defineStore("setlist", () => {
     setList.items[oldIndex] = secondItem;
     setList.reorderItems();
 
-    try {
-      await moveSetListItemApi(setListId, firstItem.noteSheetId, newIndex);
-    } catch (err) {
-      console.error("Error updating setlist order:", err);
-      error.value = "Failed to update setlist order";
-    }
+    await moveSetListItemApi(setListId, firstItem.noteSheetId, newIndex);
   }
 
   async function archiveSetList(setListId) {
-    try {
-      await archiveSetListApi(setListId);
-      const index = setLists.value.findIndex((sl) => sl.id === setListId);
-      if (index !== -1) {
-        const [archived] = setLists.value.splice(index, 1);
-        archived.archivedAt = new Date().toISOString();
-        archivedSetLists.value.unshift(archived);
-      }
-      return true;
-    } catch (err) {
-      console.error("Error archiving setlist:", err);
-      error.value = "Failed to archive setlist";
-      throw err;
+    await archiveSetListApi(setListId);
+    const index = setLists.value.findIndex((sl) => sl.id === setListId);
+    if (index !== -1) {
+      const [archived] = setLists.value.splice(index, 1);
+      archived.archivedAt = new Date().toISOString();
+      archivedSetLists.value.unshift(archived);
     }
+    return true;
   }
 
   async function restoreSetList(setListId) {
-    try {
-      await restoreSetListApi(setListId);
-      const index = archivedSetLists.value.findIndex(
-        (sl) => sl.id === setListId,
-      );
-      if (index !== -1) {
-        const [unarchived] = archivedSetLists.value.splice(index, 1);
-        unarchived.archivedAt = null;
-        setLists.value.push(unarchived);
-        reorderSetLists(setLists.value);
-      }
-      return true;
-    } catch (err) {
-      console.error("Error unarchiving setlist:", err);
-      error.value = "Failed to unarchive setlist";
-      throw err;
+    await restoreSetListApi(setListId);
+    const index = archivedSetLists.value.findIndex((sl) => sl.id === setListId);
+    if (index !== -1) {
+      const [unarchived] = archivedSetLists.value.splice(index, 1);
+      unarchived.archivedAt = null;
+      setLists.value.push(unarchived);
+      reorderSetLists(setLists.value);
     }
+    return true;
   }
 
   function reorderSetLists(setLists) {

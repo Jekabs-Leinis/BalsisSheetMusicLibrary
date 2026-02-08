@@ -7,6 +7,7 @@ import { SetListItem } from "@/models/sheetModels";
 import { getSheetsNotInList } from "@/services/noteSheetService.js";
 import EditSetListTitle from "@/components/Admin/EditSetLists/EditSetListTitle.vue";
 import { useSetListStore } from "@/stores/setlistStore.js";
+import { useToast } from "vue-toastification";
 
 const props = defineProps({
   /** @type {SetList} */
@@ -26,6 +27,7 @@ const { setList } = toRefs(props);
 
 const noteSheetStore = useNoteSheetStore();
 const setListStore = useSetListStore();
+const toast = useToast();
 
 const availableSheets = computed(() => {
   return getSheetsNotInList(noteSheetStore.noteSheets, setList.value);
@@ -40,7 +42,10 @@ const addSheet = async (sheet) => {
   });
 
   setList.value.items.push(item);
-  await setListStore.saveSetList(setList.value);
+  await setListStore.saveSetList(setList.value).catch((error) => {
+    console.error("Failed to add sheet to set list:", error);
+    toast.error(`Neizdevās pievienot dziesmu sarakstam: ${error.message}`);
+  });
 };
 
 const removeItem = async (noteSheetId) => {
@@ -48,7 +53,10 @@ const removeItem = async (noteSheetId) => {
     (item) => item.noteSheetId !== noteSheetId,
   );
 
-  await setListStore.saveSetList(setList.value);
+  await setListStore.saveSetList(setList.value).catch((error) => {
+    console.error("Failed to remove sheet from set list:", error);
+    toast.error(`Neizdevās noņemt dziesmu no saraksta: ${error.message}`);
+  });
 };
 
 const onDraggableItemMove = ({ newIndex }) => {
@@ -58,7 +66,21 @@ const onDraggableItemMove = ({ newIndex }) => {
   // we can just call moveSetListItem() with a bogus in-place move
   // This is ok, because on server side we re-order items
   // based on the first item, and it's target order
-  setListStore.moveSetListItem(setList.value.id, newIndex, newIndex);
+  setListStore
+    .moveSetListItem(setList.value.id, newIndex, newIndex)
+    .catch((error) => {
+      console.error("Failed to reorder set list items:", error);
+      toast.error(`Neizdevās pārkārtot dziesmu sarakstu: ${error.message}`);
+    });
+};
+
+const moveItem = (item, newOrder) => {
+  setListStore
+    .moveSetListItem(setList.value.id, item.order, newOrder)
+    .catch((error) => {
+      console.error("Failed to move item:", error);
+      toast.error(`Neizdevās pārvietot dziesmu: ${error.message}`);
+    });
 };
 </script>
 
@@ -67,8 +89,12 @@ const onDraggableItemMove = ({ newIndex }) => {
     <div
       class="card-header d-flex justify-content-between align-items-center setlist-header"
     >
-      <EditSetListTitle :set-list="setList" :set-list-count="setListCount" 
-      @archive="emit('archive', $event)" @delete="emit('delete', $event)"/>
+      <EditSetListTitle
+        :set-list="setList"
+        :set-list-count="setListCount"
+        @archive="emit('archive', $event)"
+        @delete="emit('delete', $event)"
+      />
     </div>
     <div class="card-body">
       <VueDraggable
@@ -103,26 +129,14 @@ const onDraggableItemMove = ({ newIndex }) => {
                 : 'no-down-arrow-padding',
             ]"
             class="btn btn-sm fs-6"
-            @click="
-              setListStore.moveSetListItem(
-                setList.id,
-                item.order,
-                item.order - 1,
-              )
-            "
+            @click="moveItem(item, item.order - 1)"
           >
             <i class="bi bi-arrow-up movement-arrows" />
           </button>
           <button
             v-if="item.order < setList.items.length - 1"
             class="btn btn-sm fs-6"
-            @click="
-              setListStore.moveSetListItem(
-                setList.id,
-                item.order,
-                item.order + 1,
-              )
-            "
+            @click="moveItem(item, item.order + 1)"
           >
             <i class="bi bi-arrow-down movement-arrows" />
           </button>

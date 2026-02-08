@@ -4,9 +4,11 @@ import router from "@/router/routes";
 import { ref, watch, onBeforeUnmount } from "vue";
 import _debounce from "lodash.debounce";
 import { useAuthStore } from "@/stores/authStore.js";
+import { useToast } from "vue-toastification";
 
 const authStore = useAuthStore();
 const noteSheetStore = useNoteSheetStore();
+const toast = useToast();
 
 const isAdmin = authStore.isAuthenticated && authStore.user.isAdmin;
 const searchInput = ref("");
@@ -29,6 +31,7 @@ async function attemptLogout() {
     router.push({ name: "Login" });
   } catch (error) {
     console.error("Logout error:", error);
+    toast.error(`Kļūda izrakstoties: ${error.message}`);
   }
 }
 </script>

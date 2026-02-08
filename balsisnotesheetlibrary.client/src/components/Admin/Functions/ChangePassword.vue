@@ -34,6 +34,7 @@ async function onConfirm() {
     selectedUserName.value = "";
     newPassword.value = "";
   } catch (e) {
+    console.error("Failed to change password:", e);
     toast.error(`Neizdevās nomainīt paroli: ${e.message}`);
   } finally {
     loading.value = false;

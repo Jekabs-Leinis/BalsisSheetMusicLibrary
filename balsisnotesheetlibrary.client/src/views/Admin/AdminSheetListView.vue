@@ -8,11 +8,16 @@ import CreateNewSheet from "@/components/Admin/List/CreateNewSheet.vue";
 import { SortDirection } from "@/models/utilModels";
 import _debounce from "lodash.debounce";
 import { NoteSheet } from "@/models/sheetModels";
+import { useToast } from "vue-toastification";
 
 const noteSheetStore = useNoteSheetStore();
+const toast = useToast();
 
 onMounted(async () => {
-  await noteSheetStore.fetchNoteSheets();
+  await noteSheetStore.fetchNoteSheets().catch(error =>{
+    console.error("Failed to fetch note sheets:", error);
+    toast.error(`Neizdevās ielādēt notis: ${error.message}`);
+  });
 });
 
 const searchInput = ref("");

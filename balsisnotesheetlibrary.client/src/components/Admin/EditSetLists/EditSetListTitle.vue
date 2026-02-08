@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { useSetListStore } from "@/stores/setlistStore";
 import { SetList } from "@/models/sheetModels.js";
+import { useToast } from "vue-toastification";
 
 const props = defineProps({
   /** @type {SetList} */
@@ -16,16 +17,25 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["archive", "delete"]);
+const toast = useToast();
 
 const setListStore = useSetListStore();
 const isEditing = ref(false);
 const editedTitle = ref("");
 const isLoading = ref(false);
-const error = ref("");
 
 const isValid = computed(() => {
   return editedTitle.value.trim() !== "" && editedTitle.value.length <= 200;
 });
+
+const moveSetList = async (newOrder) => {
+  try {
+    await setListStore.moveSetList(props.setList.order, newOrder);
+  } catch (err) {
+    console.error("Failed to move set list:", err);
+    toast.error(`Failed to move set list:${err.message}`);
+  }
+};
 
 const startEditing = () => {
   editedTitle.value = props.setList.title;
@@ -34,14 +44,12 @@ const startEditing = () => {
 
 const cancelEditing = () => {
   isEditing.value = false;
-  error.value = "";
 };
 
 const saveTitle = async () => {
   if (!isValid.value) return;
 
   isLoading.value = true;
-  error.value = "";
 
   try {
     await setListStore.saveSetList(
@@ -52,8 +60,8 @@ const saveTitle = async () => {
     );
     isEditing.value = false;
   } catch (err) {
-    console.error("Failed to update set list title:", err);
-    error.value = "Failed to update title. Please try again.";
+    console.error("Error updating setlist title:", err);
+    toast.error(`Failed to update set list title:${err.message}`);
   } finally {
     isLoading.value = false;
   }
@@ -111,9 +119,6 @@ const saveTitle = async () => {
             <i class="bi bi-check-lg"></i>
           </button>
         </div>
-        <div v-if="error" class="invalid-feedback d-block">
-          {{ error }}
-        </div>
       </div>
     </div>
     <div class="flex-grow-1" />
@@ -124,14 +129,14 @@ const saveTitle = async () => {
           setList.order < setListCount - 1 ? 'pe-0' : 'no-down-arrow-padding',
         ]"
         class="btn btn-action btn-sm"
-        @click="setListStore.moveSetList(setList.order, setList.order - 1)"
+        @click="moveSetList(setList.order, setList.order - 1)"
       >
         <i class="bi bi-arrow-up movement-arrows" />
       </button>
       <button
         v-if="setList.order < setListCount - 1"
         class="btn btn-action btn-sm"
-        @click="setListStore.moveSetList(setList.order, setList.order + 1)"
+        @click="moveSetList(setList.order, setList.order + 1)"
       >
         <i class="bi bi-arrow-down movement-arrows" />
       </button>

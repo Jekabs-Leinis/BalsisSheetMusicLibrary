@@ -28,6 +28,10 @@ router.beforeEach(async (to) => {
       return { name: "Login" };
     }
   }
+
+  if (to.path.startsWith('/admin') && !authStore.user?.isAdmin) {
+    return { name: "SheetListView" };
+  }
 });
 
 router.afterEach(() => {

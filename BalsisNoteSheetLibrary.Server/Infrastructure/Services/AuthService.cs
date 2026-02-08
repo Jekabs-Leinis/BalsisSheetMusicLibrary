@@ -24,7 +24,7 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IHttpContext
             result = SignInResult.Failed;
         }
         
-        if (!result.Succeeded)
+        if (!result.Succeeded || user == null)
         {
             throw new InvalidOperationException("Invalid username or password");
         }

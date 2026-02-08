@@ -36,14 +36,40 @@ public class LocalFileStorageService : IFileStorageService
             throw;
         }
     }
+    
+    public string GetSafeFilePath(string fileName)
+    {
+        // Validate filename
+        if (string.IsNullOrWhiteSpace(fileName))
+            throw new ArgumentException("Filename cannot be empty", nameof(fileName));
+    
+        // Remove any path components
+        var safeFileName = Path.GetFileName(fileName);
+    
+        var filePath = Path.Combine(_basePath, safeFileName);
+    
+        // Ensure the resolved path is still within base path
+        var fullPath = Path.GetFullPath(filePath);
+        if (!fullPath.StartsWith(Path.GetFullPath(_basePath), StringComparison.OrdinalIgnoreCase))
+            throw new ArgumentException("Invalid file path", nameof(fileName));
+    
+        return fullPath;
+    }
 
     public async Task<string> SaveFileAsync(Stream fileStream, string fileName)
     {
+        ArgumentNullException.ThrowIfNull(fileStream);
+        ArgumentException.ThrowIfNullOrWhiteSpace(fileName);
+
+        if (!fileStream.CanRead)
+            throw new ArgumentException("Stream must be readable", nameof(fileStream));
+
         try
         {
             _logger.LogDebug("Saving file: {FileName}", fileName);
-            var filePath = Path.Combine(_basePath, fileName);
-            await using var output = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+            var filePath = GetSafeFilePath(fileName);
+
+            await using var output = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
             await fileStream.CopyToAsync(output);
 
             _logger.LogInformation("File saved successfully: {FileName}", fileName);
@@ -58,23 +84,18 @@ public class LocalFileStorageService : IFileStorageService
 
     public bool FileExists(string fileName)
     {
-        var filePath = Path.Combine(_basePath, fileName);
+        var filePath = GetSafeFilePath(fileName);
         var exists = File.Exists(filePath);
         _logger.LogDebug("File existence check for {FileName}: {Exists}", fileName, exists);
 
         return exists;
     }
 
-    public string GetFilePath(string fileName)
-    {
-        return Path.Combine(_basePath, fileName);
-    }
-
     public Task DeleteFile(string fileName)
     {
         try
         {
-            var filePath = Path.Combine(_basePath, fileName);
+            var filePath = GetSafeFilePath(fileName);
 
             if (!File.Exists(filePath))
             {
@@ -110,7 +131,7 @@ public class LocalFileStorageService : IFileStorageService
                 throw new FileNotFoundException($"File not found: {oldFileName}");
             }
 
-            var newFilePath = Path.Combine(_basePath, newFileName);
+            var newFilePath = GetSafeFilePath(newFileName);
 
             File.Move(oldFilePath, newFilePath, true);
             _logger.LogInformation("File renamed successfully from {OldFileName} to {NewFileName}", oldFileName,

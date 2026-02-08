@@ -40,6 +40,6 @@ public class DownloadController(
             return NotFound("No valid file associated with this note sheet.");
         }
 
-        return PhysicalFile(fileStorageService.GetFilePath(sheet.SystemFileName!), "application/octet-stream", sheet.FileName);
+        return PhysicalFile(fileStorageService.GetSafeFilePath(sheet.SystemFileName!), "application/octet-stream", sheet.FileName);
     }
 }

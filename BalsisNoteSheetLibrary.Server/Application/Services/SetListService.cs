@@ -139,6 +139,12 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         // Otherwise updating from two different clients without either reloading causes issues
         var reorderableLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order);
         reorderableLists.RemoveAll(sl => sl.Id == setList.Id);
+        
+        if (reorderableLists.Count < dto.NewOrder)
+        {
+            throw new InvalidOperationException("New order is out of bounds");
+        }
+        
         reorderableLists.Insert((int)dto.NewOrder, setList);
         ReorderSetLists(reorderableLists);
         unitOfWork.SetLists.UpdateRange(reorderableLists);

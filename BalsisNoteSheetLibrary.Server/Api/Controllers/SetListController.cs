@@ -100,11 +100,18 @@ public class SetListController(ISetListService setListService, ILogger<SetListCo
         if (!ModelState.IsValid)
         {
             logger.LogWarning("Invalid model state for MoveSetListDto: {ModelState}", ModelState);
-            
+
             return BadRequest(ModelState);
         }
 
-        await setListService.MoveSetListAsync(dto);
+        try
+        {
+            await setListService.MoveSetListAsync(dto);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
 
         return Ok("Set list order updated.");
     }

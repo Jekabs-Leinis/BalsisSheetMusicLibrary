@@ -36,7 +36,7 @@ async function onDeleteConfirm() {
     toast.success(`Notis "${props.sheet.title}" ir veiksmīgi izdzēstas.`);
   } catch (e) {
     console.error("Error deleting note sheet:", e);
-    toast.error(`Notu dzēšana neizdevās: ${e.message}`);
+    toast.error(`Nošu dzēšana neizdevās: ${e.message}`);
   }
 
   emit("deleted");

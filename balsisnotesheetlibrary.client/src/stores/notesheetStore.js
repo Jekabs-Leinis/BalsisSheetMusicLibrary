@@ -83,8 +83,8 @@ export const useNoteSheetStore = defineStore("notesheet", () => {
       await deleteNoteSheetApi(id);
       noteSheets.value = noteSheets.value.filter((sheet) => sheet.id !== id);
     } catch (err) {
-      console.error("Error deleting note sheet:", err);
       error.value = "Failed to delete note sheet";
+      throw err;
     }
   }
   

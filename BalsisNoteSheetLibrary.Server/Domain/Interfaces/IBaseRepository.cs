@@ -14,7 +14,7 @@ public interface IBaseRepository<T> where T : class
         bool orderByDescending = false,
         string[]? includeProperties = null,
         bool withTracking = true
-        );
+    );
 
     public void Add(T entity);
     public void AddRange(List<T> entities);

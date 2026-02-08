@@ -14,7 +14,7 @@ public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<
     {
         return DbSet.FindAsync(id);
     }
-    
+
     public ValueTask<T?> GetByKeysAsync(params object[] keyValues)
     {
         return DbSet.FindAsync(keyValues);
@@ -44,8 +44,8 @@ public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<
 
         if (orderBy != null)
         {
-            query = orderByDescending 
-                ? query.OrderByDescending(orderBy) 
+            query = orderByDescending
+                ? query.OrderByDescending(orderBy)
                 : query.OrderBy(orderBy);
         }
 
@@ -57,37 +57,37 @@ public abstract class BaseRepository<T>(AppDbContext context) : IBaseRepository<
         return query.ToListAsync();
     }
 
-    
+
     public Task<List<T>> GetAllAsync()
     {
         return DbSet.ToListAsync();
     }
-    
+
     public void Add(T entity)
     {
         DbSet.Add(entity);
     }
-    
+
     public void AddRange(List<T> entities)
     {
         DbSet.AddRange(entities);
     }
-    
+
     public void Update(T entity)
     {
         DbSet.Update(entity);
     }
-    
+
     public void UpdateRange(List<T> entities)
     {
         DbSet.UpdateRange(entities);
     }
-    
+
     public void Remove(T entity)
     {
         DbSet.Remove(entity);
     }
-    
+
     public void RemoveRange(List<T> entities)
     {
         DbSet.RemoveRange(entities);

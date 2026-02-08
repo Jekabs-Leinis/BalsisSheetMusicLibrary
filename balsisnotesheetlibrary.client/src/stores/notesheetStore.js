@@ -14,11 +14,15 @@ import {
 } from "@/services/noteSheetService";
 
 export const useNoteSheetStore = defineStore("notesheet", () => {
+  /** @type import('vue').Ref<NoteSheet[]> */
   const noteSheets = ref([]);
+  /** @type import('vue').Ref<boolean> */
   const isLoading = ref(true);
-  const error = ref(null);
+  /** @type import('vue').Ref<string> */
   const searchQuery = ref("");
+  /** @type import('vue').Ref<string> */
   const sortField = ref("title");
+  /** @type import('vue').Ref<string> */
   const sortDirection = ref(SortDirection.ASC);
 
   async function fetchNoteSheets() {

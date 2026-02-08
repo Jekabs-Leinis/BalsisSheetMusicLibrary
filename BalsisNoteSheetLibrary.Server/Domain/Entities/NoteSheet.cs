@@ -12,6 +12,7 @@ public class NoteSheet
     public string? FileName { get; set; }
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
    public IEnumerable<SetListItem>? SetListItems { get; set; }
 

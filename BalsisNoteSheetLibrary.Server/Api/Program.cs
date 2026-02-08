@@ -29,6 +29,10 @@ try
 
     app.Run();
 }
+catch (Exception ex) when (ex is HostAbortedException)
+{
+    // This is expected when running EF migrations, do not log as fatal
+}
 catch (Exception ex)
 {
     Log.Fatal(ex, "Application terminated unexpectedly");

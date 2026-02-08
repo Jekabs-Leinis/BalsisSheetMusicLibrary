@@ -35,7 +35,7 @@ public class SetListItemServiceTests : IntegrationTestBase
         // Arrange
         var setList = new Entities.SetList { Title = "Test List" };
         UnitOfWork.SetLists.Add(setList);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto
             { SetListId = setList.Id!.Value, NoteSheetId = NonexistentNoteSheetId, NewOrder = 0 };
 
@@ -57,7 +57,7 @@ public class SetListItemServiceTests : IntegrationTestBase
         };
         UnitOfWork.NoteSheets.AddRange(noteSheets);
 
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
@@ -66,7 +66,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto { SetListId = setListId, NoteSheetId = noteSheets[2].Id!.Value, NewOrder = 0 };
 
         // Act
@@ -96,7 +96,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { Title = "C" }
         };
         UnitOfWork.NoteSheets.AddRange(noteSheets);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
@@ -105,7 +105,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto { SetListId = setListId, NoteSheetId = noteSheets[0].Id!.Value, NewOrder = 2 };
 
         // Act
@@ -132,7 +132,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { Title = "C" }
         };
         UnitOfWork.NoteSheets.AddRange(noteSheets);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
@@ -141,7 +141,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto { SetListId = setListId, NoteSheetId = noteSheets[1].Id!.Value, NewOrder = 1 };
 
         // Act
@@ -168,7 +168,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { Title = "C" }
         };
         UnitOfWork.NoteSheets.AddRange(noteSheets);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
@@ -177,7 +177,7 @@ public class SetListItemServiceTests : IntegrationTestBase
             new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto
             { SetListId = setListId, NoteSheetId = noteSheets[0].Id!.Value, NewOrder = 99 }; // out of range
 

@@ -23,7 +23,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Arrange
         var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Test" };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetNoteSheetAsync(1);
@@ -51,7 +51,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new Entities.NoteSheet { Title = "B" },
             new Entities.NoteSheet { Title = "A" }
         ]);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetAllNoteSheetsAsync();
@@ -87,7 +87,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Arrange
         var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Original" };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var updateDto = new UpdateNoteSheetDto { Id = 1, Title = "Updated Title" };
         var fileStream = new MemoryStream([1, 2, 3]);
         _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
@@ -107,7 +107,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Arrange
         var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>())).Returns(Task.CompletedTask);
 
         // Act
@@ -170,7 +170,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Arrange
         var noteSheet = new Entities.NoteSheet { Id = 2, Title = "Original", SystemFileName = "original.txt" };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var updateDto = new UpdateNoteSheetDto { Id = 2, Title = "Updated Title" };
         _fileStorageServiceMock.Setup(x => x.RenameFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
@@ -213,7 +213,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public async Task GetAllNoteSheetsAsync_ReturnsNoteSheetsOrderedByTitleCaseInsensitive()
     {
         // Arrange
-        var noteSheets = new List<BalsisNoteSheetLibrary.Server.Domain.Entities.NoteSheet>
+        var noteSheets = new List<Entities.NoteSheet>
         {
             new() { Title = "Zebra" },
             new() { Title = "apple" },
@@ -221,8 +221,8 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new() { Title = "apple" } // Duplicate title to test stable sort
         };
 
-        await DbContext.NoteSheets.AddRangeAsync(noteSheets);
-        await DbContext.SaveChangesAsync();
+        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetAllNoteSheetsAsync();
@@ -251,8 +251,8 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new() { Title = "!First" }
         };
 
-        await DbContext.NoteSheets.AddRangeAsync(noteSheets);
-        await DbContext.SaveChangesAsync();
+        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetAllNoteSheetsAsync();
@@ -283,8 +283,8 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new() { Title = "Д!Last" }
         };
 
-        await DbContext.NoteSheets.AddRangeAsync(noteSheets);
-        await DbContext.SaveChangesAsync();
+        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var result = await _service.GetAllNoteSheetsAsync();

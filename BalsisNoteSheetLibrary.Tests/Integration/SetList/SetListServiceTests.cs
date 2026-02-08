@@ -182,11 +182,11 @@ public class SetListServiceTests : IntegrationTestBase
             Title = "NoteSheet 1"
         };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         // Add an item manually
         var item = new Entities.SetListItem { SetListId = setList.Id, NoteSheetId = noteSheet.Id, Order = 0 };
         UnitOfWork.SetListItems.Add(item);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
         var all = (await _service.GetAllSetListsAsync(true)).ToList();
@@ -225,13 +225,13 @@ public class SetListServiceTests : IntegrationTestBase
             Title = "NoteSheet 3"
         };
         UnitOfWork.NoteSheets.AddRange([noteSheet1, noteSheet2, noteSheet3]);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var item1 = new Entities.SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet1.Id, Order = 0 };
         var item2 = new Entities.SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet2.Id, Order = 1 };
         UnitOfWork.SetListItems.Add(item1);
         UnitOfWork.SetListItems.Add(item2);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Remove item1, add item3, reorder item2
         var updateDto = new UpdateSetListDto

@@ -52,14 +52,14 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
             Id = 1, Title = "TestTitle", Author = "TestAuthor", FileName = "OldName.pdf", SystemFileName = "oldname.pdf"
         };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         _fileStorageServiceMock.Setup(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
         // Act
         await _service.RenameAllFilenamesAsync();
         // Wait for background task to complete
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.Current.CancellationToken);
 
         // Assert
         _fileStorageServiceMock.Verify(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
@@ -77,14 +77,14 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
             SystemFileName = "missing.pdf"
         };
         UnitOfWork.NoteSheets.Add(noteSheet);
-        await UnitOfWork.SaveChangesAsync();
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         _fileStorageServiceMock.Setup(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()))
             .Throws<FileNotFoundException>();
 
         // Act
         await _service.RenameAllFilenamesAsync();
-        await Task.Delay(500);
+        await Task.Delay(500, TestContext.Current.CancellationToken);
 
         // Assert
         _fileStorageServiceMock.Verify(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);

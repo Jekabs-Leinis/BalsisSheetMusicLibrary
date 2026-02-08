@@ -12,20 +12,21 @@ public class AuthService(SignInManager<IdentityUser> signInManager, IHttpContext
     {
         var user = await signInManager.UserManager.FindByNameAsync(loginDto.UserName);
 
-        if (user == null)
+        SignInResult result;
+        if (user != null)
         {
-            throw new InvalidOperationException("Invalid username or password.");
+            result = await signInManager.PasswordSignInAsync(user, loginDto.Password, true, false);
         }
-
-        var result = await signInManager.PasswordSignInAsync(
-            user,
-            loginDto.Password,
-            true,
-            false);
-
+        else
+        {
+            // To prevent user enumeration attacks, we perform a dummy password check even if the user doesn't exist
+            _ = await signInManager.PasswordSignInAsync(new IdentityUser(), loginDto.Password, true, false);
+            result = SignInResult.Failed;
+        }
+        
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException("Invalid username or password.");
+            throw new InvalidOperationException("Invalid username or password");
         }
 
         var isAdmin = await signInManager.UserManager.IsInRoleAsync(user, Role.Admin);

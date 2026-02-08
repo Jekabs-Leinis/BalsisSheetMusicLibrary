@@ -29,6 +29,8 @@ public class NoteSheetService(
 
     public async Task<NoteSheetDto> CreateNoteSheetAsync(CreateNoteSheetDto dto, Stream fileStream)
     {
+        ArgumentNullException.ThrowIfNull(fileStream);
+        
         var noteSheet = dto.ToEntity();
         unitOfWork.NoteSheets.Add(noteSheet);
         // Save initially to generate ID for filename
@@ -36,8 +38,25 @@ public class NoteSheetService(
 
         noteSheet.FileName = noteSheet.GetFileName();
         noteSheet.SystemFileName = noteSheet.GetSystemFileName();
-        await fileStorageService.SaveFileAsync(fileStream, noteSheet.SystemFileName);
-        await unitOfWork.SaveChangesAsync();
+        
+        try
+        {
+            await fileStorageService.SaveFileAsync(fileStream, noteSheet.SystemFileName);
+            await unitOfWork.SaveChangesAsync();
+        }
+        catch
+        {
+            // Rollback: delete the file if it was created
+            if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
+            {
+                await fileStorageService.DeleteFile(noteSheet.SystemFileName);
+            }
+            // Remove the entity from tracking
+            unitOfWork.NoteSheets.Remove(noteSheet);
+            await unitOfWork.SaveChangesAsync();
+            
+            throw;
+        }
 
         return NoteSheetDto.FromEntity(noteSheet);
     }

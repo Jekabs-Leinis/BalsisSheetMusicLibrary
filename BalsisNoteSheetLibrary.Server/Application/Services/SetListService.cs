@@ -76,6 +76,8 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
             unitOfWork.SetListItems.RemoveRange(itemsToRemove);
         }
 
+        var existingItemsDict = existingItems.ToDictionary(item => item.NoteSheetId);
+
         // Update existing items and add new ones
         // Have to use a for loop to reorder the remaining and new items
         // We cannot rely on the Order property from the DTO,
@@ -83,7 +85,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         for (var i = 0; i < updatedItems.Count; i++)
         {
             var updatedItem = updatedItems[i];
-            var existingItem = existingItems.FirstOrDefault(ei => ei.NoteSheetId == updatedItem.NoteSheetId);
+            var existingItem = existingItemsDict.GetValueOrDefault(updatedItem.NoteSheetId);
 
             if (existingItem != null)
             {
@@ -153,7 +155,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
             throw new InvalidOperationException("SetList not found");
         }
 
-        setList.ArchivedAt = DateTime.Now;
+        setList.ArchivedAt = DateTime.UtcNow;
         setList.Order = null;
         unitOfWork.SetLists.Update(setList);
 

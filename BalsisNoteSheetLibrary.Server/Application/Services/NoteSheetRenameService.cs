@@ -6,18 +6,19 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace BalsisNoteSheetLibrary.Server.Application.Services;
 
-public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<NoteSheetRenameService> logger) : INoteSheetRenameService
+public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<NoteSheetRenameService> logger)
+    : INoteSheetRenameService
 {
     private static readonly SemaphoreSlim RenameLock = new(1, 1);
 
     public async Task RenameAllFilenamesAsync()
     {
         logger.LogInformation("Starting rename operation for all note sheet filenames.");
-        
+
         if (!await RenameLock.WaitAsync(0))
         {
             logger.LogInformation("Rename operation already in progress. Exiting.");
-            
+
             return;
         }
 
@@ -25,18 +26,27 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         {
             try
             {
-                await RunRenameAllFilenamesInScope(serviceProvider);
+                await RenameAllFilenamesTask(serviceProvider);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unhandled exception in rename operation");
             }
             finally
             {
                 RenameLock.Release();
-                
                 logger.LogInformation("Rename operation completed.");
             }
-        });
+        }).ContinueWith(t =>
+        {
+            if (t.IsFaulted)
+            {
+                logger.LogError(t.Exception, "Task faulted in rename operation");
+            }
+        }, TaskScheduler.Default);
     }
 
-    private async Task RunRenameAllFilenamesInScope(IServiceProvider scopeProvider)
+    private async Task RenameAllFilenamesTask(IServiceProvider scopeProvider)
     {
         try
         {
@@ -82,7 +92,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
             catch (Exception ex)
             {
                 logger.LogError(ex, "Error renaming note sheets");
-                
+
                 _ = SendStatus(scopedHub, "error", $"Radās kļūda pārsaucot notis {sheet.Title}: {ex.Message}");
             }
 
@@ -108,7 +118,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         catch (FileNotFoundException ex)
         {
             logger.LogError(ex, "File not found for NoteSheet ID {Id} at path {Path}", sheet.Id, oldPath);
-            
+
             return false;
         }
 
@@ -119,7 +129,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
 
         return true;
     }
-    
+
     private static async Task SendStatus(IHubContext<StatusHub> hub, string status, string message)
     {
         // Should only produce notification for clients that are on the rename page, so sending to all is ok.

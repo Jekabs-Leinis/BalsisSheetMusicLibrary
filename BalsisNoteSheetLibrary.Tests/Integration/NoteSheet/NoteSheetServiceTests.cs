@@ -302,4 +302,45 @@ public class NoteSheetServiceTests : IntegrationTestBase
         Assert.Equal("B5Fifth", titles[4]);
         Assert.Equal("Д!Last", titles[5]);
     }
+
+    [Fact]
+    public async Task CreateNoteSheetAsync_WithNullFileStream_ThrowsArgumentNullException()
+    {
+        // Arrange
+        var dto = new CreateNoteSheetDto { Title = "Test" };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _service.CreateNoteSheetAsync(dto, null!));
+    }
+
+    [Fact]
+    public async Task CreateNoteSheetAsync_WhenFileSaveFails_RollsBackAndThrows()
+    {
+        // Arrange
+        var dto = new CreateNoteSheetDto { Title = "Test" };
+        var fileStream = new MemoryStream([1, 2, 3]);
+        _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
+            .ThrowsAsync(new IOException("Disk full"));
+
+        // Act & Assert
+        await Assert.ThrowsAsync<IOException>(() => _service.CreateNoteSheetAsync(dto, fileStream));
+
+        // Verify rollback - file should be deleted and entity should not exist
+        _fileStorageServiceMock.Verify(x => x.DeleteFile(It.IsAny<string>()), Times.Once);
+        var noteSheets = await _service.GetAllNoteSheetsAsync();
+        Assert.Empty(noteSheets);
+    }
+
+    [Fact]
+    public async Task UpdateNoteSheetAsync_WithoutFileAndNoExistingFile_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var noteSheet = new Entities.NoteSheet { Id = 3, Title = "Original", SystemFileName = null };
+        UnitOfWork.NoteSheets.Add(noteSheet);
+        await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var updateDto = new UpdateNoteSheetDto { Id = 3, Title = "Updated" };
+
+        // Act & Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateNoteSheetAsync(updateDto, null));
+    }
 }

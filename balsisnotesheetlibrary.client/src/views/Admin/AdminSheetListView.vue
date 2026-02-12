@@ -132,7 +132,7 @@ const openEditModal = (sheetId) => {
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="onSort('filename')" class="sort-header">
+            <th @click="onSort('fileName')" class="sort-header">
               Faila nosaukums
               <i
                 v-if="sortField === 'filename'"

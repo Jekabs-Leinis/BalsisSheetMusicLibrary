@@ -129,14 +129,14 @@ const saveTitle = async () => {
           setList.order < setListCount - 1 ? 'pe-0' : 'no-down-arrow-padding',
         ]"
         class="btn btn-action btn-sm"
-        @click="moveSetList(setList.order, setList.order - 1)"
+        @click="moveSetList(setList.order - 1)"
       >
         <i class="bi bi-arrow-up movement-arrows" />
       </button>
       <button
         v-if="setList.order < setListCount - 1"
         class="btn btn-action btn-sm"
-        @click="moveSetList(setList.order, setList.order + 1)"
+        @click="moveSetList(setList.order + 1)"
       >
         <i class="bi bi-arrow-down movement-arrows" />
       </button>

@@ -35,7 +35,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task<SetListDto?> GetSetListByIdAsync(uint id)
     {
-        var setList = await unitOfWork.SetLists.GetByIdAsync(id);
+        var setList = await unitOfWork.SetLists.GetByIdWithItemsAsync(id);
 
         return setList == null ? null : SetListDto.FromEntity(setList);
     }
@@ -55,7 +55,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task<SetListDto> UpdateSetListAsync(UpdateSetListDto dto)
     {
-        var setList = await unitOfWork.SetLists.GetByIdAsync(dto.Id);
+        var setList = await unitOfWork.SetLists.GetByIdWithItemsAsync(dto.Id);
 
         if (setList == null)
         {
@@ -113,7 +113,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 
     public async Task DeleteSetListAsync(uint id)
     {
-        var setList = await unitOfWork.SetLists.GetByIdAsync(id);
+        var setList = await unitOfWork.SetLists.GetByIdWithItemsAsync(id);
 
         if (setList == null)
         {

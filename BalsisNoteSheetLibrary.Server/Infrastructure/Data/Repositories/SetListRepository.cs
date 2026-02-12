@@ -11,4 +11,9 @@ public class SetListRepository(AppDbContext context) : BaseRepository<SetList>(c
     {
         return await DbSet.Where(sl => sl.Order != null).MaxAsync(sl => sl.Order) ?? 0;
     }
+    
+    public async Task<SetList?> GetByIdWithItemsAsync(uint setListId)
+    {
+        return await DbSet.Include(sl => sl.Items).FirstOrDefaultAsync(sl => sl.Id == setListId);
+    }
 }

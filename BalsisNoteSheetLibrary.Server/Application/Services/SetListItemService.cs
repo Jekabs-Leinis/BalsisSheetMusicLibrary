@@ -8,14 +8,12 @@ public class SetListItemService(IUnitOfWork unitOfWork) : ISetListItemService
 {
     public async Task MoveSetListItemAsync(MoveSetListItemDto dto)
     {
-        var setLists = await unitOfWork.SetLists.GetAsync(sl => sl.Id == dto.SetListId, includeProperties: ["Items"]);
+        var setList = await unitOfWork.SetLists.GetByIdWithItemsAsync(dto.SetListId);
 
-        if (setLists.Count == 0)
+        if (setList == null)
         {
             throw new InvalidOperationException("SetList not found");
         }
-        
-        var setList = setLists.First();
 
         var item = setList.Items.FirstOrDefault(i => i.NoteSheetId == dto.NoteSheetId);
 

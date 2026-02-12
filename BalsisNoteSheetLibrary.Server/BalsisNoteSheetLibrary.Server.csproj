@@ -33,4 +33,24 @@
         </ProjectReference>
     </ItemGroup>
 
+    <ItemGroup>
+        <None Include=".env.example" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always" Condition="Exists('.env.example')" />
+    </ItemGroup>
+
+    <Target Name="CreateFreshDb" BeforeTargets="ComputeFilesToPublish">
+        <Message Text="Generating fresh app.db from migrations in output directory..." Importance="High" />
+        <PropertyGroup>
+            <FreshDbPath>$(OutputPath)app.db</FreshDbPath>
+        </PropertyGroup>
+        
+        <Delete Files="$(FreshDbPath)" Condition="Exists('$(FreshDbPath)')" />
+        <Exec Command="dotnet ef database update --connection &quot;Data Source=$(FreshDbPath)&quot;" />
+        
+        <ItemGroup>
+            <ResolvedFileToPublish Include="$(FreshDbPath)">
+                <RelativePath>app.db</RelativePath>
+                <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
 </Project>

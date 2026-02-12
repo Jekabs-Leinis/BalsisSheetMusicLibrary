@@ -1,8 +1,0 @@
-<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/0.5.128-alpha">
-    <PropertyGroup>
-        <Comment>Project definition so that Docs are visible in solution view.</Comment>
-        <StartupCommand>echo "Docs project is not executable."</StartupCommand>
-        <JavaScriptTestRoot>.\</JavaScriptTestRoot>
-        <ShouldRunBuildScript>false</ShouldRunBuildScript>
-    </PropertyGroup>
-</Project>

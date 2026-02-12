@@ -108,7 +108,7 @@ dotnet publish .\BalsisNoteSheetLibrary.Server\BalsisNoteSheetLibrary.Server.csp
 or, with runtime and self-contained options for Linux:
 
 ```powershell
-dotnet publish BalsisNoteSheetLibrary.Server --configuration Release --runtime linux-x64 --self-contained true -o ./publish
+dotnet publish .\BalsisNoteSheetLibrary.Server\BalsisNoteSheetLibrary.Server.csproj --configuration Release --runtime linux-x64 --self-contained true -o ./publish
 ```
 
 Copy the contents of the `publish` folder to your server and run the executable (`BalsisNoteSheetLibrary.Server.exe` on Windows, `BalsisNoteSheetLibrary.Server` on Linux).

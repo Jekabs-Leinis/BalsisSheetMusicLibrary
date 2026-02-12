@@ -184,7 +184,7 @@ public class NoteSheetControllerTests : IntegrationTestBase
         var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "test.pdf" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>())).Returns(Task.CompletedTask);
+        _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>(), It.IsAny<string>(), false)).Returns(Task.CompletedTask);
 
         // Act
         var result = await _controller.Delete(1);

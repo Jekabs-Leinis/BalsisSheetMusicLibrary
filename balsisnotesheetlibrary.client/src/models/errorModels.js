@@ -1,8 +1,7 @@
 export class ResponseError extends Error {
   constructor(err, fallbackMessage) {
     if (err.response?.data?.errors) {
-      //Assuming .net core style error response
-      //This will appear on return BadRequest(ModelState)
+      //Assuming .net core SerializableError
       const errorMessages = [];
       for (const key in err.response.data.errors) {
         if (
@@ -13,11 +12,16 @@ export class ResponseError extends Error {
       }
       super(errorMessages.join("\n"));
     } else if (err.response?.data?.title) {
-      //Assuming .net core style response
+      //Assuming .net core SerializableError with no errors
       super(err.response.data.title);
     } else if (err.response?.data) {
-      // Probably a string message
-      super(err.response.data);
+      if (err.response.data.message) {
+        //Assuming ExceptionHandlingMiddleware response
+        super(err.response.data.message);
+      } else {
+        // Probably a string message
+        super(err.response.data);
+      }
     } else {
       super(err.message || fallbackMessage);
     }

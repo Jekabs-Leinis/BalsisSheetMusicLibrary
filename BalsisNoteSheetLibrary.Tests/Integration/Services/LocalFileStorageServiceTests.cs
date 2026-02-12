@@ -19,8 +19,10 @@ public class LocalFileStorageServiceTests : IDisposable
         _testBasePath = Path.Combine(Path.GetTempPath(), $"FileStorageTests_{Guid.NewGuid()}");
         Directory.CreateDirectory(_testBasePath);
 
-        // Set environment variable
+        // Set environment variables
         Environment.SetEnvironmentVariable(EnvironmentVariables.SheetsFolderPath, _testBasePath);
+        // Disable soft-delete by default to maintain backward compatibility with existing tests
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
 
         _hostEnvironmentMock = new Mock<IHostEnvironment>();
         _hostEnvironmentMock.Setup(x => x.ContentRootPath).Returns(Path.GetTempPath());
@@ -38,6 +40,8 @@ public class LocalFileStorageServiceTests : IDisposable
             Directory.Delete(_testBasePath, true);
         }
         Environment.SetEnvironmentVariable(EnvironmentVariables.SheetsFolderPath, null);
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, null);
+        Environment.SetEnvironmentVariable(EnvironmentVariables.TrashFolderPath, null);
     }
 
     [Fact]
@@ -154,7 +158,7 @@ public class LocalFileStorageServiceTests : IDisposable
         await File.WriteAllTextAsync(filePath, "test", TestContext.Current.CancellationToken);
 
         // Act
-        await _service.DeleteFile(fileName);
+        await _service.DeleteFile(fileName, "test");
 
         // Assert
         Assert.False(File.Exists(filePath));
@@ -165,7 +169,7 @@ public class LocalFileStorageServiceTests : IDisposable
     {
         // Act & Assert
         await Assert.ThrowsAsync<FileNotFoundException>(() => 
-            _service.DeleteFile("nonexistent.pdf"));
+            _service.DeleteFile("nonexistent.pdf", "test"));
     }
 
     [Fact]
@@ -288,6 +292,7 @@ public class LocalFileStorageServiceTests : IDisposable
 
         // Restore for cleanup
         Environment.SetEnvironmentVariable(EnvironmentVariables.SheetsFolderPath, _testBasePath);
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
     }
 
     [Fact]
@@ -312,6 +317,7 @@ public class LocalFileStorageServiceTests : IDisposable
         finally
         {
             Environment.SetEnvironmentVariable(EnvironmentVariables.SheetsFolderPath, _testBasePath);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
         }
     }
 
@@ -337,6 +343,158 @@ public class LocalFileStorageServiceTests : IDisposable
         finally
         {
             Environment.SetEnvironmentVariable(EnvironmentVariables.SheetsFolderPath, _testBasePath);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
         }
+    }
+
+    [Fact]
+    public async Task DeleteFile_WithSoftDeleteEnabled_MovesFileToTrash()
+    {
+        // Arrange
+        var trashPath = Path.Combine(_testBasePath, "trash");
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, null);
+        var service = new LocalFileStorageService(_hostEnvironmentMock.Object, _loggerMock.Object);
+
+        var fileName = "softdelete.pdf";
+        var filePath = Path.Combine(_testBasePath, fileName);
+        await File.WriteAllTextAsync(filePath, "test content", TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            await service.DeleteFile(fileName, "update");
+
+            // Assert
+            Assert.False(File.Exists(filePath));
+            Assert.True(Directory.Exists(trashPath));
+            var trashFiles = Directory.GetFiles(trashPath, "softdelete_*_update.pdf");
+            Assert.Single(trashFiles);
+        }
+        finally
+        {
+            if (Directory.Exists(trashPath))
+            {
+                Directory.Delete(trashPath, true);
+            }
+            Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFile_WithSoftDeleteEnabled_AppendsTimestampAndReason()
+    {
+        // Arrange
+        var trashPath = Path.Combine(_testBasePath, "trash");
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, null);
+        var service = new LocalFileStorageService(_hostEnvironmentMock.Object, _loggerMock.Object);
+
+        var fileName = "timestamp_test.pdf";
+        var filePath = Path.Combine(_testBasePath, fileName);
+        await File.WriteAllTextAsync(filePath, "test content", TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            await service.DeleteFile(fileName, "delete");
+
+            // Assert
+            var trashFiles = Directory.GetFiles(trashPath);
+            Assert.Single(trashFiles);
+            var trashFileName = Path.GetFileName(trashFiles[0]);
+            Assert.StartsWith("timestamp_test_", trashFileName);
+            Assert.EndsWith("_delete.pdf", trashFileName);
+            // Verify timestamp format (14 digits between underscores)
+            var parts = trashFileName.Split('_');
+            Assert.Equal(4, parts.Length);
+            Assert.Equal(14, parts[2].Length);
+        }
+        finally
+        {
+            if (Directory.Exists(trashPath))
+            {
+                Directory.Delete(trashPath, true);
+            }
+            Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFile_WithExistingFileWithForcePermanent_DeletesFile()
+    {
+        // Arrange
+        var fileName = "permanent_delete.pdf";
+        var filePath = Path.Combine(_testBasePath, fileName);
+        await File.WriteAllTextAsync(filePath, "test", TestContext.Current.CancellationToken);
+
+        // Act
+        await _service.DeleteFile(fileName, forcePermanent:true);
+
+        // Assert
+        Assert.False(File.Exists(filePath));
+    }
+
+    [Fact]
+    public void Constructor_WithCustomTrashPath_UsesCustomPath()
+    {
+        // Arrange
+        var customTrashPath = Path.Combine(Path.GetTempPath(), $"CustomTrash_{Guid.NewGuid()}");
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, null);
+        Environment.SetEnvironmentVariable(EnvironmentVariables.TrashFolderPath, customTrashPath);
+
+        try
+        {
+            // Act
+            var service = new LocalFileStorageService(_hostEnvironmentMock.Object, _loggerMock.Object);
+
+            // Assert
+            Assert.True(Directory.Exists(customTrashPath));
+        }
+        finally
+        {
+            if (Directory.Exists(customTrashPath))
+            {
+                Directory.Delete(customTrashPath, true);
+            }
+            Environment.SetEnvironmentVariable(EnvironmentVariables.TrashFolderPath, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
+        }
+    }
+
+    [Fact]
+    public void Constructor_WithSoftDeleteDisabled_DoesNotCreateTrashDirectory()
+    {
+        // Arrange
+        var trashPath = Path.Combine(_testBasePath, "trash");
+        Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
+
+        try
+        {
+            // Act
+            var service = new LocalFileStorageService(_hostEnvironmentMock.Object, _loggerMock.Object);
+
+            // Assert
+            Assert.False(Directory.Exists(trashPath));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled, "1");
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFile_WithSoftDeleteDisabled_PermanentlyDeletesFile()
+    {
+        // Arrange
+        var trashPath = Path.Combine(_testBasePath, "trash");
+        var fileName = "permanent.pdf";
+        var filePath = Path.Combine(_testBasePath, fileName);
+        await File.WriteAllTextAsync(filePath, "test", TestContext.Current.CancellationToken);
+
+        // Act
+        await _service.DeleteFile(fileName, "update");
+
+        // Assert
+        Assert.False(File.Exists(filePath));
+        Assert.False(Directory.Exists(trashPath));
     }
 }

@@ -7,6 +7,8 @@ public class LocalFileStorageService : IFileStorageService
 {
     private readonly ILogger<LocalFileStorageService> _logger;
     private readonly string _basePath;
+    private readonly string _trashPath;
+    private readonly bool _softDeleteDisabled;
 
     public LocalFileStorageService(IHostEnvironment hostEnvironment, ILogger<LocalFileStorageService> logger)
     {
@@ -15,18 +17,40 @@ public class LocalFileStorageService : IFileStorageService
                                throw new InvalidOperationException(
                                    $"{EnvironmentVariables.SheetsFolderPath} environment variable must be set!");
 
-        // First check if the path is absolute and exists, if so use it directly. Otherwise, treat it as relative to the content root.
-        _basePath = Directory.Exists(sheetsFolderPath)
+        _basePath = Path.IsPathRooted(sheetsFolderPath)
             ? sheetsFolderPath
             : Path.Combine(hostEnvironment.ContentRootPath, sheetsFolderPath);
 
         logger.LogInformation("Base path: {BasePath}", _basePath);
+
+        var softDeleteDisabledValue = Environment.GetEnvironmentVariable(EnvironmentVariables.SoftDeleteDisabled);
+        _softDeleteDisabled = softDeleteDisabledValue == "1";
+
+        var trashFolderPath = Environment.GetEnvironmentVariable(EnvironmentVariables.TrashFolderPath);
+        if (string.IsNullOrEmpty(trashFolderPath))
+        {
+            _trashPath = Path.Combine(_basePath, "trash");
+        }
+        else
+        {
+            _trashPath = Path.IsPathRooted(trashFolderPath)
+                ? trashFolderPath
+                : Path.Combine(hostEnvironment.ContentRootPath, trashFolderPath);
+        }
+
+        logger.LogInformation("Trash path: {TrashPath}, Soft delete disabled: {SoftDeleteDisabled}", _trashPath, _softDeleteDisabled);
 
         try
         {
             if (!Directory.Exists(_basePath))
             {
                 Directory.CreateDirectory(_basePath);
+            }
+
+            if (!_softDeleteDisabled && !Directory.Exists(_trashPath))
+            {
+                Directory.CreateDirectory(_trashPath);
+                logger.LogInformation("Created trash directory at: {TrashPath}", _trashPath);
             }
         }
         catch (Exception e)
@@ -91,7 +115,7 @@ public class LocalFileStorageService : IFileStorageService
         return exists;
     }
 
-    public Task DeleteFile(string fileName)
+    public Task DeleteFile(string fileName, string reason = "manual", bool forcePermanent = false)
     {
         try
         {
@@ -104,8 +128,22 @@ public class LocalFileStorageService : IFileStorageService
                 throw new FileNotFoundException($"File not found: {fileName}");
             }
 
-            File.Delete(filePath);
-            _logger.LogInformation("File deleted successfully: {FileName}", fileName);
+            if (_softDeleteDisabled || forcePermanent)
+            {
+                File.Delete(filePath);
+                _logger.LogInformation("File permanently deleted: {FileName}", fileName);
+            }
+            else
+            {
+                var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmss");
+                var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(fileName);
+                var extension = Path.GetExtension(fileName);
+                var trashFileName = $"{fileNameWithoutExtension}_{timestamp}_{reason}{extension}";
+                var trashFilePath = Path.Combine(_trashPath, trashFileName);
+
+                File.Move(filePath, trashFilePath);
+                _logger.LogInformation("File soft-deleted: {FileName} -> {TrashFileName}", fileName, trashFileName);
+            }
 
             return Task.CompletedTask;
         }
@@ -116,7 +154,7 @@ public class LocalFileStorageService : IFileStorageService
         }
     }
 
-    // There is no built-in method to rename a file async, but the synchronous method is fast enough for our use case.
+    // There is no built-in method to rename a file async, but the synchronous method is fast enough for our use case as it's just a metadata change on the filesystem table.
     public void RenameFile(string oldFileName, string newFileName)
     {
         try

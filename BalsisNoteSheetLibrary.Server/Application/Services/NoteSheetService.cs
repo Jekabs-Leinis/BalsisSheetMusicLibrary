@@ -46,10 +46,10 @@ public class NoteSheetService(
         }
         catch
         {
-            // Rollback: delete the file if it was created
+            // Rollback: permanently delete the file if it was created (not soft-delete)
             if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
             {
-                await fileStorageService.DeleteFile(noteSheet.SystemFileName);
+                await fileStorageService.DeleteFile(noteSheet.SystemFileName, forcePermanent: true);
             }
             // Remove the entity from tracking
             unitOfWork.NoteSheets.Remove(noteSheet);
@@ -76,7 +76,7 @@ public class NoteSheetService(
         {
             if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
             {
-                await fileStorageService.DeleteFile(noteSheet.SystemFileName);
+                await fileStorageService.DeleteFile(noteSheet.SystemFileName, "update");
             }
 
             noteSheet.FileName = noteSheet.GetFileName();
@@ -116,7 +116,7 @@ public class NoteSheetService(
 
         if (!string.IsNullOrEmpty(noteSheet.SystemFileName))
         {
-            await fileStorageService.DeleteFile(noteSheet.SystemFileName);
+            await fileStorageService.DeleteFile(noteSheet.SystemFileName, "delete");
         }
 
         unitOfWork.NoteSheets.Remove(noteSheet);

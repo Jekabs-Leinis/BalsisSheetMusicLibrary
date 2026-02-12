@@ -4,7 +4,7 @@ using BalsisNoteSheetLibrary.Server.Infrastructure.Data.Repositories;
 
 namespace BalsisNoteSheetLibrary.Server.Infrastructure.Data.UnitOfWork;
 
-public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork, IAsyncDisposable
+public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
 {
     public INoteSheetRepository NoteSheets { get; } = new NoteSheetRepository(dbContext);
     public ISetListRepository SetLists { get; } = new SetListRepository(dbContext);
@@ -12,9 +12,4 @@ public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork, IAsyncDisposable
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default) =>
         dbContext.SaveChangesAsync(cancellationToken);
-
-    public async ValueTask DisposeAsync()
-    {
-        await dbContext.DisposeAsync();
-    }
 }

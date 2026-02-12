@@ -42,7 +42,11 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         context.Response.ContentType = "application/json";
         context.Response.StatusCode = statusCode;
         
-        var jsonResponse = JsonSerializer.Serialize(errorResponse);
+        var jsonResponse = JsonSerializer.Serialize(errorResponse, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            WriteIndented = false
+        });
         
         await context.Response.WriteAsync(jsonResponse);
     }

@@ -108,7 +108,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
         UnitOfWork.NoteSheets.Add(noteSheet);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>())).Returns(Task.CompletedTask);
+        _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>(), It.IsAny<string>(), false)).Returns(Task.CompletedTask);
 
         // Act
         await _service.DeleteNoteSheetAsync(1);
@@ -116,7 +116,7 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Assert
         var deletedNoteSheet = await UnitOfWork.NoteSheets.GetByIdAsync(1);
         Assert.Null(deletedNoteSheet);
-        _fileStorageServiceMock.Verify(x => x.DeleteFile("testfile.txt"), Times.Once);
+        _fileStorageServiceMock.Verify(x => x.DeleteFile("testfile.txt", "delete", false), Times.Once);
     }
 
     [Fact]
@@ -325,8 +325,8 @@ public class NoteSheetServiceTests : IntegrationTestBase
         // Act & Assert
         await Assert.ThrowsAsync<IOException>(() => _service.CreateNoteSheetAsync(dto, fileStream));
 
-        // Verify rollback - file should be deleted and entity should not exist
-        _fileStorageServiceMock.Verify(x => x.DeleteFile(It.IsAny<string>()), Times.Once);
+        // Verify rollback - file should be permanently deleted (not soft-deleted) and entity should not exist
+        _fileStorageServiceMock.Verify(x => x.DeleteFile(It.IsAny<string>(), It.IsAny<string>(), true), Times.Once);
         var noteSheets = await _service.GetAllNoteSheetsAsync();
         Assert.Empty(noteSheets);
     }

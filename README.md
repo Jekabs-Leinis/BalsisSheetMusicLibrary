@@ -29,38 +29,55 @@ It includes built-in admin functionality for creating and managing note sheets a
 
 1. Restore .NET dependencies:
 
-   ```powershell
+```powershell
    dotnet restore .\BalsisNoteSheetLibrary.sln
-   ```
+```
 
 2. Install client dependencies:
 
-   ```powershell
-   npm install --prefix .\balsisnotesheetlibrary.client
-   ```
+```powershell
+   npm install --prefix .\balsisnotesheetlibrary.clien
+```
 
 3. Configure environment variables:
 
     - Copy `BalsisNoteSheetLibrary.Server/.env.example` to `BalsisNoteSheetLibrary.Server/.env`
     - Fill in passwords and adjust seeding flags as needed.
+    - Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where note sheet PDFs will be stored. This should be either a relative path from the server binary (e.g., `./Sheets`) or an absolute path (e.g., `C:/BalsisSheets`).
 
    Example `.env`:
 
-   ```dotenv
-   LIB_USER_NAME=daudzasbalsis
-   LIB_USER_PASS=change-me
-   LIB_ADMIN_NAME=admin@balsis.lv
-   LIB_ADMIN_PASS=change-me
+ ```dotenv
+LIB_USER_NAME=your_user_username
+LIB_USER_PASS=
 
-   # If 1, will run the seeder on application start
-   LIB_ENABLE_SEEDERS=1
+LIB_ADMIN_NAME=your_admin_username
+LIB_ADMIN_PASS=
 
-   # If 1, will allow seeding to overwrite existing user passwords with LIB_USER_PASS and LIB_ADMIN_PASS
-   LIB_ALLOW_SEEDER_PASSWORD_RESET=0
+# If 1, will run the seeder on application start
+# Must be enabled on first run to create initial users, then should be disabled
+# Password can be changed afterwards via web interface after login
+LIB_ENABLE_SEEDERS=1
 
-   # If 1, will allow manual password reset for admin via API
-   LIB_ALLOW_MANUAL_PASSWORD_RESET=1
-   ```
+# If 1, will allow seeding to overwrite existing user passwords with LIB_USER_PASS and LIB_ADMIN_PASS
+# Used as a recovery option in case passwords are lost.
+LIB_ALLOW_SEEDER_PASSWORD_RESET=0
+
+# If 1, will allow manual password reset for admin via web interface
+# Can be disabled for public testing deployments
+LIB_ALLOW_MANUAL_PASSWORD_RESET=1
+
+# Path to the folder where the sheets are stored. Path can be either absolute or relative.
+# If relative, it must not begin with a '/' or '\', and will be relative to the binary location.
+LIB_SHEETS_FOLDER_PATH=path/to/sheets/folder
+
+# If 1, will disable soft delete functionality and permanently delete sheets instead of moving them to the trash folder.
+LIB_SOFT_DELETE_DISABLED=0
+
+# Path to the folder where the deleted sheets are moved to when soft delete is enabled. Path can be either absolute or relative to LIB_SHEETS_FOLDER_PATH.
+# If not set a default "trash" folder will be used within the sheets folder.
+LIB_TRASH_FOLDER_PATH=trash
+```
 
    > [!IMPORTANT]
    > `BalsisNoteSheetLibrary.Server/.env` is gitignored. Do not commit secrets.
@@ -80,6 +97,23 @@ It includes built-in admin functionality for creating and managing note sheets a
     - `http://localhost:5124`
 - Swagger UI: `https://localhost:7171/swagger`
 - Vite dev server (SPA proxy target): `https://localhost:5173`
+
+## Publishing
+
+To publish the app for production, use the `dotnet publish` command:
+
+```powershell
+dotnet publish .\BalsisNoteSheetLibrary.Server\BalsisNoteSheetLibrary.Server.csproj -c Release -o .\publish
+```
+or, with runtime and self-contained options for Linux:
+
+```powershell
+dotnet publish BalsisNoteSheetLibrary.Server --configuration Release --runtime linux-x64 --self-contained true -o ./publish
+```
+
+Copy the contents of the `publish` folder to your server and run the executable (`BalsisNoteSheetLibrary.Server.exe` on Windows, `BalsisNoteSheetLibrary.Server` on Linux).
+
+For deployment instructions, see [the wiki]().
 
 ## Testing
 

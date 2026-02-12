@@ -76,8 +76,6 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
             unitOfWork.SetListItems.RemoveRange(itemsToRemove);
         }
 
-        var existingItemsDict = existingItems.ToDictionary(item => item.NoteSheetId);
-
         // Update existing items and add new ones
         // Have to use a for loop to reorder the remaining and new items
         // We cannot rely on the Order property from the DTO,
@@ -85,7 +83,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         for (var i = 0; i < updatedItems.Count; i++)
         {
             var updatedItem = updatedItems[i];
-            var existingItem = existingItemsDict.GetValueOrDefault(updatedItem.NoteSheetId);
+            var existingItem = existingItems.FirstOrDefault(ei => ei.NoteSheetId == updatedItem.NoteSheetId);
 
             if (existingItem != null)
             {
@@ -139,12 +137,12 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         // Otherwise updating from two different clients without either reloading causes issues
         var reorderableLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order);
         reorderableLists.RemoveAll(sl => sl.Id == setList.Id);
-        
+
         if (reorderableLists.Count < dto.NewOrder)
         {
             throw new InvalidOperationException("New order is out of bounds");
         }
-        
+
         reorderableLists.Insert((int)dto.NewOrder, setList);
         ReorderSetLists(reorderableLists);
         unitOfWork.SetLists.UpdateRange(reorderableLists);

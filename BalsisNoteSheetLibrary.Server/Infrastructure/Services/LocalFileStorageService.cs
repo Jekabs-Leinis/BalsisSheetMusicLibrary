@@ -79,6 +79,11 @@ public class LocalFileStorageService : IFileStorageService
     
         return fullPath;
     }
+    
+    public string GetBasePath()
+    {
+        return _basePath;
+    }
 
     public async Task<string> SaveFileAsync(Stream fileStream, string fileName)
     {

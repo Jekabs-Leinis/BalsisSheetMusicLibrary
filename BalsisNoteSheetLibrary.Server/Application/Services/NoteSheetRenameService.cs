@@ -57,9 +57,8 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
             var scopedFileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
             // Intentionally not awaited, as we don't want to block on this.
             _ = SendStatus(scopedRenameHub, "start", "Pārsaukšana uzsākta.");
-            var sheets = await scopedUnitOfWork.NoteSheets.GetAllAsync();
-            var sheetsFolder = Path.Combine(scopedEnv.ContentRootPath, "Static", "Sheets");
-            await RenameAllSheets(sheets, sheetsFolder, scopedUnitOfWork, scopedFileStorageService, scopedRenameHub);
+            var sheets = await scopedUnitOfWork.NoteSheets.GetAllAsync(); ;
+            await RenameAllSheets(sheets, scopedUnitOfWork, scopedFileStorageService, scopedRenameHub);
             _ = SendStatus(scopedRenameHub, "complete", "Pāršaukšana pabeigta.");
         }
         catch (Exception ex)
@@ -68,7 +67,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         }
     }
 
-    private async Task RenameAllSheets(List<NoteSheet> sheets, string sheetsFolder, IUnitOfWork scopedUnitOfWork,
+    private async Task RenameAllSheets(List<NoteSheet> sheets, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage, IHubContext<StatusHub> scopedHub)
     {
         var total = sheets.Count;
@@ -78,7 +77,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         {
             try
             {
-                var renamed = await RenameSingleSheet(sheet, sheetsFolder, scopedUnitOfWork, fileStorage);
+                var renamed = await RenameSingleSheet(sheet, scopedUnitOfWork, fileStorage);
 
                 if (!renamed)
                 {
@@ -103,11 +102,12 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         }
     }
 
-    private async Task<bool> RenameSingleSheet(NoteSheet sheet, string sheetsFolder, IUnitOfWork scopedUnitOfWork,
+    private async Task<bool> RenameSingleSheet(NoteSheet sheet, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage)
     {
         var newFileName = sheet.GetFileName();
         var newSystemFileName = sheet.GetSystemFileName();
+        var sheetsFolder = fileStorage.GetBasePath();
         var oldPath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
         var newPath = Path.Combine(sheetsFolder, newSystemFileName);
 

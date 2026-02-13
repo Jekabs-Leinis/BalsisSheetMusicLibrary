@@ -1,4 +1,4 @@
-export class NoteSheet {
+export class SheetMusic {
   constructor(props = {}) {
     Object.assign(this, props);
   }
@@ -63,18 +63,18 @@ export class SetList {
   archivedAt;
 
   /**
-   * @param allNoteSheets {NoteSheet[]}
-   * @returns {NoteSheet[]}
+   * @param allSheetMusic {SheetMusic[]}
+   * @returns {SheetMusic[]}
    */
-  getNoteSheets(allNoteSheets) {
-    // Create a map for quick lookup of NoteSheet by id
-    const noteSheetMap = new Map(allNoteSheets.map(ns => [ns.id, ns]));
+  getSheetMusic(allSheetMusic) {
+    // Create a map for quick lookup of SheetMusic by id
+    const sheetMusicMap = new Map(allSheetMusic.map(ns => [ns.id, ns]));
     
-    // Return NoteSheets in the order of this.items by their order property
+    // Return SheetMusic in the order of this.items by their order property
     return this.items
       .slice() // avoid mutating original array
       .sort((a, b) => a.order - b.order)
-      .map(item => noteSheetMap.get(item.noteSheetId))
+      .map(item => sheetMusicMap.get(item.sheetMusicId))
       .filter(Boolean);
   }
   
@@ -92,17 +92,17 @@ export class SetListItem {
   constructor(props = {}) {
     Object.assign(this, props);
     
-    if (props.noteSheet) {
-      this.noteSheet = new NoteSheet(props.noteSheet);
+    if (props.sheetMusic) {
+      this.sheetMusic = new SheetMusic(props.sheetMusic);
     }
   }
   
   /** @type {Number} */
-  noteSheetId;
+  sheetMusicId;
   /** @type {string} */
   setListId;
   /** @type {Number} */
   order;
-  /** @type {NoteSheet} */
-  noteSheet;
+  /** @type {SheetMusic} */
+  sheetMusic;
 }

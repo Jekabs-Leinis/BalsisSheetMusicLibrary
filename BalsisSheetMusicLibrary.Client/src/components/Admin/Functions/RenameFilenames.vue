@@ -18,7 +18,7 @@ async function onConfirm() {
 
   showModal.value = false;
   try {
-    await axios.post("/api/NoteSheet/RenameAllFilenames");
+    await axios.post("/api/sheetMusic/RenameAllFilenames");
   } catch (err) {
     const message = err?.response?.data?.error || err.message;
 

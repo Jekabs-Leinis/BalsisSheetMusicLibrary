@@ -1,10 +1,10 @@
 <script setup>
 /** @type {import("vue").DefineProps<{
- noteSheets: NoteSheet[],
+ sheetMusic: SheetMusic[],
  setLists: SetList[],
  }>} */
 const props = defineProps({
-  noteSheets: Array,
+  sheetMusic: Array,
   setLists: Array,
 });
 </script>
@@ -24,7 +24,7 @@ const props = defineProps({
               <h2 class="pt-0 my-3"><b>{{ setList.title }}</b></h2>
             </li>
             <li
-              v-for="sheet in setList.getNoteSheets(props.noteSheets)"
+              v-for="sheet in setList.getSheetMusic(props.sheetMusic)"
               :key="sheet.id"
             >
               <a :href="`/api/download/${sheet.id}/${sheet.fileName}`" class="text-decoration-none" target="_blank">

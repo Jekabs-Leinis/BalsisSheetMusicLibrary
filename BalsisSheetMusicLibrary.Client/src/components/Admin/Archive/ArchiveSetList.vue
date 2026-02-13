@@ -74,9 +74,9 @@ const formatDate = (dateString) => {
           </tr>
           </thead>
           <tbody>
-          <tr v-for="item in setList.items" :key="item.noteSheetId">
+          <tr v-for="item in setList.items" :key="item.sheetMusicId">
             <td>{{ item.order + 1 }}</td>
-            <td class="text-break">{{ item.noteSheet?.getFormattedTitle() || "N/A" }}</td>
+            <td class="text-break">{{ item.sheetMusic?.getFormattedTitle() || "N/A" }}</td>
           </tr>
           </tbody>
         </table>

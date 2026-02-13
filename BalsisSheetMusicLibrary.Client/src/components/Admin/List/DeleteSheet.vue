@@ -1,10 +1,10 @@
 <script setup>
 import { computed } from "vue";
 import VModal from "@/components/Common/VModal.vue";
-import { useNoteSheetStore } from "@/stores/notesheetStore.js";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 import { useToast } from "vue-toastification";
 
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 const toast = useToast();
 
 const props = defineProps({
@@ -31,11 +31,11 @@ async function onDeleteConfirm() {
   }
 
   try {
-    await noteSheetStore.deleteNoteSheet(props.sheet.id);
+    await sheetMusicStore.deleteSheetMusic(props.sheet.id);
 
     toast.success(`Notis "${props.sheet.title}" ir veiksmīgi izdzēstas.`);
   } catch (e) {
-    console.error("Error deleting note sheet:", e);
+    console.error("Error deleting sheet music:", e);
     toast.error(`Nošu dzēšana neizdevās: ${e.message}`);
   }
 

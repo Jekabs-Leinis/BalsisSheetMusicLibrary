@@ -1,5 +1,5 @@
 <script setup>
-import { useNoteSheetStore } from "@/stores/notesheetStore";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 import router from "@/router/routes";
 import { ref, watch, onBeforeUnmount } from "vue";
 import _debounce from "lodash.debounce";
@@ -7,14 +7,14 @@ import { useAuthStore } from "@/stores/authStore.js";
 import { useToast } from "vue-toastification";
 
 const authStore = useAuthStore();
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 const toast = useToast();
 
 const isAdmin = authStore.isAuthenticated && authStore.user.isAdmin;
 const searchInput = ref("");
 
 function onSearch(query) {
-  noteSheetStore.setSearchQuery(query);
+  sheetMusicStore.setSearchQuery(query);
 }
 
 const debouncedSearch = _debounce(onSearch, 300);
@@ -22,7 +22,7 @@ const debouncedSearch = _debounce(onSearch, 300);
 watch(searchInput, (query) => debouncedSearch(query));
 
 onBeforeUnmount(() => {
-  noteSheetStore.setSearchQuery("");
+  sheetMusicStore.setSearchQuery("");
 });
 
 async function attemptLogout() {

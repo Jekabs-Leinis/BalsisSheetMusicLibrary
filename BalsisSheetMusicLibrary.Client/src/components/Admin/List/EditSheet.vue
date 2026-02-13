@@ -1,9 +1,9 @@
 <script setup>
 import { computed, ref, watch } from "vue";
 import VModal from "@/components/Common/VModal.vue";
-import { NoteSheet } from "@/models/sheetModels";
+import { SheetMusic } from "@/models/sheetModels";
 import { useToast } from "vue-toastification";
-import { useNoteSheetStore } from "@/stores/notesheetStore.js";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 
 const props = defineProps({
   sheet: {
@@ -19,14 +19,14 @@ const props = defineProps({
 const emit = defineEmits(["close", "save", "update:show"]);
 
 const toast = useToast();
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 
 const showModal = computed({
   get: () => props.show,
   set: (value) => emit("update:show", value),
 });
 
-const formData = ref(new NoteSheet());
+const formData = ref(new SheetMusic());
 const selectedFile = ref(null);
 const fileError = ref("");
 
@@ -39,9 +39,9 @@ watch(
   () => props.sheet,
   (newSheet) => {
     if (newSheet) {
-      formData.value = new NoteSheet(newSheet);
+      formData.value = new SheetMusic(newSheet);
     } else {
-      formData.value = new NoteSheet();
+      formData.value = new SheetMusic();
     }
     selectedFile.value = null;
     fileError.value = "";
@@ -124,13 +124,13 @@ async function onSave() {
   
   try {
     if (isCreateMode.value) {
-      savedSheet = await noteSheetStore.createNoteSheet(formData.value, selectedFile.value);
+      savedSheet = await sheetMusicStore.createSheetMusic(formData.value, selectedFile.value);
     } else {
-      savedSheet = await noteSheetStore.updateNoteSheet(formData.value, selectedFile.value);
+      savedSheet = await sheetMusicStore.updateSheetMusic(formData.value, selectedFile.value);
     }
     toast.success(`Notis "${savedSheet.title}" ir veiksmīgi saglabātas.`);
   } catch (e) {
-    console.error("Error saving note sheet:", e);
+    console.error("Error saving sheet music:", e);
     toast.error(`Notu saglabāšana neizdevās: ${e.message}`);
     
     return;

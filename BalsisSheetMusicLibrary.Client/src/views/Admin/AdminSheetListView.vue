@@ -1,21 +1,21 @@
 <script setup>
 import { onMounted, ref, watch, onBeforeUnmount } from "vue";
-import { useNoteSheetStore } from "@/stores/notesheetStore";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
 import DeleteSheet from "@/components/Admin/List/DeleteSheet.vue";
 import EditSheet from "@/components/Admin/List/EditSheet.vue";
 import CreateNewSheet from "@/components/Admin/List/CreateNewSheet.vue";
 import { SortDirection } from "@/models/utilModels";
 import _debounce from "lodash.debounce";
-import { NoteSheet } from "@/models/sheetModels";
+import { SheetMusic } from "@/models/sheetModels";
 import { useToast } from "vue-toastification";
 
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 const toast = useToast();
 
 onMounted(async () => {
-  await noteSheetStore.fetchNoteSheets().catch(error =>{
-    console.error("Failed to fetch note sheets:", error);
+  await sheetMusicStore.fetchSheetMusic().catch(error =>{
+    console.error("Failed to fetch sheet music:", error);
     toast.error(`Neizdevās ielādēt notis: ${error.message}`);
   });
 });
@@ -23,7 +23,7 @@ onMounted(async () => {
 const searchInput = ref("");
 
 function onSearch(query) {
-  noteSheetStore.setSearchQuery(query);
+  sheetMusicStore.setSearchQuery(query);
 }
 
 const debouncedSearch = _debounce(onSearch, 300);
@@ -31,7 +31,7 @@ const debouncedSearch = _debounce(onSearch, 300);
 watch(searchInput, (query) => debouncedSearch(query));
 
 onBeforeUnmount(() => {
-  noteSheetStore.setSearchQuery("");
+  sheetMusicStore.setSearchQuery("");
 });
 
 const showDeleteModal = ref(false);
@@ -46,11 +46,11 @@ const sortField = ref("title");
 
 const onSort = (field) => {
   sortField.value = field;
-  noteSheetStore.setSortField(field);
+  sheetMusicStore.setSortField(field);
 };
 
 const getSortIcon = () => {
-  return noteSheetStore.sortDirection === SortDirection.ASC
+  return sheetMusicStore.sortDirection === SortDirection.ASC
     ? "bi-sort-down"
     : "bi-sort-down-alt";
 };
@@ -59,8 +59,8 @@ const showEditModal = ref(false);
 const sheetToEdit = ref(null);
 
 const openEditModal = (sheetId) => {
-  const sheet = noteSheetStore.noteSheets.find((s) => s.id === sheetId);
-  sheetToEdit.value = new NoteSheet(sheet);
+  const sheet = sheetMusicStore.sheetMusic.find((s) => s.id === sheetId);
+  sheetToEdit.value = new SheetMusic(sheet);
   showEditModal.value = true;
 };
 </script>
@@ -144,7 +144,7 @@ const openEditModal = (sheetId) => {
         </thead>
         <tbody>
           <tr
-            v-for="sheet in noteSheetStore.filteredNoteSheets"
+            v-for="sheet in sheetMusicStore.filteredSheetMusic"
             :key="sheet.id"
             class="text-break"
           >
@@ -185,13 +185,13 @@ const openEditModal = (sheetId) => {
               </div>
             </td>
           </tr>
-          <tr v-if="noteSheetStore.filteredNoteSheets.length === 0">
+          <tr v-if="sheetMusicStore.filteredSheetMusic.length === 0">
             <td
               colspan="7"
               class="text-center py-3"
-              v-loading="noteSheetStore.isLoading"
+              v-loading="sheetMusicStore.isLoading"
             >
-              <template v-if="!noteSheetStore.isLoading">
+              <template v-if="!sheetMusicStore.isLoading">
                 Notis nav atrastas
               </template>
             </td>

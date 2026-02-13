@@ -51,7 +51,7 @@ const filteredSetLists = computed(() => {
 
     // Fuzzy search for song data
     return setList.items.some((item) =>
-      item.noteSheet?.getFormattedTitle().toLowerCase().match(fuzzyQuery),
+      item.sheetMusic?.getFormattedTitle().toLowerCase().match(fuzzyQuery),
     );
   });
 

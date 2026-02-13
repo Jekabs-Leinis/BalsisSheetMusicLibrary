@@ -1,10 +1,10 @@
 <script setup>
 import { computed, toRefs } from "vue";
 import SheetSearchDropdown from "@/components/Admin/EditSetLists/SheetSearchDropdown.vue";
-import { useNoteSheetStore } from "@/stores/notesheetStore";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 import { VueDraggable } from "vue-draggable-plus";
 import { SetListItem } from "@/models/sheetModels";
-import { getSheetsNotInList } from "@/services/noteSheetService.js";
+import { getSheetsNotInList } from "@/services/sheetMusicService.js";
 import EditSetListTitle from "@/components/Admin/EditSetLists/EditSetListTitle.vue";
 import { useSetListStore } from "@/stores/setlistStore.js";
 import { useToast } from "vue-toastification";
@@ -25,20 +25,20 @@ const emit = defineEmits(["archive", "delete"]);
 
 const { setList } = toRefs(props);
 
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 const setListStore = useSetListStore();
 const toast = useToast();
 
 const availableSheets = computed(() => {
-  return getSheetsNotInList(noteSheetStore.noteSheets, setList.value);
+  return getSheetsNotInList(sheetMusicStore.sheetMusic, setList.value);
 });
 
 const addSheet = async (sheet) => {
   const item = new SetListItem({
-    noteSheetId: sheet.id,
+    sheetMusicId: sheet.id,
     setListId: setList.value.id,
     order: setList.value.items.length, // Place at the end of set
-    noteSheet: sheet,
+    sheetMusic: sheet,
   });
 
   setList.value.items.push(item);
@@ -48,9 +48,9 @@ const addSheet = async (sheet) => {
   });
 };
 
-const removeItem = async (noteSheetId) => {
+const removeItem = async (sheetMusicId) => {
   setList.value.items = setList.value.items.filter(
-    (item) => item.noteSheetId !== noteSheetId,
+    (item) => item.sheetMusicId !== sheetMusicId,
   );
 
   await setListStore.saveSetList(setList.value).catch((error) => {
@@ -102,12 +102,12 @@ const moveItem = (item, newOrder) => {
         :group="`sheets-${setList.id}`"
         class="list-group sheets-list mb-3"
         handle=".sheet-drag-handle"
-        item-key="noteSheetId"
+        item-key="sheetMusicId"
         @sort="onDraggableItemMove"
       >
         <div
           v-for="item in setList.items"
-          :key="`${setList.id}-${item.noteSheetId}`"
+          :key="`${setList.id}-${item.sheetMusicId}`"
           class="list-group-item d-flex justify-content-between align-items-center"
         >
           <div class="d-flex text-break align-items-center flex-grow-1">
@@ -117,7 +117,7 @@ const moveItem = (item, newOrder) => {
             <span>
               {{ item.order + 1 }}.
               {{
-                item.noteSheet?.getFormattedTitle() || "Nosaukums nav pieejams"
+                item.sheetMusic?.getFormattedTitle() || "Nosaukums nav pieejams"
               }}
             </span>
           </div>
@@ -142,7 +142,7 @@ const moveItem = (item, newOrder) => {
           </button>
           <button
             class="btn btn-sm btn-close"
-            @click="removeItem(item.noteSheetId)"
+            @click="removeItem(item.sheetMusicId)"
           />
         </div>
       </VueDraggable>

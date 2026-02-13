@@ -2,10 +2,10 @@ import axios from "axios";
 import { SetList } from "@/models/sheetModels";
 import { ResponseError } from "@/models/errorModels.js";
 
-export async function getAllSetLists(withNoteSheets = false) {
+export async function getAllSetLists(withSheetMusic = false) {
   try {
     const response = await axios.get(`/api/setList/getAll`, {
-      params: { withNoteSheets },
+      params: { withSheetMusic },
     });
 
     return response.data.map((setList) => new SetList(setList));

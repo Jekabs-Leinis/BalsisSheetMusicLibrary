@@ -3,8 +3,8 @@ import { SortDirection } from "@/models/utilModels";
 // Latvian language collator for proper diacritic sorting
 const latvianCollator = new Intl.Collator("lv-LV");
 
-export function filterAndSortNoteSheets(
-  noteSheets,
+export function filterAndSortSheetMusic(
+  sheetMusic,
   query,
   sortField,
   sortDirection,
@@ -13,9 +13,9 @@ export function filterAndSortNoteSheets(
   const search = query.trim().toLowerCase();
 
   if (!search) {
-    filtered = [...noteSheets];
+    filtered = [...sheetMusic];
   } else {
-    filtered = noteSheets.filter((sheet) =>
+    filtered = sheetMusic.filter((sheet) =>
       sheet.getFormattedTitle().toLowerCase().includes(search),
     );
   }
@@ -47,22 +47,22 @@ export function filterAndSortNoteSheets(
   });
 }
 
-export function filterLatvianNoteSheets(noteSheets) {
-  return noteSheets.filter((sheet) => sheet.isLatvian);
+export function filterLatvianSheetMusic(sheetMusic) {
+  return sheetMusic.filter((sheet) => sheet.isLatvian);
 }
 
-export function filterForeignNoteSheets(noteSheets) {
-  return noteSheets.filter((sheet) => !sheet.isLatvian);
+export function filterForeignSheetMusic(sheetMusic) {
+  return sheetMusic.filter((sheet) => !sheet.isLatvian);
 }
 
-export function getSheetsNotInList(noteSheets, setList) {
+export function getSheetsNotInList(sheetMusic, setList) {
   if (!setList || !setList.items.length) {
-    return noteSheets;
+    return sheetMusic;
   }
 
-  const setListNoteSheetIds = new Set(
-    setList.items.map((item) => item.noteSheetId),
+  const setListSheetMusicIds = new Set(
+    setList.items.map((item) => item.sheetMusicId),
   );
 
-  return noteSheets.filter((sheet) => !setListNoteSheetIds.has(sheet.id));
+  return sheetMusic.filter((sheet) => !setListSheetMusicIds.has(sheet.id));
 }

@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue';
 import EditSheet from './EditSheet.vue';
-import { NoteSheet } from "@/models/sheetModels";
+import { SheetMusic } from "@/models/sheetModels";
 
 const showModal = ref(false);
-const emptySheet = ref(new NoteSheet());
+const emptySheet = ref(new SheetMusic());
 
 function openModal() {
   showModal.value = true;
@@ -13,7 +13,7 @@ function openModal() {
 function onSaved(sheet) {
   showModal.value = false;
   emit("sheet-created", sheet);
-  emptySheet.value = new NoteSheet(); 
+  emptySheet.value = new SheetMusic(); 
 }
 
 const emit = defineEmits(["sheet-created"]);

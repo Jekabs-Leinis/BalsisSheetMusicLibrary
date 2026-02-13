@@ -23,12 +23,12 @@ export const useSetListStore = defineStore("setlist", () => {
   /** @type {import('vue').Ref<string|null>} */
   const error = ref(null);
 
-  async function fetchSetLists(withNoteSheets = false) {
+  async function fetchSetLists(withSheetMusic = false) {
     isLoading.value = true;
     error.value = null;
 
     try {
-      const lists = await getAllSetLists(withNoteSheets);
+      const lists = await getAllSetLists(withSheetMusic);
       setLists.value = lists.sort((a, b) => a.order - b.order);
     } finally {
       isLoading.value = false;
@@ -156,7 +156,7 @@ export const useSetListStore = defineStore("setlist", () => {
     setList.items[oldIndex] = secondItem;
     setList.reorderItems();
 
-    await moveSetListItemApi(setListId, firstItem.noteSheetId, newIndex);
+    await moveSetListItemApi(setListId, firstItem.sheetMusicId, newIndex);
   }
 
   async function archiveSetList(setListId) {

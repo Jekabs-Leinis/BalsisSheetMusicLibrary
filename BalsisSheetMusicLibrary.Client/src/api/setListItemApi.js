@@ -1,11 +1,11 @@
 import axios from "axios";
 import { ResponseError } from "@/models/errorModels.js";
 
-export async function moveSetListItem(setListId, noteSheetId, newOrder) {
+export async function moveSetListItem(setListId, sheetMusicId, newOrder) {
   try {
     const response = await axios.post(`/api/setListItem/move`, {
       setListId,
-      noteSheetId,
+      sheetMusicId,
       newOrder,
     });
 

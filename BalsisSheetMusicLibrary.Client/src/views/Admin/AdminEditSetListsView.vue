@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useSetListStore } from "@/stores/setlistStore";
-import { useNoteSheetStore } from "@/stores/notesheetStore";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 import EditSetList from "@/components/Admin/EditSetLists/EditSetList.vue";
 import { VueDraggable } from "vue-draggable-plus";
 import AdminHeader from "@/components/Admin/AdminHeader.vue";
@@ -11,7 +11,7 @@ import { useToast } from "vue-toastification";
 
 // Initialize stores
 const setListStore = useSetListStore();
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 const toast = useToast();
 
 const isInitializing = ref(true);
@@ -19,7 +19,7 @@ const isInitializing = ref(true);
 onMounted(async () => {
   await Promise.all([
     setListStore.fetchSetLists(true),
-    noteSheetStore.fetchNoteSheets(),
+    sheetMusicStore.fetchSheetMusic(),
   ])
     .then(() => {
       isInitializing.value = false;
@@ -115,10 +115,10 @@ const onArchiveConfirmed = (setList) => {
       </div>
 
       <!-- Error messages -->
-      <div v-if="setListStore.error || noteSheetStore.error" class="row">
+      <div v-if="setListStore.error || sheetMusicStore.error" class="row">
         <div class="col-12">
           <div class="alert alert-danger">
-            {{ setListStore.error || noteSheetStore.error }}
+            {{ setListStore.error || sheetMusicStore.error }}
           </div>
         </div>
       </div>

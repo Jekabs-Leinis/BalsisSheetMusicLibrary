@@ -1,20 +1,20 @@
 <script setup>
 import SheetListHeader from "@/components/SheetList/SheetListHeader.vue";
 import { onMounted } from "vue";
-import SetListNoteList from "@/components/SheetList/SetListNoteList.vue";
-import NoteSheetList from "@/components/SheetList/NoteSheetList.vue";
-import { useNoteSheetStore } from "@/stores/notesheetStore";
+import SetListContentsList from "@/components/SheetList/SetListContentsList.vue";
+import SheetMusicList from "@/components/SheetList/SheetMusicList.vue";
+import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 import { SortDirection } from "@/models/utilModels";
 import { useSetListStore } from "@/stores/setlistStore.js";
 import { useToast } from "vue-toastification";
 
-const noteSheetStore = useNoteSheetStore();
+const sheetMusicStore = useSheetMusicStore();
 const setListStore = useSetListStore();
 const toast = useToast();
 
 onMounted(async () => {
   await Promise.all([
-    noteSheetStore.fetchNoteSheets(),
+    sheetMusicStore.fetchSheetMusic(),
     setListStore.fetchSetLists(),
   ]).catch((error) => {
     console.error("Error loading sheets or set lists:", error);
@@ -22,32 +22,32 @@ onMounted(async () => {
   });
 
   // Reset sorting to default as user might navigate here from admin view with different sorting
-  noteSheetStore.setSortField("title", false);
-  noteSheetStore.setSortDirection(SortDirection.ASC);
+  sheetMusicStore.setSortField("title", false);
+  sheetMusicStore.setSortDirection(SortDirection.ASC);
 });
 </script>
 
 <template>
   <SheetListHeader />
-  <SetListNoteList
+  <SetListContentsList
     id="active-sheets"
     v-loading="setListStore.isLoading"
-    :note-sheets="noteSheetStore.filteredNoteSheets"
+    :sheet-music="sheetMusicStore.filteredSheetMusic"
     :set-lists="setListStore.setLists"
   />
   <div id="lv-sheets">
-    <div class="container" v-loading="noteSheetStore.isLoading">
-      <NoteSheetList
+    <div class="container" v-loading="sheetMusicStore.isLoading">
+      <SheetMusicList
         title="Latviešu skaņdarbi"
-        :note-sheets="noteSheetStore.filteredLatvianNoteSheets"
+        :sheet-music="sheetMusicStore.filteredLatvianSheetMusic"
       />
     </div>
   </div>
   <div id="foreign-sheets">
-    <div class="container" v-loading="noteSheetStore.isLoading">
-      <NoteSheetList
+    <div class="container" v-loading="sheetMusicStore.isLoading">
+      <SheetMusicList
         title="Ārzemju skaņdarbi"
-        :note-sheets="noteSheetStore.filteredForeignNoteSheets"
+        :sheet-music="sheetMusicStore.filteredForeignSheetMusic"
       />
     </div>
   </div>

@@ -2,7 +2,7 @@
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 const props = defineProps({
-  /** @type {NoteSheet[]} */
+  /** @type {SheetMusic[]} */
   sheets: {
     type: Array,
     required: true,
@@ -14,7 +14,7 @@ const emit = defineEmits(["select"]);
 const searchQuery = ref("");
 const showDropdown = ref(false);
 
-/** @type {NoteSheet[]} */
+/** @type {SheetMusic[]} */
 const filteredSheets = computed(() => {
   if (!searchQuery.value.trim()) return props.sheets;
 

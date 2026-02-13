@@ -1,8 +1,8 @@
-# BalsisNoteSheetLibrary
+# BalsisSheetMusicLibrary
 
-Balsis Note Sheet Library is a web application for choirists from choir **Balsis** to store note sheets (sheet music) and organize them into setlists.
+Balsis Note Sheet Library is a web SPA for choirists from choir **Balsis** to store note sheets (sheet music) and organize them into setlists.
 
-It includes built-in admin functionality for creating and managing note sheets and setlists.
+It includes a 
 
 ## Tech stack
 
@@ -30,18 +30,18 @@ It includes built-in admin functionality for creating and managing note sheets a
 1. Restore .NET dependencies:
 
 ```powershell
-   dotnet restore .\BalsisNoteSheetLibrary.sln
+   dotnet restore .\BalsisSheetMusicLibrary.sln
 ```
 
 2. Install client dependencies:
 
 ```powershell
-   npm install --prefix .\balsisnotesheetlibrary.clien
+   npm install --prefix .\BalsisSheetMusicLibrary.clien
 ```
 
 3. Configure environment variables:
 
-    - Copy `BalsisNoteSheetLibrary.Server/.env.example` to `BalsisNoteSheetLibrary.Server/.env`
+    - Copy `BalsisSheetMusicLibrary.Server/.env.example` to `BalsisSheetMusicLibrary.Server/.env`
     - Fill in passwords and adjust seeding flags as needed.
     - Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where note sheet PDFs will be stored. This should be either a relative path from the server binary (e.g., `./Sheets`) or an absolute path (e.g., `C:/BalsisSheets`).
 
@@ -80,12 +80,12 @@ LIB_TRASH_FOLDER_PATH=trash
 ```
 
    > [!IMPORTANT]
-   > `BalsisNoteSheetLibrary.Server/.env` is gitignored. Do not commit secrets.
+   > `BalsisSheetMusicLibrary.Server/.env` is intentionally gitignored. Do not commit secrets.
 
 4. Run the app:
 
    ```powershell
-   dotnet run --project .\BalsisNoteSheetLibrary.Server\BalsisNoteSheetLibrary.Server.csproj
+   dotnet run --project .\BalsisSheetMusicLibrary.Server\BalsisSheetMusicLibrary.Server.csproj
    ```
 
    This uses the ASP.NET Core SPA proxy to start the Vite dev server automatically (`npm run dev`).
@@ -103,15 +103,15 @@ LIB_TRASH_FOLDER_PATH=trash
 To publish the app for production, use the `dotnet publish` command:
 
 ```powershell
-dotnet publish .\BalsisNoteSheetLibrary.Server\BalsisNoteSheetLibrary.Server.csproj -c Release -o .\publish
+dotnet publish .\BalsisSheetMusicLibrary.Server\BalsisSheetMusicLibrary.Server.csproj -c Release -o .\publish
 ```
 or, with runtime and self-contained options for Linux:
 
 ```powershell
-dotnet publish .\BalsisNoteSheetLibrary.Server\BalsisNoteSheetLibrary.Server.csproj --configuration Release --runtime linux-x64 --self-contained true -o ./publish
+dotnet publish .\BalsisSheetMusicLibrary.Server\BalsisSheetMusicLibrary.Server.csproj --configuration Release --runtime linux-x64 --self-contained true -o ./publish
 ```
 
-Copy the contents of the `publish` folder to your server and run the executable (`BalsisNoteSheetLibrary.Server.exe` on Windows, `BalsisNoteSheetLibrary.Server` on Linux).
+Copy the contents of the `publish` folder to your server and run the executable (`BalsisSheetMusicLibrary.Server.exe` on Windows, `BalsisSheetMusicLibrary.Server` on Linux).
 
 For deployment instructions, see [the wiki]().
 
@@ -122,18 +122,18 @@ This repository uses **xUnit** for tests, with **Moq** for mocking.
 Run all tests:
 
 ```powershell
-dotnet test .\BalsisNoteSheetLibrary.sln
+dotnet test .\BalsisSheetMusicLibrary.sln
 ```
 
 Collect coverage (via `coverlet.collector` / .NET test data collector):
 
 ```powershell
-dotnet test .\BalsisNoteSheetLibrary.sln --collect:"XPlat Code Coverage"
+dotnet test .\BalsisSheetMusicLibrary.sln --collect:"XPlat Code Coverage"
 ```
 
 Notes:
 
-- Unit and integration tests live in `BalsisNoteSheetLibrary.Tests`.
+- Unit and integration tests live in `BalsisSheetMusicLibrary.Tests`.
 - Project guidance:
     - Unit testing guidelines: `Docs/ForLLMs/Guidelines/UnitTestingGuidelines.md`
     - Integration testing guidelines: `Docs/ForLLMs/Guidelines/IntegrationTestingGuidelines.md`
@@ -150,7 +150,7 @@ Notes:
 
 ```text
 BalsisNotis/
-  BalsisNoteSheetLibrary.Server/      # ASP.NET Core backend (API + SPA proxy)
+  BalsisSheetMusicLibrary.Server/      # ASP.NET Core backend (API + SPA proxy)
     Api/
     Application/
     Domain/
@@ -158,10 +158,10 @@ BalsisNotis/
     Properties/
     Static/
       Sheets/                         # PDF files stored on disk
-  BalsisNoteSheetLibrary.Tests/       # xUnit test project
+  BalsisSheetMusicLibrary.Tests/       # xUnit test project
     Integration/
     Unit/
-  balsisnotesheetlibrary.client/      # Vue 3 + Vite frontend
+  BalsisSheetMusicLibrary.Client/      # Vue 3 + Vite frontend
     src/
       api/
       assets/

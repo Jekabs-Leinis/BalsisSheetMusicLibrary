@@ -5,7 +5,7 @@ This document outlines the steps to deploy the self-contained Linux x64 release 
 * Access to a self-contained release build. Download from [Releases]() or build your own using:
 
 ```bash
-dotnet publish BalsisNoteSheetLibrary.Server --configuration Release --runtime linux-x64 --self-contained true -o ./publish
+dotnet publish BalsisSheetMusicLibrary.Server --configuration Release --runtime linux-x64 --self-contained true -o ./publish
 ```
 * A valid DNS entry pointing to your VPS IP address.
 
@@ -33,12 +33,12 @@ sudo apt install nginx ufw curl tar unzip -y
 Create directory
 
 ```bash
-sudo mkdir -p /var/www/BalsisNoteSheetLibrary
+sudo mkdir -p /var/www/BalsisSheetMusicLibrary
 ```
 Set ownership to www-data (Nginx default user)
 
 ```bash
-sudo chown -R www-data:www-data /var/www/BalsisNoteSheetLibrary
+sudo chown -R www-data:www-data /var/www/BalsisSheetMusicLibrary
 ```
 
 ---
@@ -52,7 +52,7 @@ You can deploy the files by downloading them directly from GitHub Releases or by
 Navigate to the app directory:
 
 ```bash
-cd /var/www/BalsisNoteSheetLibrary
+cd /var/www/BalsisSheetMusicLibrary
 ```
 
 Download the release (replace <GITHUB_RELEASE_URL> with the real URL). Run the command as the `www-data` user:
@@ -80,7 +80,7 @@ If building locally, upload the contents of your `./publish` folder.
 Run this from your LOCAL machine:
 
 ```bash
-scp -r ./publish/* user@<YOUR_VPS_IP>:/var/www/BalsisNoteSheetLibrary
+scp -r ./publish/* user@<YOUR_VPS_IP>:/var/www/BalsisSheetMusicLibrary
 ```
 
 ### Final Permissions Check
@@ -90,13 +90,13 @@ Ensure the main executable has run permissions:
 Make the binary executable:
 
 ```bash
-sudo chmod +x /var/www/BalsisNoteSheetLibrary/BalsisNoteSheetLibrary.Server
+sudo chmod +x /var/www/BalsisSheetMusicLibrary/BalsisSheetMusicLibrary.Server
 ```
 
 Ensure `www-data` owns the files (if uploaded via SCP as root/user):
 
 ```bash
-sudo chown -R www-data:www-data /var/www/BalsisNoteSheetLibrary
+sudo chown -R www-data:www-data /var/www/BalsisSheetMusicLibrary
 ```
 
 ---
@@ -108,7 +108,7 @@ Configure Systemd to manage the application process. This ensures the app restar
 Create the service file:
 
 ```bash
-sudo nano /etc/systemd/system/balsisnotesheetlibrary.service
+sudo nano /etc/systemd/system/BalsisSheetMusicLibrary.service
 ```
 
 Paste the following configuration verbatim into that file:
@@ -118,11 +118,11 @@ Paste the following configuration verbatim into that file:
 Description = Balsis Note Sheet Library
 
 [Service]
-WorkingDirectory = /var/www/BalsisNoteSheetLibrary
-ExecStart = /var/www/BalsisNoteSheetLibrary/BalsisNoteSheetLibrary.Server
+WorkingDirectory = /var/www/BalsisSheetMusicLibrary
+ExecStart = /var/www/BalsisSheetMusicLibrary/BalsisSheetMusicLibrary.Server
 Restart = always
 RestartSec = 10
-SyslogIdentifier = BalsisNoteSheetLibrary
+SyslogIdentifier = BalsisSheetMusicLibrary
 User = www-data
 Environment="ASPNETCORE_ENVIRONMENT=Production"
 Environment="DOTNET_PRINT_TELEMETRY_MESSAGE=false"
@@ -144,13 +144,13 @@ sudo systemctl daemon-reload
 Enable the service to start on boot:
 
 ```bash
-sudo systemctl enable balsisnotesheetlibrary.service
+sudo systemctl enable BalsisSheetMusicLibrary.service
 ```
 
 Start the service immediately:
 
 ```bash
-sudo systemctl start balsisnotesheetlibrary.service
+sudo systemctl start BalsisSheetMusicLibrary.service
 ```
 
 ---
@@ -162,7 +162,7 @@ Configure Nginx to proxy HTTP requests to the Kestrel server running on localhos
 Create the site configuration file:
 
 ```bash
-sudo nano /etc/nginx/sites-available/balsisnotesheetlibrary
+sudo nano /etc/nginx/sites-available/BalsisSheetMusicLibrary
 ```
 
 Replace the `server_name` values with your actual domain (for example: `example.com www.example.com`).
@@ -190,7 +190,7 @@ Enable the site and restart Nginx by running these commands one at a time.
 Create a symbolic link to enable the site:
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/balsisnotesheetlibrary /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/BalsisSheetMusicLibrary /etc/nginx/sites-enabled/
 ```
 
 Test Nginx configuration syntax:
@@ -233,8 +233,8 @@ sudo ufw enable
 
 The application uses a local SQLite database named `app.db` located in the application directory.
 
-* **Persistence:** Ensure `app.db` is present in `/var/www/BalsisNoteSheetLibrary`.
-* **Backups:** Regularly back up `/var/www/BalsisNoteSheetLibrary/app.db`.
+* **Persistence:** Ensure `app.db` is present in `/var/www/BalsisSheetMusicLibrary`.
+* **Backups:** Regularly back up `/var/www/BalsisSheetMusicLibrary/app.db`.
 * **Updates:** When deploying a new version, **DO NOT** overwrite `app.db` if you want to keep existing data.
 
 ---
@@ -252,7 +252,7 @@ curl -I http://localhost:5000
 3.  Check service status:
 
 ```bash
-sudo systemctl status balsisnotesheetlibrary.service
+sudo systemctl status BalsisSheetMusicLibrary.service
 ```
 
 ---
@@ -264,7 +264,7 @@ If the application is not accessible, check the following.
 A. Application Logs — view the output from the .NET application:
 
 ```bash
-sudo journalctl -u balsisnotesheetlibrary -f
+sudo journalctl -u BalsisSheetMusicLibrary -f
 ```
 
 B. Nginx Error Logs — check for proxy connection errors:
@@ -282,7 +282,7 @@ sudo ss -ltnp | grep 5000
 D. Permission Issues — ensure the User in the systemd file matches the file owner. The following should show `www-data:www-data` as the owner/group:
 
 ```bash
-ls -la /var/www/BalsisNoteSheetLibrary
+ls -la /var/www/BalsisSheetMusicLibrary
 ```
 
 ---

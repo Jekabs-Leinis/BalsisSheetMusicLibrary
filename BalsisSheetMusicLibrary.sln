@@ -1,0 +1,42 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalsisSheetMusicLibrary.Server", "BalsisSheetMusicLibrary.Server\BalsisSheetMusicLibrary.Server.csproj", "{6C325501-1DE6-470E-9379-FAC9AE2A8249}"
+EndProject
+Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "BalsisSheetMusicLibrary.Client", "BalsisSheetMusicLibrary.Client\BalsisSheetMusicLibrary.Client.esproj", "{AE2F7871-40C2-4994-8884-0B5629DDE135}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BalsisSheetMusicLibrary.Tests", "BalsisSheetMusicLibrary.Tests\BalsisSheetMusicLibrary.Tests.csproj", "{297C72EE-9E8B-4EE0-B1B7-760E8C921810}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6C325501-1DE6-470E-9379-FAC9AE2A8249} = {6C325501-1DE6-470E-9379-FAC9AE2A8249}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6C325501-1DE6-470E-9379-FAC9AE2A8249}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C325501-1DE6-470E-9379-FAC9AE2A8249}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C325501-1DE6-470E-9379-FAC9AE2A8249}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C325501-1DE6-470E-9379-FAC9AE2A8249}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE2F7871-40C2-4994-8884-0B5629DDE135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE2F7871-40C2-4994-8884-0B5629DDE135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE2F7871-40C2-4994-8884-0B5629DDE135}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{AE2F7871-40C2-4994-8884-0B5629DDE135}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE2F7871-40C2-4994-8884-0B5629DDE135}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE2F7871-40C2-4994-8884-0B5629DDE135}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{297C72EE-9E8B-4EE0-B1B7-760E8C921810}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+		GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {69478B5C-26FD-453D-A6C1-6FAB46382657}
+		EndGlobalSection
+EndGlobal

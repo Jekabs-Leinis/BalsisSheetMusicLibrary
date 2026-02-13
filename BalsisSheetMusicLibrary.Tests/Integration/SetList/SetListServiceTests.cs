@@ -173,18 +173,18 @@ public class SetListServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetAllSetListsAsync_WithNoteSheetsTrue_ReturnsSetListsWithItems()
+    public async Task GetAllSetListsAsync_WithSheetMusicTrue_ReturnsSetListsWithItems()
     {
         // Arrange
         var setList = await _service.CreateSetListAsync(new CreateSetListDto { Title = "With Items" });
-        var noteSheet = new Entities.NoteSheet
+        var sheetMusic = new Entities.SheetMusic
         {
-            Title = "NoteSheet 1"
+            Title = "SheetMusic 1"
         };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         // Add an item manually
-        var item = new Entities.SetListItem { SetListId = setList.Id, NoteSheetId = noteSheet.Id, Order = 0 };
+        var item = new Entities.SetListItem { SetListId = setList.Id, SheetMusicId = sheetMusic.Id, Order = 0 };
         UnitOfWork.SetListItems.Add(item);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
@@ -195,7 +195,7 @@ public class SetListServiceTests : IntegrationTestBase
         var found = all.FirstOrDefault(s => s.Id == setList.Id);
         Assert.NotNull(found);
         Assert.NotEmpty(found.Items);
-        Assert.Equal(1u, found.Items[0].NoteSheetId);
+        Assert.Equal(1u, found.Items[0].SheetMusicId);
     }
 
     [Fact]
@@ -218,17 +218,17 @@ public class SetListServiceTests : IntegrationTestBase
     {
         // Arrange
         var setList = await _service.CreateSetListAsync(new CreateSetListDto { Title = "With Items" });
-        var noteSheet1 = new Entities.NoteSheet { Title = "NoteSheet 1" };
-        var noteSheet2 = new Entities.NoteSheet { Title = "NoteSheet 2" };
-        var noteSheet3 = new Entities.NoteSheet
+        var sheetMusic1 = new Entities.SheetMusic { Title = "SheetMusic 1" };
+        var sheetMusic2 = new Entities.SheetMusic { Title = "SheetMusic 2" };
+        var sheetMusic3 = new Entities.SheetMusic
         {
-            Title = "NoteSheet 3"
+            Title = "SheetMusic 3"
         };
-        UnitOfWork.NoteSheets.AddRange([noteSheet1, noteSheet2, noteSheet3]);
+        UnitOfWork.SheetMusic.AddRange([sheetMusic1, sheetMusic2, sheetMusic3]);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var item1 = new Entities.SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet1.Id, Order = 0 };
-        var item2 = new Entities.SetListItem { SetListId = setList.Id!.Value, NoteSheetId = noteSheet2.Id, Order = 1 };
+        var item1 = new Entities.SetListItem { SetListId = setList.Id!.Value, SheetMusicId = sheetMusic1.Id, Order = 0 };
+        var item2 = new Entities.SetListItem { SetListId = setList.Id!.Value, SheetMusicId = sheetMusic2.Id, Order = 1 };
         UnitOfWork.SetListItems.Add(item1);
         UnitOfWork.SetListItems.Add(item2);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
@@ -240,8 +240,8 @@ public class SetListServiceTests : IntegrationTestBase
             Title = "Updated",
             Items =
             [
-                new UpdateSetListItemDto { NoteSheetId = noteSheet2.Id!.Value, Order = 0 }, // item2 moved to first
-                new UpdateSetListItemDto { NoteSheetId = noteSheet3.Id!.Value, Order = 1 }
+                new UpdateSetListItemDto { SheetMusicId = sheetMusic2.Id!.Value, Order = 0 }, // item2 moved to first
+                new UpdateSetListItemDto { SheetMusicId = sheetMusic3.Id!.Value, Order = 1 }
             ]
         };
 
@@ -250,8 +250,8 @@ public class SetListServiceTests : IntegrationTestBase
 
         // Assert
         Assert.Equal(2, result.Items.Count);
-        Assert.Equal(2u, result.Items[0].NoteSheetId); // item2 first
-        Assert.Equal(3u, result.Items[1].NoteSheetId); // new item
+        Assert.Equal(2u, result.Items[0].SheetMusicId); // item2 first
+        Assert.Equal(3u, result.Items[1].SheetMusicId); // new item
     }
 
     [Fact]

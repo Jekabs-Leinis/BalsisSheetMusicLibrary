@@ -6,23 +6,23 @@ public class BaseRepositoryTests : IntegrationTestBase
     public async Task GetByKeysAsync_WithValidKeys_ReturnsEntity()
     {
         // Arrange
-        var noteSheet = new Server.Domain.Entities.NoteSheet { Id = 1, Title = "Test" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Server.Domain.Entities.SheetMusic { Id = 1, Title = "Test" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await UnitOfWork.NoteSheets.GetByKeysAsync(1u);
+        var result = await UnitOfWork.SheetMusic.GetByKeysAsync(1u);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(noteSheet.Title, result.Title);
+        Assert.Equal(sheetMusic.Title, result.Title);
     }
 
     [Fact]
     public async Task GetByKeysAsync_WithInvalidKeys_ReturnsNull()
     {
         // Act
-        var result = await UnitOfWork.NoteSheets.GetByKeysAsync(999u);
+        var result = await UnitOfWork.SheetMusic.GetByKeysAsync(999u);
 
         // Assert
         Assert.Null(result);
@@ -32,15 +32,15 @@ public class BaseRepositoryTests : IntegrationTestBase
     public async Task GetAsync_WithFilter_ReturnsFilteredEntities()
     {
         // Arrange
-        UnitOfWork.NoteSheets.AddRange([
-            new Server.Domain.Entities.NoteSheet { Title = "A" },
-            new Server.Domain.Entities.NoteSheet { Title = "B" },
-            new Server.Domain.Entities.NoteSheet { Title = "C" }
+        UnitOfWork.SheetMusic.AddRange([
+            new Server.Domain.Entities.SheetMusic { Title = "A" },
+            new Server.Domain.Entities.SheetMusic { Title = "B" },
+            new Server.Domain.Entities.SheetMusic { Title = "C" }
         ]);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await UnitOfWork.NoteSheets.GetAsync(filter: ns => ns.Title == "B");
+        var result = await UnitOfWork.SheetMusic.GetAsync(filter: ns => ns.Title == "B");
 
         // Assert
         Assert.Single(result);
@@ -51,15 +51,15 @@ public class BaseRepositoryTests : IntegrationTestBase
     public async Task GetAsync_WithOrderByDescending_ReturnsOrderedEntities()
     {
         // Arrange
-        UnitOfWork.NoteSheets.AddRange([
-            new Server.Domain.Entities.NoteSheet { Title = "A" },
-            new Server.Domain.Entities.NoteSheet { Title = "C" },
-            new Server.Domain.Entities.NoteSheet { Title = "B" }
+        UnitOfWork.SheetMusic.AddRange([
+            new Server.Domain.Entities.SheetMusic { Title = "A" },
+            new Server.Domain.Entities.SheetMusic { Title = "C" },
+            new Server.Domain.Entities.SheetMusic { Title = "B" }
         ]);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await UnitOfWork.NoteSheets.GetAsync(
+        var result = await UnitOfWork.SheetMusic.GetAsync(
             orderBy: ns => ns.Title,
             orderByDescending: true
         );
@@ -75,16 +75,16 @@ public class BaseRepositoryTests : IntegrationTestBase
     public async Task GetAsync_WithIncludeProperties_IncludesRelatedEntities()
     {
         // Arrange
-        var noteSheet = new Server.Domain.Entities.NoteSheet { Id = 1, Title = "Test" };
+        var sheetMusic = new Server.Domain.Entities.SheetMusic { Id = 1, Title = "Test" };
         var setList = new Server.Domain.Entities.SetList { Id = 1, Title = "My Set" };
         var setListItem = new Server.Domain.Entities.SetListItem
         {
             SetListId = 1,
-            NoteSheetId = 1,
+            SheetMusicId = 1,
             Order = 1
         };
         
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         UnitOfWork.SetLists.Add(setList);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         
@@ -93,14 +93,14 @@ public class BaseRepositoryTests : IntegrationTestBase
 
         // Act
         var result = await UnitOfWork.SetListItems.GetAsync(
-            includeProperties: ["NoteSheet", "SetList"]
+            includeProperties: ["SheetMusic", "SetList"]
         );
 
         // Assert
         Assert.Single(result);
-        Assert.NotNull(result[0].NoteSheet);
+        Assert.NotNull(result[0].SheetMusic);
         Assert.NotNull(result[0].SetList);
-        Assert.Equal("Test", result[0].NoteSheet.Title);
+        Assert.Equal("Test", result[0].SheetMusic.Title);
         Assert.Equal("My Set", result[0].SetList.Title);
     }
 
@@ -108,12 +108,12 @@ public class BaseRepositoryTests : IntegrationTestBase
     public async Task GetAsync_WithNoTracking_ReturnsDetachedEntities()
     {
         // Arrange
-        var noteSheet = new Server.Domain.Entities.NoteSheet { Id = 1, Title = "Test" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Server.Domain.Entities.SheetMusic { Id = 1, Title = "Test" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await UnitOfWork.NoteSheets.GetAsync(withTracking: false);
+        var result = await UnitOfWork.SheetMusic.GetAsync(withTracking: false);
 
         // Assert
         Assert.Single(result);

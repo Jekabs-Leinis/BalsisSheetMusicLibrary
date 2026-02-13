@@ -11,46 +11,57 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BalsisSheetMusicLibrary.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240411191551_CreateNoteSheetModels")]
-    partial class CreateNoteSheetModels
+    [Migration("20260208011105_RenameFilenameToFileNameInSheetMusic")]
+    partial class RenameFilenameToFileNameInSheetMusic
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.3");
+            modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Models.NoteSheet", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Author")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Filename")
+                    b.Property<string>("FileName")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool?>("IsLatvian")
+                    b.Property<bool>("IsLatvian")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Lyricist")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SystemFileName")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Title")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Year")
+                    b.Property<uint?>("Year")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.ToTable("NoteSheets");
+                    b.ToTable("SheetMusic");
                 });
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Models.SetList", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SetList", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<uint>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime?>("ArchivedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<uint?>("Order")
@@ -64,20 +75,20 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                     b.ToTable("SetLists");
                 });
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Models.SetListItem", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SetListItem", b =>
                 {
-                    b.Property<string>("SetListId")
-                        .HasColumnType("TEXT");
+                    b.Property<uint>("SetListId")
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("NoteSheetId")
-                        .HasColumnType("TEXT");
+                    b.Property<uint>("SheetMusicId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<uint?>("Order")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("SetListId", "NoteSheetId");
+                    b.HasKey("SetListId", "SheetMusicId");
 
-                    b.HasIndex("NoteSheetId");
+                    b.HasIndex("SheetMusicId");
 
                     b.ToTable("SetListItems");
                 });
@@ -274,21 +285,21 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Models.SetListItem", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SetListItem", b =>
                 {
-                    b.HasOne("BalsisSheetMusicLibrary.Server.Models.NoteSheet", "NoteSheet")
+                    b.HasOne("BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic", "SheetMusic")
                         .WithMany("SetListItems")
-                        .HasForeignKey("NoteSheetId")
+                        .HasForeignKey("SheetMusicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BalsisSheetMusicLibrary.Server.Models.SetList", "SetList")
+                    b.HasOne("BalsisSheetMusicLibrary.Server.Domain.Entities.SetList", "SetList")
                         .WithMany("Items")
                         .HasForeignKey("SetListId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NoteSheet");
+                    b.Navigation("SheetMusic");
 
                     b.Navigation("SetList");
                 });
@@ -344,12 +355,12 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Models.NoteSheet", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic", b =>
                 {
                     b.Navigation("SetListItems");
                 });
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Models.SetList", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SetList", b =>
                 {
                     b.Navigation("Items");
                 });

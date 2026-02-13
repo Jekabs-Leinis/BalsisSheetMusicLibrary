@@ -6,7 +6,7 @@ namespace BalsisSheetMusicLibrary.Server.Infrastructure.Data.UnitOfWork;
 
 public class UnitOfWork(AppDbContext dbContext) : IUnitOfWork
 {
-    public INoteSheetRepository NoteSheets { get; } = new NoteSheetRepository(dbContext);
+    public ISheetMusicRepository SheetMusic { get; } = new SheetMusicRepository(dbContext);
     public ISetListRepository SetLists { get; } = new SetListRepository(dbContext);
     public ISetListItemRepository SetListItems { get; } = new SetListItemRepository(dbContext);
 

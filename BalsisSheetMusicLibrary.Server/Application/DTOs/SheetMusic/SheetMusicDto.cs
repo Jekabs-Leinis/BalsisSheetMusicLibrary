@@ -1,6 +1,6 @@
-namespace BalsisSheetMusicLibrary.Server.Application.DTOs.NoteSheet;
+namespace BalsisSheetMusicLibrary.Server.Application.DTOs.SheetMusic;
 
-public class NoteSheetDto
+public class SheetMusicDto
 {
     public uint? Id { get; set; }
     public string? Title { get; set; }
@@ -11,9 +11,9 @@ public class NoteSheetDto
     public string? SystemFileName { get; set; }
     public bool IsLatvian { get; set; }
 
-    public static NoteSheetDto FromEntity(Domain.Entities.NoteSheet entity)
+    public static SheetMusicDto FromEntity(Domain.Entities.SheetMusic entity)
     {
-        return new NoteSheetDto
+        return new SheetMusicDto
         {
             Id = entity.Id,
             Title = entity.Title,

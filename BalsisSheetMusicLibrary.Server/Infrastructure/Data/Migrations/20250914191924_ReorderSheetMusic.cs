@@ -5,14 +5,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BalsisSheetMusicLibrary.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class ReorderNoteSheets : Migration
+    public partial class ReorderSheetMusic : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Create a new table with the desired column order
             migrationBuilder.CreateTable(
-                name: "NoteSheets_temp",
+                name: "SheetMusic_temp",
                 columns: table => new
                 {
                     Id = table.Column<uint>(type: "INTEGER", nullable: false)
@@ -27,21 +27,21 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NoteSheets", x => x.Id);
+                    table.PrimaryKey("PK_SheetMusic", x => x.Id);
                 });
 
             // Copy data from old table to new table
             migrationBuilder.Sql(@"
-                INSERT INTO NoteSheets_temp (Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian)
-                SELECT Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian FROM NoteSheets;");
+                INSERT INTO SheetMusic_temp (Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian)
+                SELECT Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian FROM SheetMusic;");
 
             // Drop the old table
-            migrationBuilder.DropTable(name: "NoteSheets");
+            migrationBuilder.DropTable(name: "SheetMusic");
 
             // Rename the new table
             migrationBuilder.RenameTable(
-                name: "NoteSheets_temp",
-                newName: "NoteSheets");
+                name: "SheetMusic_temp",
+                newName: "SheetMusic");
         }
 
         /// <inheritdoc />
@@ -49,7 +49,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
         {
             // Revert to the original column order if needed
             migrationBuilder.CreateTable(
-                name: "NoteSheets_temp",
+                name: "SheetMusic_temp",
                 columns: table => new
                 {
                     Id = table.Column<uint>(type: "INTEGER", nullable: false)
@@ -64,21 +64,21 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NoteSheets", x => x.Id);
+                    table.PrimaryKey("PK_SheetMusic", x => x.Id);
                 });
 
             // Copy data back to the original order
             migrationBuilder.Sql(@"
-                INSERT INTO NoteSheets_temp (Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian)
-                SELECT Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian FROM NoteSheets;");
+                INSERT INTO SheetMusic_temp (Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian)
+                SELECT Id, Title, Author, Lyricist, Year, Filename, SystemFileName, IsLatvian FROM SheetMusic;");
 
             // Drop the table with the new order
-            migrationBuilder.DropTable(name: "NoteSheets");
+            migrationBuilder.DropTable(name: "SheetMusic");
 
             // Rename the temp table back to the original name
             migrationBuilder.RenameTable(
-                name: "NoteSheets_temp",
-                newName: "NoteSheets");
+                name: "SheetMusic_temp",
+                newName: "SheetMusic");
         }
     }
 }

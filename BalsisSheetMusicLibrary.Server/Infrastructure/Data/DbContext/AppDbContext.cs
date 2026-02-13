@@ -49,7 +49,7 @@ public class AppDbContext : IdentityDbContext
         }
     }
 
-    public DbSet<NoteSheet> NoteSheets { get; set; } = null!;
+    public DbSet<SheetMusic> SheetMusic { get; set; } = null!;
     public DbSet<SetList> SetLists { get; set; } = null!;
     public DbSet<SetListItem> SetListItems { get; set; } = null!;
 

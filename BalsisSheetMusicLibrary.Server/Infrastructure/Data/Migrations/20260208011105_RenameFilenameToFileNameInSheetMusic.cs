@@ -5,14 +5,14 @@
 namespace BalsisSheetMusicLibrary.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class RenameFilenameToFilenameInNoteSheets : Migration
+    public partial class RenameFilenameToFileNameInSheetMusic : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameColumn(
                 name: "Filename",
-                table: "NoteSheets",
+                table: "SheetMusic",
                 newName: "FileName");
         }
 
@@ -21,7 +21,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
         {
             migrationBuilder.RenameColumn(
                 name: "FileName",
-                table: "NoteSheets",
+                table: "SheetMusic",
                 newName: "Filename");
         }
     }

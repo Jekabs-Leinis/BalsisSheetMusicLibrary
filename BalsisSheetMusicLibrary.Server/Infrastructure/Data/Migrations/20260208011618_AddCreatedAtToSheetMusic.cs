@@ -6,14 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BalsisSheetMusicLibrary.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class AddCreatedAtToNoteSheets : Migration
+    public partial class AddCreatedAtToSheetMusic : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
-                table: "NoteSheets",
+                table: "SheetMusic",
                 type: "TEXT",
                 nullable: false,
                 defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
@@ -24,7 +24,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "CreatedAt",
-                table: "NoteSheets");
+                table: "SheetMusic");
         }
     }
 }

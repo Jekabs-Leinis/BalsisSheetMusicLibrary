@@ -10,7 +10,7 @@ namespace BalsisSheetMusicLibrary.Server.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
 public class DownloadController(
-    INoteSheetService noteSheetService,
+    ISheetMusicService sheetMusicService,
     IFileStorageService fileStorageService,
     ILogger<DownloadController> logger) : ControllerBase
 {
@@ -20,24 +20,24 @@ public class DownloadController(
     [HttpGet("{id:int}/{filename}")]
     public async Task<IActionResult> Index(uint id, string filename)
     {
-        var sheet = await noteSheetService.GetNoteSheetAsync(id);
+        var sheet = await sheetMusicService.GetSheetMusicAsync(id);
 
         if (sheet == null)
         {
-            logger.LogWarning("User attempted to download a non-existent note sheet with ID {Id}.", id);
+            logger.LogWarning("User attempted to download a non-existent sheet music with ID {Id}.", id);
 
-            return NotFound("Note sheet not found.");
+            return NotFound("Sheet music not found.");
         }
 
-        if (!noteSheetService.HasValidFile(sheet))
+        if (!sheetMusicService.HasValidFile(sheet))
         {
             logger.LogError(
-                "Note sheet with ID {Id} has no valid file associated with it. System filename: {filename}",
+                "Sheet music with ID {Id} has no valid file associated with it. System filename: {filename}",
                 id,
                 sheet.SystemFileName
             );
 
-            return NotFound("No valid file associated with this note sheet.");
+            return NotFound("No valid file associated with this sheet music.");
         }
 
         return PhysicalFile(fileStorageService.GetSafeFilePath(sheet.SystemFileName!), "application/octet-stream", sheet.FileName);

@@ -8,6 +8,6 @@ public class SetListItemConfiguration : IEntityTypeConfiguration<SetListItem>
 {
     public void Configure(EntityTypeBuilder<SetListItem> builder)
     {
-        builder.HasKey(sli => new { sli.SetListId, sli.NoteSheetId });
+        builder.HasKey(sli => new { sli.SetListId, sli.SheetMusicId });
     }
 }

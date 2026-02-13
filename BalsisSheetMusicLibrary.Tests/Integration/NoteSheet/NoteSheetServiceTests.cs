@@ -1,78 +1,78 @@
-using BalsisSheetMusicLibrary.Server.Application.DTOs.NoteSheet;
+using BalsisSheetMusicLibrary.Server.Application.DTOs.SheetMusic;
 using BalsisSheetMusicLibrary.Server.Application.Services;
 using BalsisSheetMusicLibrary.Server.Domain.Interfaces;
 using Moq;
 using Entities = BalsisSheetMusicLibrary.Server.Domain.Entities;
 
-namespace BalsisSheetMusicLibrary.Tests.Integration.NoteSheet;
+namespace BalsisSheetMusicLibrary.Tests.Integration.SheetMusic;
 
-public class NoteSheetServiceTests : IntegrationTestBase
+public class SheetMusicMusicServiceTests : IntegrationTestBase
 {
     private const uint NonexistentId = 999;
     private readonly Mock<IFileStorageService> _fileStorageServiceMock = new();
-    private readonly NoteSheetService _service;
+    private readonly SheetMusicMusicService _sheetMusicService;
 
-    public NoteSheetServiceTests()
+    public SheetMusicMusicServiceTests()
     {
-        _service = new NoteSheetService(UnitOfWork, _fileStorageServiceMock.Object);
+        _sheetMusicService = new SheetMusicMusicService(UnitOfWork, _fileStorageServiceMock.Object);
     }
 
     [Fact]
-    public async Task GetNoteSheetAsync_WithExistingId_ReturnsNoteSheet()
+    public async Task GetSheetMusicAsync_WithExistingId_ReturnsSheetMusic()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Test" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "Test" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _service.GetNoteSheetAsync(1);
+        var result = await _sheetMusicService.GetSheetMusicAsync(1);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(noteSheet.Title, result.Title);
+        Assert.Equal(sheetMusic.Title, result.Title);
     }
 
     [Fact]
-    public async Task GetNoteSheetAsync_WithNonExistingId_ReturnsNull()
+    public async Task GetSheetMusicAsync_WithNonExistingId_ReturnsNull()
     {
         // Act
-        var result = await _service.GetNoteSheetAsync(NonexistentId);
+        var result = await _sheetMusicService.GetSheetMusicAsync(NonexistentId);
 
         // Assert
         Assert.Null(result);
     }
 
     [Fact]
-    public async Task GetAllNoteSheetsAsync_ReturnsAllNoteSheetsOrderedByTitle()
+    public async Task GetAllSheetMusicAsync_ReturnsAllSheetMusicOrderedByTitle()
     {
         // Arrange
-        UnitOfWork.NoteSheets.AddRange([
-            new Entities.NoteSheet { Title = "B" },
-            new Entities.NoteSheet { Title = "A" }
+        UnitOfWork.SheetMusic.AddRange([
+            new Entities.SheetMusic { Title = "B" },
+            new Entities.SheetMusic { Title = "A" }
         ]);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _service.GetAllNoteSheetsAsync();
+        var result = await _sheetMusicService.GetAllSheetMusicAsync();
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(2, result.Count());
-        Assert.IsType<NoteSheetDto>(result.ElementAt(0));
+        Assert.IsType<SheetMusicDto>(result.ElementAt(0));
     }
 
     [Fact]
-    public async Task CreateNoteSheetAsync_ValidData_CreatesAndReturnsNoteSheet()
+    public async Task CreateSheetMusicAsync_ValidData_CreatesAndReturnsSheetMusic()
     {
         // Arrange
-        var dto = new CreateNoteSheetDto { Title = "New Note" };
+        var dto = new CreateSheetMusicDto { Title = "New Sheet" };
         var fileStream = new MemoryStream([1, 2, 3]);
         _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
             .ReturnsAsync("savedfile.txt");
 
         // Act
-        var result = await _service.CreateNoteSheetAsync(dto, fileStream);
+        var result = await _sheetMusicService.CreateSheetMusicAsync(dto, fileStream);
 
         // Assert
         Assert.NotNull(result);
@@ -82,19 +82,19 @@ public class NoteSheetServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task UpdateNoteSheetAsync_WithFile_UpdatesNoteSheetAndFile()
+    public async Task UpdateSheetMusicAsync_WithFile_UpdatesSheetMusicAndFile()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Original" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "Original" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var updateDto = new UpdateNoteSheetDto { Id = 1, Title = "Updated Title" };
+        var updateDto = new UpdateSheetMusicDto { Id = 1, Title = "Updated Title" };
         var fileStream = new MemoryStream([1, 2, 3]);
         _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
             .ReturnsAsync("savedfile.txt");
 
         // Act
-        var result = await _service.UpdateNoteSheetAsync(updateDto, fileStream);
+        var result = await _sheetMusicService.UpdateSheetMusicAsync(updateDto, fileStream);
 
         // Assert
         Assert.Equal(updateDto.Title, result.Title);
@@ -102,39 +102,39 @@ public class NoteSheetServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task DeleteNoteSheetAsync_WithExistingId_DeletesNoteSheetAndFile()
+    public async Task DeleteSheetMusicAsync_WithExistingId_DeletesSheetMusicAndFile()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "To Delete", SystemFileName = "testfile.txt" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>(), It.IsAny<string>(), false)).Returns(Task.CompletedTask);
 
         // Act
-        await _service.DeleteNoteSheetAsync(1);
+        await _sheetMusicService.DeleteSheetMusicAsync(1);
 
         // Assert
-        var deletedNoteSheet = await UnitOfWork.NoteSheets.GetByIdAsync(1);
-        Assert.Null(deletedNoteSheet);
+        var deletedSheetMusic = await UnitOfWork.SheetMusic.GetByIdAsync(1);
+        Assert.Null(deletedSheetMusic);
         _fileStorageServiceMock.Verify(x => x.DeleteFile("testfile.txt", "delete", false), Times.Once);
     }
 
     [Fact]
-    public async Task DeleteNoteSheetAsync_NonExistingId_ThrowsException()
+    public async Task DeleteSheetMusicAsync_NonExistingId_ThrowsException()
     {
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.DeleteNoteSheetAsync(NonexistentId));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _sheetMusicService.DeleteSheetMusicAsync(NonexistentId));
     }
 
     [Fact]
     public void HasValidFile_WithValidFile_ReturnsTrue()
     {
         // Arrange
-        var dto = new NoteSheetDto { SystemFileName = "valid.txt", FileName = "valid.txt" };
+        var dto = new SheetMusicDto { SystemFileName = "valid.txt", FileName = "valid.txt" };
         _fileStorageServiceMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
 
         // Act
-        var result = _service.HasValidFile(dto);
+        var result = _sheetMusicService.HasValidFile(dto);
 
         // Assert
         Assert.True(result);
@@ -144,38 +144,38 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public void HasValidFile_WithMissingFileName_ReturnsFalse()
     {
         // Arrange
-        var dto = new NoteSheetDto { SystemFileName = null, FileName = "test.txt" };
+        var dto = new SheetMusicDto { SystemFileName = null, FileName = "test.txt" };
 
         // Act
-        var result = _service.HasValidFile(dto);
+        var result = _sheetMusicService.HasValidFile(dto);
 
         // Assert
         Assert.False(result);
     }
 
     [Fact]
-    public async Task UpdateNoteSheetAsync_NonExistingId_ThrowsException()
+    public async Task UpdateSheetMusicAsync_NonExistingId_ThrowsException()
     {
         // Arrange
-        var updateDto = new UpdateNoteSheetDto { Id = NonexistentId, Title = "Doesn't exist" };
+        var updateDto = new UpdateSheetMusicDto { Id = NonexistentId, Title = "Doesn't exist" };
         var fileStream = new MemoryStream([1, 2, 3]);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateNoteSheetAsync(updateDto, fileStream));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _sheetMusicService.UpdateSheetMusicAsync(updateDto, fileStream));
     }
 
     [Fact]
-    public async Task UpdateNoteSheetAsync_WithoutFile_UpdatesMetadataOnly()
+    public async Task UpdateSheetMusicAsync_WithoutFile_UpdatesMetadataOnly()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 2, Title = "Original", SystemFileName = "original.txt" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 2, Title = "Original", SystemFileName = "original.txt" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var updateDto = new UpdateNoteSheetDto { Id = 2, Title = "Updated Title" };
+        var updateDto = new UpdateSheetMusicDto { Id = 2, Title = "Updated Title" };
         _fileStorageServiceMock.Setup(x => x.RenameFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
 
         // Act
-        var result = await _service.UpdateNoteSheetAsync(updateDto, null);
+        var result = await _sheetMusicService.UpdateSheetMusicAsync(updateDto, null);
 
         // Assert
         Assert.Equal(updateDto.Title, result.Title);
@@ -188,21 +188,21 @@ public class NoteSheetServiceTests : IntegrationTestBase
     public void HasValidFile_WithSystemFileNameButFileMissing_ReturnsFalse()
     {
         // Arrange
-        var dto = new NoteSheetDto { SystemFileName = "missing.txt", FileName = "missing.txt" };
+        var dto = new SheetMusicDto { SystemFileName = "missing.txt", FileName = "missing.txt" };
         _fileStorageServiceMock.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
         // Act
-        var result = _service.HasValidFile(dto);
+        var result = _sheetMusicService.HasValidFile(dto);
 
         // Assert
         Assert.False(result);
     }
 
     [Fact]
-    public async Task GetAllNoteSheetsAsync_WhenNoNoteSheets_ReturnsEmptyList()
+    public async Task GetAllSheetMusicAsync_WhenNoSheetMusic_ReturnsEmptyList()
     {
         // Act
-        var result = await _service.GetAllNoteSheetsAsync();
+        var result = await _sheetMusicService.GetAllSheetMusicAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -210,10 +210,10 @@ public class NoteSheetServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetAllNoteSheetsAsync_ReturnsNoteSheetsOrderedByTitleCaseInsensitive()
+    public async Task GetAllSheetMusicAsync_ReturnsSheetMusicOrderedByTitleCaseInsensitive()
     {
         // Arrange
-        var noteSheets = new List<Entities.NoteSheet>
+        var SheetMusic = new List<Entities.SheetMusic>
         {
             new() { Title = "Zebra" },
             new() { Title = "apple" },
@@ -221,11 +221,11 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new() { Title = "apple" } // Duplicate title to test stable sort
         };
 
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _service.GetAllNoteSheetsAsync();
+        var result = await _sheetMusicService.GetAllSheetMusicAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -239,10 +239,10 @@ public class NoteSheetServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetAllNoteSheetsAsync_WithSpecialCharacters_OrdersCorrectly()
+    public async Task GetAllSheetMusicAsync_WithSpecialCharacters_OrdersCorrectly()
     {
         // Arrange
-        var noteSheets = new List<BalsisSheetMusicLibrary.Server.Domain.Entities.NoteSheet>
+        var SheetMusic = new List<BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic>
         {
             new() { Title = "1. First" },
             new() { Title = "Third" },
@@ -251,11 +251,11 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new() { Title = "!First" }
         };
 
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _service.GetAllNoteSheetsAsync();
+        var result = await _sheetMusicService.GetAllSheetMusicAsync();
 
         // Assert
         var titles = result.Select(ns => ns.Title).ToList();
@@ -270,10 +270,10 @@ public class NoteSheetServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetAllNoteSheetsAsync_WithNonEnglishChars_OrdersCorrectly()
+    public async Task GetAllSheetMusicAsync_WithNonEnglishChars_OrdersCorrectly()
     {
         // Arrange
-        var noteSheets = new List<BalsisSheetMusicLibrary.Server.Domain.Entities.NoteSheet>
+        var SheetMusic = new List<BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic>
         {
             new() { Title = "A1First" },
             new() { Title = "Ā4Fourth" },
@@ -283,11 +283,11 @@ public class NoteSheetServiceTests : IntegrationTestBase
             new() { Title = "Д!Last" }
         };
 
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _service.GetAllNoteSheetsAsync();
+        var result = await _sheetMusicService.GetAllSheetMusicAsync();
 
         // Assert
         var titles = result.Select(ns => ns.Title).ToList();
@@ -304,43 +304,43 @@ public class NoteSheetServiceTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task CreateNoteSheetAsync_WithNullFileStream_ThrowsArgumentNullException()
+    public async Task CreateSheetMusicAsync_WithNullFileStream_ThrowsArgumentNullException()
     {
         // Arrange
-        var dto = new CreateNoteSheetDto { Title = "Test" };
+        var dto = new CreateSheetMusicDto { Title = "Test" };
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => _service.CreateNoteSheetAsync(dto, null!));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => _sheetMusicService.CreateSheetMusicAsync(dto, null!));
     }
 
     [Fact]
-    public async Task CreateNoteSheetAsync_WhenFileSaveFails_RollsBackAndThrows()
+    public async Task CreateSheetMusicAsync_WhenFileSaveFails_RollsBackAndThrows()
     {
         // Arrange
-        var dto = new CreateNoteSheetDto { Title = "Test" };
+        var dto = new CreateSheetMusicDto { Title = "Test" };
         var fileStream = new MemoryStream([1, 2, 3]);
         _fileStorageServiceMock.Setup(x => x.SaveFileAsync(It.IsAny<Stream>(), It.IsAny<string>()))
             .ThrowsAsync(new IOException("Disk full"));
 
         // Act & Assert
-        await Assert.ThrowsAsync<IOException>(() => _service.CreateNoteSheetAsync(dto, fileStream));
+        await Assert.ThrowsAsync<IOException>(() => _sheetMusicService.CreateSheetMusicAsync(dto, fileStream));
 
         // Verify rollback - file should be permanently deleted (not soft-deleted) and entity should not exist
         _fileStorageServiceMock.Verify(x => x.DeleteFile(It.IsAny<string>(), It.IsAny<string>(), true), Times.Once);
-        var noteSheets = await _service.GetAllNoteSheetsAsync();
-        Assert.Empty(noteSheets);
+        var SheetMusic = await _sheetMusicService.GetAllSheetMusicAsync();
+        Assert.Empty(SheetMusic);
     }
 
     [Fact]
-    public async Task UpdateNoteSheetAsync_WithoutFileAndNoExistingFile_ThrowsInvalidOperationException()
+    public async Task UpdateSheetMusicAsync_WithoutFileAndNoExistingFile_ThrowsInvalidOperationException()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 3, Title = "Original", SystemFileName = null };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 3, Title = "Original", SystemFileName = null };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var updateDto = new UpdateNoteSheetDto { Id = 3, Title = "Updated" };
+        var updateDto = new UpdateSheetMusicDto { Id = 3, Title = "Updated" };
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _service.UpdateNoteSheetAsync(updateDto, null));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _sheetMusicService.UpdateSheetMusicAsync(updateDto, null));
     }
 }

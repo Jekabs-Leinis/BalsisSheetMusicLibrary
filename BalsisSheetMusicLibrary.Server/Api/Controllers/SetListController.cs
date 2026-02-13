@@ -12,9 +12,9 @@ namespace BalsisSheetMusicLibrary.Server.Api.Controllers;
 public class SetListController(ISetListService setListService, ILogger<SetListController> logger) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll(bool withNoteSheets = false)
+    public async Task<ActionResult<IEnumerable<SetListDto>>> GetAll(bool withSheetMusic = false)
     {
-        var setLists = await setListService.GetAllSetListsAsync(withNoteSheets);
+        var setLists = await setListService.GetAllSetListsAsync(withSheetMusic);
 
         return Ok(setLists);
     }

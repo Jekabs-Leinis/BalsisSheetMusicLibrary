@@ -15,7 +15,7 @@ public class SetListItemService(IUnitOfWork unitOfWork) : ISetListItemService
             throw new InvalidOperationException("SetList not found");
         }
 
-        var item = setList.Items.FirstOrDefault(i => i.NoteSheetId == dto.NoteSheetId);
+        var item = setList.Items.FirstOrDefault(i => i.SheetMusicId == dto.SheetMusicId);
 
         if (item == null)
         {
@@ -23,7 +23,7 @@ public class SetListItemService(IUnitOfWork unitOfWork) : ISetListItemService
         }
 
         var reorderableItems = setList.Items.OrderBy(sl => sl.Order).ToList();
-        reorderableItems.RemoveAll(i => i.NoteSheetId == dto.NoteSheetId);
+        reorderableItems.RemoveAll(i => i.SheetMusicId == dto.SheetMusicId);
 
         if (dto.NewOrder > reorderableItems.Count)
         {

@@ -7,14 +7,14 @@ namespace BalsisSheetMusicLibrary.Server.Application.Services;
 
 public class SetListService(IUnitOfWork unitOfWork) : ISetListService
 {
-    public async Task<IEnumerable<SetListDto>> GetAllSetListsAsync(bool withNoteSheets = false)
+    public async Task<IEnumerable<SetListDto>> GetAllSetListsAsync(bool withSheetMusic = false)
     {
         IEnumerable<SetList> setLists;
 
-        if (withNoteSheets)
+        if (withSheetMusic)
         {
             setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt == null, list => list.Order,
-                includeProperties: ["Items.NoteSheet"], withTracking: false);
+                includeProperties: ["Items.SheetMusic"], withTracking: false);
         }
         else
         {
@@ -28,7 +28,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
     public async Task<IEnumerable<SetListDto>> GetAllArchivedSetListsAsync()
     {
         var setLists = await unitOfWork.SetLists.GetAsync(list => list.ArchivedAt != null, list => list.ArchivedAt,
-            includeProperties: ["Items.NoteSheet"], withTracking: false);
+            includeProperties: ["Items.SheetMusic"], withTracking: false);
 
         return setLists.Select(SetListDto.FromEntity);
     }
@@ -68,7 +68,7 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         var updatedItems = dto.Items.Select(i => i.ToEntity()).ToList();
 
         // Find items to remove (present in DB, not in DTO)
-        var itemsToRemove = existingItems.Where(ei => updatedItems.All(ui => ui.NoteSheetId != ei.NoteSheetId))
+        var itemsToRemove = existingItems.Where(ei => updatedItems.All(ui => ui.SheetMusicId != ei.SheetMusicId))
             .ToList();
 
         if (itemsToRemove.Count > 0)
@@ -83,13 +83,13 @@ public class SetListService(IUnitOfWork unitOfWork) : ISetListService
         for (var i = 0; i < updatedItems.Count; i++)
         {
             var updatedItem = updatedItems[i];
-            var existingItem = existingItems.FirstOrDefault(ei => ei.NoteSheetId == updatedItem.NoteSheetId);
+            var existingItem = existingItems.FirstOrDefault(ei => ei.SheetMusicId == updatedItem.SheetMusicId);
 
             if (existingItem != null)
             {
                 // Update properties if changed
                 existingItem.SetListId = setList.Id;
-                existingItem.NoteSheetId = updatedItem.NoteSheetId;
+                existingItem.SheetMusicId = updatedItem.SheetMusicId;
                 existingItem.Order = (uint)i;
 
                 unitOfWork.SetListItems.Update(existingItem);

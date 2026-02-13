@@ -18,14 +18,14 @@ public class CreateSetListDto
 
 public class CreateSetListItemDto
 {
-    public uint NoteSheetId { get; set; }
+    public uint SheetMusicId { get; set; }
     public uint Order { get; set; }
 
     public SetListItem ToEntity()
     {
         return new SetListItem
         {
-            NoteSheetId = NoteSheetId,
+            SheetMusicId = SheetMusicId,
             Order = Order
         };
     }

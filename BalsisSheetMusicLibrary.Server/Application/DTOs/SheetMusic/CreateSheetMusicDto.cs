@@ -1,12 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace BalsisSheetMusicLibrary.Server.Application.DTOs.NoteSheet;
+namespace BalsisSheetMusicLibrary.Server.Application.DTOs.SheetMusic;
 
-public class UpdateNoteSheetDto
+public class CreateSheetMusicDto
 {
-    [Required(ErrorMessage = "Id is required for update")]
-    public uint Id { get; set; }
-
     [Required(ErrorMessage = "Title is required")]
     [StringLength(200, ErrorMessage = "Title cannot be longer than 200 characters")]
     public string? Title { get; set; }
@@ -20,12 +17,15 @@ public class UpdateNoteSheetDto
     public uint? Year { get; set; }
     public bool IsLatvian { get; set; }
 
-    public void UpdateEntity(Domain.Entities.NoteSheet entity)
+    public Domain.Entities.SheetMusic ToEntity()
     {
-        entity.Title = Title;
-        entity.Author = Author;
-        entity.Lyricist = Lyricist;
-        entity.Year = Year;
-        entity.IsLatvian = IsLatvian;
+        return new Domain.Entities.SheetMusic
+        {
+            Title = Title,
+            Author = Author,
+            Lyricist = Lyricist,
+            Year = Year,
+            IsLatvian = IsLatvian
+        };
     }
 }

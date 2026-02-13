@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using BalsisSheetMusicLibrary.Server.Api.Controllers;
-using BalsisSheetMusicLibrary.Server.Application.DTOs.NoteSheet;
+using BalsisSheetMusicLibrary.Server.Application.DTOs.SheetMusic;
 using BalsisSheetMusicLibrary.Server.Application.Interfaces;
 using BalsisSheetMusicLibrary.Server.Application.Services;
 using BalsisSheetMusicLibrary.Server.Domain.Interfaces;
@@ -13,19 +13,19 @@ using Entities = BalsisSheetMusicLibrary.Server.Domain.Entities;
 
 namespace BalsisSheetMusicLibrary.Tests.Integration.Controllers;
 
-public class NoteSheetControllerTests : IntegrationTestBase
+public class SheetMusicControllerTests : IntegrationTestBase
 {
     private readonly Mock<IFileStorageService> _fileStorageServiceMock = new();
-    private readonly Mock<ILogger<NoteSheetController>> _loggerMock = new();
-    private readonly Mock<INoteSheetRenameService> _renameServiceMock = new();
-    private readonly NoteSheetController _controller;
-    private readonly INoteSheetService _noteSheetService;
+    private readonly Mock<ILogger<SheetMusicController>> _loggerMock = new();
+    private readonly Mock<ISheetMusicRenameService> _renameServiceMock = new();
+    private readonly SheetMusicController _musicController;
+    private readonly ISheetMusicService _sheetMusicService;
 
-    public NoteSheetControllerTests()
+    public SheetMusicControllerTests()
     {
-        _noteSheetService = new NoteSheetService(UnitOfWork, _fileStorageServiceMock.Object);
-        _controller = new NoteSheetController(
-            _noteSheetService,
+        _sheetMusicService = new SheetMusicMusicService(UnitOfWork, _fileStorageServiceMock.Object);
+        _musicController = new SheetMusicController(
+            _sheetMusicService,
             _renameServiceMock.Object,
             _loggerMock.Object
         );
@@ -37,45 +37,45 @@ public class NoteSheetControllerTests : IntegrationTestBase
             new Claim(ClaimTypes.Role, Role.Admin)
         ], "mock"));
 
-        _controller.ControllerContext = new ControllerContext
+        _musicController.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext { User = user }
         };
     }
 
     [Fact]
-    public async Task GetAll_ReturnsOkWithNoteSheets()
+    public async Task GetAll_ReturnsOkWithSheetMusic()
     {
         // Arrange
-        UnitOfWork.NoteSheets.AddRange([
-            new Entities.NoteSheet { Title = "A" },
-            new Entities.NoteSheet { Title = "B" }
+        UnitOfWork.SheetMusic.AddRange([
+            new Entities.SheetMusic { Title = "A" },
+            new Entities.SheetMusic { Title = "B" }
         ]);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _controller.GetAll();
+        var result = await _musicController.GetAll();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var noteSheets = Assert.IsAssignableFrom<List<NoteSheetDto>>(okResult.Value);
-        Assert.Equal(2, noteSheets.Count);
+        var SheetMusic = Assert.IsAssignableFrom<List<SheetMusicDto>>(okResult.Value);
+        Assert.Equal(2, SheetMusic.Count);
     }
 
     [Fact]
-    public async Task Get_WithExistingId_ReturnsOkWithNoteSheet()
+    public async Task Get_WithExistingId_ReturnsOkWithSheetMusic()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Test" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "Test" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _controller.Get(1);
+        var result = await _musicController.Get(1);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var dto = Assert.IsType<NoteSheetDto>(okResult.Value);
+        var dto = Assert.IsType<SheetMusicDto>(okResult.Value);
         Assert.Equal("Test", dto.Title);
     }
 
@@ -83,7 +83,7 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Get_WithNonExistingId_ReturnsNotFound()
     {
         // Act
-        var result = await _controller.Get(999);
+        var result = await _musicController.Get(999);
 
         // Assert
         Assert.IsType<NotFoundObjectResult>(result);
@@ -93,7 +93,7 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Add_WithValidData_ReturnsCreatedAtAction()
     {
         // Arrange
-        var dto = new CreateNoteSheetDto { Title = "New Note" };
+        var dto = new CreateSheetMusicDto { Title = "New Sheet" };
         var fileMock = new Mock<IFormFile>();
         var content = "PDF content"u8.ToArray();
         var ms = new MemoryStream(content);
@@ -104,25 +104,25 @@ public class NoteSheetControllerTests : IntegrationTestBase
             .ReturnsAsync("saved.pdf");
 
         // Act
-        var result = await _controller.Add(dto, fileMock.Object);
+        var result = await _musicController.Add(dto, fileMock.Object);
 
         // Assert
         var createdResult = Assert.IsType<CreatedAtActionResult>(result);
-        Assert.Equal(nameof(NoteSheetController.Get), createdResult.ActionName);
-        var returnedDto = Assert.IsType<NoteSheetDto>(createdResult.Value);
-        Assert.Equal("New Note", returnedDto.Title);
+        Assert.Equal(nameof(SheetMusicController.Get), createdResult.ActionName);
+        var returnedDto = Assert.IsType<SheetMusicDto>(createdResult.Value);
+        Assert.Equal("New Sheet", returnedDto.Title);
     }
 
     [Fact]
     public async Task Add_WithEmptyFile_ReturnsBadRequest()
     {
         // Arrange
-        var dto = new CreateNoteSheetDto { Title = "Test" };
+        var dto = new CreateSheetMusicDto { Title = "Test" };
         var fileMock = new Mock<IFormFile>();
         fileMock.Setup(f => f.Length).Returns(0);
 
         // Act
-        var result = await _controller.Add(dto, fileMock.Object);
+        var result = await _musicController.Add(dto, fileMock.Object);
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
@@ -132,13 +132,13 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Add_WithInvalidFileType_ReturnsBadRequest()
     {
         // Arrange
-        var dto = new CreateNoteSheetDto { Title = "Test" };
+        var dto = new CreateSheetMusicDto { Title = "Test" };
         var fileMock = new Mock<IFormFile>();
         fileMock.Setup(f => f.Length).Returns(100);
         fileMock.Setup(f => f.ContentType).Returns("image/jpeg");
 
         // Act
-        var result = await _controller.Add(dto, fileMock.Object);
+        var result = await _musicController.Add(dto, fileMock.Object);
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
@@ -148,19 +148,19 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Update_WithValidData_ReturnsOk()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Original", SystemFileName = "original.pdf" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "Original", SystemFileName = "original.pdf" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var dto = new UpdateNoteSheetDto { Id = 1, Title = "Updated" };
+        var dto = new UpdateSheetMusicDto { Id = 1, Title = "Updated" };
         _fileStorageServiceMock.Setup(x => x.RenameFile(It.IsAny<string>(), It.IsAny<string>()));
 
         // Act
-        var result = await _controller.Update(dto, null);
+        var result = await _musicController.Update(dto, null);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedDto = Assert.IsType<NoteSheetDto>(okResult.Value);
+        var returnedDto = Assert.IsType<SheetMusicDto>(okResult.Value);
         Assert.Equal("Updated", returnedDto.Title);
     }
 
@@ -168,10 +168,10 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Update_WithNonExistingId_ReturnsNotFound()
     {
         // Arrange
-        var dto = new UpdateNoteSheetDto { Id = 999, Title = "Test" };
+        var dto = new UpdateSheetMusicDto { Id = 999, Title = "Test" };
 
         // Act
-        var result = await _controller.Update(dto, null);
+        var result = await _musicController.Update(dto, null);
 
         // Assert
         Assert.IsType<NotFoundObjectResult>(result);
@@ -181,13 +181,13 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Delete_WithExistingId_ReturnsOk()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "To Delete", SystemFileName = "test.pdf" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "To Delete", SystemFileName = "test.pdf" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         _fileStorageServiceMock.Setup(x => x.DeleteFile(It.IsAny<string>(), It.IsAny<string>(), false)).Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.Delete(1);
+        var result = await _musicController.Delete(1);
 
         // Assert
         Assert.IsType<OkObjectResult>(result);
@@ -197,7 +197,7 @@ public class NoteSheetControllerTests : IntegrationTestBase
     public async Task Delete_WithNonExistingId_ReturnsNotFound()
     {
         // Act
-        var result = await _controller.Delete(999);
+        var result = await _musicController.Delete(999);
 
         // Assert
         Assert.IsType<NotFoundObjectResult>(result);
@@ -210,7 +210,7 @@ public class NoteSheetControllerTests : IntegrationTestBase
         _renameServiceMock.Setup(x => x.RenameAllFilenamesAsync()).Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.RenameAllFilenames();
+        var result = await _musicController.RenameAllFilenames();
 
         // Assert
         Assert.IsType<OkObjectResult>(result);

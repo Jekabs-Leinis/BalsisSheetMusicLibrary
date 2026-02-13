@@ -1,6 +1,6 @@
 namespace BalsisSheetMusicLibrary.Server.Application.Interfaces;
 
-public interface INoteSheetRenameService
+public interface ISheetMusicRenameService
 {
     Task RenameAllFilenamesAsync();
 }

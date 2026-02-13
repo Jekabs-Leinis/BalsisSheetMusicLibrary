@@ -5,13 +5,13 @@
 namespace BalsisSheetMusicLibrary.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateNoteSheetModels : Migration
+    public partial class CreateSheetMusicModels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "NoteSheets",
+                name: "SheetMusic",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "INTEGER", nullable: false),
@@ -24,7 +24,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_NoteSheets", x => x.Id);
+                    table.PrimaryKey("PK_SheetMusic", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -45,16 +45,16 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                 columns: table => new
                 {
                     SetListId = table.Column<string>(type: "INTEGER", nullable: false),
-                    NoteSheetId = table.Column<string>(type: "INTEGER", nullable: false),
+                    SheetMusicId = table.Column<string>(type: "INTEGER", nullable: false),
                     Order = table.Column<uint>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SetListItems", x => new { x.SetListId, x.NoteSheetId });
+                    table.PrimaryKey("PK_SetListItems", x => new { x.SetListId, x.SheetMusicId });
                     table.ForeignKey(
-                        name: "FK_SetListItems_NoteSheets_NoteSheetId",
-                        column: x => x.NoteSheetId,
-                        principalTable: "NoteSheets",
+                        name: "FK_SetListItems_SheetMusic_SheetMusicId",
+                        column: x => x.SheetMusicId,
+                        principalTable: "SheetMusic",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -66,9 +66,9 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_SetListItems_NoteSheetId",
+                name: "IX_SetListItems_SheetMusicId",
                 table: "SetListItems",
-                column: "NoteSheetId");
+                column: "SheetMusicId");
         }
 
         /// <inheritdoc />
@@ -78,7 +78,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                 name: "SetListItems");
 
             migrationBuilder.DropTable(
-                name: "NoteSheets");
+                name: "SheetMusic");
 
             migrationBuilder.DropTable(
                 name: "SetLists");

@@ -50,13 +50,13 @@ public static class WebApplicationBuilderExtensions
         // Infrastructure services
         builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
         // Repositories
-        builder.Services.AddScoped<INoteSheetRepository, NoteSheetRepository>();
+        builder.Services.AddScoped<ISheetMusicRepository, SheetMusicRepository>();
         builder.Services.AddScoped<ISetListRepository, SetListRepository>();
         builder.Services.AddScoped<ISetListItemRepository, SetListItemRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         // Application services
-        builder.Services.AddScoped<INoteSheetService, NoteSheetService>();
-        builder.Services.AddScoped<INoteSheetRenameService, NoteSheetRenameService>();
+        builder.Services.AddScoped<ISheetMusicService, SheetMusicMusicService>();
+        builder.Services.AddScoped<ISheetMusicRenameService, SheetMusicMusicRenameService>();
         builder.Services.AddScoped<ISetListService, SetListService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<ISetListItemService, SetListItemService>();

@@ -30,7 +30,7 @@ public class SetListItemController(ISetListItemService setListItemService, ILogg
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogError(ex, "Error moving set list item with set list ID {sheetId} and note sheet {noteId}", dto.SetListId, dto.NoteSheetId);
+            logger.LogError(ex, "Error moving set list item with set list ID {sheetId} and note sheet {noteId}", dto.SetListId, dto.SheetMusicId);
             
             return BadRequest(ex.Message);
         }

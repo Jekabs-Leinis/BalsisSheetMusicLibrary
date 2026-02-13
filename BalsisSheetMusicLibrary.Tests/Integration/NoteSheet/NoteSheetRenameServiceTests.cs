@@ -1,5 +1,6 @@
 using BalsisSheetMusicLibrary.Server.Application.Services;
 using BalsisSheetMusicLibrary.Server.Domain.Interfaces;
+using BalsisSheetMusicLibrary.Server.Domain.ValueObjects;
 using BalsisSheetMusicLibrary.Server.Infrastructure.Hubs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
@@ -8,22 +9,22 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Entities = BalsisSheetMusicLibrary.Server.Domain.Entities;
 
-namespace BalsisSheetMusicLibrary.Tests.Integration.NoteSheet;
+namespace BalsisSheetMusicLibrary.Tests.Integration.SheetMusic;
 
-public class NoteSheetRenameServiceTests : IntegrationTestBase
+public class SheetMusicMusicRenameServiceTests : IntegrationTestBase
 {
     private readonly Mock<IWebHostEnvironment> _envMock = new();
     private readonly Mock<IFileStorageService> _fileStorageServiceMock = new();
     private readonly Mock<IHubContext<StatusHub>> _hubContextMock = new();
-    private readonly Mock<ILogger<NoteSheetRenameService>> _loggerMock = new();
+    private readonly Mock<ILogger<SheetMusicMusicRenameService>> _loggerMock = new();
     private readonly Mock<IServiceScopeFactory> _scopeFactoryMock = new();
-    private readonly NoteSheetRenameService _service;
+    private readonly SheetMusicMusicRenameService _service;
     private readonly Mock<IServiceProvider> _serviceProviderMock = new();
 
-    public NoteSheetRenameServiceTests()
+    public SheetMusicMusicRenameServiceTests()
     {
         // Clean up database before each test
-        DbContext.NoteSheets.RemoveRange(DbContext.NoteSheets);
+        DbContext.SheetMusic.RemoveRange(DbContext.SheetMusic);
         DbContext.SaveChanges();
 
         // Set up environment mock
@@ -40,21 +41,22 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
         _serviceProviderMock.Setup(x => x.GetService(typeof(IHubContext<StatusHub>))).Returns(_hubContextMock.Object);
         _serviceProviderMock.Setup(x => x.GetService(typeof(IWebHostEnvironment))).Returns(_envMock.Object);
 
-        _service = new NoteSheetRenameService(_serviceProviderMock.Object, _loggerMock.Object);
+        _service = new SheetMusicMusicRenameService(_serviceProviderMock.Object, _loggerMock.Object);
     }
 
     [Fact]
     public async Task RenameAllFilenamesAsync_WithExistingFiles_UpdatesFileNamesAndDatabase()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet
+        var sheetMusic = new Entities.SheetMusic
         {
             Id = 1, Title = "TestTitle", Author = "TestAuthor", FileName = "OldName.pdf", SystemFileName = "oldname.pdf"
         };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         _fileStorageServiceMock.Setup(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>())).Verifiable();
+        _fileStorageServiceMock.Setup(f => f.GetBasePath()).Returns("/");
 
         // Act
         await _service.RenameAllFilenamesAsync();
@@ -63,7 +65,7 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
 
         // Assert
         _fileStorageServiceMock.Verify(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-        var updatedSheet = await UnitOfWork.NoteSheets.GetByIdAsync(noteSheet.Id!.Value);
+        var updatedSheet = await UnitOfWork.SheetMusic.GetByIdAsync(sheetMusic.Id!.Value);
         Assert.Equal(updatedSheet!.FileName, updatedSheet.GetFileName());
     }
 
@@ -71,16 +73,17 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
     public async Task RenameAllFilenamesAsync_FileMissing_HandlesGracefully()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet
+        var sheetMusic = new Entities.SheetMusic
         {
             Id = 2, Title = "MissingFile", Author = "TestAuthor", FileName = "Missing.pdf",
             SystemFileName = "missing.pdf"
         };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         _fileStorageServiceMock.Setup(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()))
             .Throws<FileNotFoundException>();
+        _fileStorageServiceMock.Setup(f => f.GetBasePath()).Returns("/");
 
         // Act
         await _service.RenameAllFilenamesAsync();
@@ -88,7 +91,7 @@ public class NoteSheetRenameServiceTests : IntegrationTestBase
 
         // Assert
         _fileStorageServiceMock.Verify(f => f.RenameFile(It.IsAny<string>(), It.IsAny<string>()), Times.Once);
-        var updatedSheet = await UnitOfWork.NoteSheets.GetByIdAsync(noteSheet.Id!.Value);
+        var updatedSheet = await UnitOfWork.SheetMusic.GetByIdAsync(sheetMusic.Id!.Value);
         // Should not update FileName/SystemFileName if file is missing
         Assert.Equal("Missing.pdf", updatedSheet!.FileName);
         Assert.Equal("missing.pdf", updatedSheet.SystemFileName);

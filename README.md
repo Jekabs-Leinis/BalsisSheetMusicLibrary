@@ -1,6 +1,6 @@
 # BalsisSheetMusicLibrary
 
-Balsis Note Sheet Library is a web SPA for choirists from choir **Balsis** to store note sheets (sheet music) and organize them into setlists.
+Balsis Sheet Music Library is a web SPA for choirists from choir **Balsis** to store sheet music and organize them into setlists.
 
 It includes a 
 
@@ -43,7 +43,7 @@ It includes a
 
     - Copy `BalsisSheetMusicLibrary.Server/.env.example` to `BalsisSheetMusicLibrary.Server/.env`
     - Fill in passwords and adjust seeding flags as needed.
-    - Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where note sheet PDFs will be stored. This should be either a relative path from the server binary (e.g., `./Sheets`) or an absolute path (e.g., `C:/BalsisSheets`).
+    - Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where sheet music PDFs will be stored. This should be either a relative path from the server binary (e.g., `./Sheets`) or an absolute path (e.g., `C:/BalsisSheets`).
 
    Example `.env`:
 

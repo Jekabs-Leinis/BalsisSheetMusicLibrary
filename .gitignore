@@ -362,8 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-/BalsisNoteSheetLibrary.Server/Static/Sheets/*
-/BalsisNoteSheetLibrary.Server/app.db
+/BalsisSheetMusicLibrary.Server/Static/Sheets/*
+/BalsisSheetMusicLibrary.Server/app.db
 .env
-/BalsisNoteSheetLibrary.Server/Static/*
+/BalsisSheetMusicLibrary.Server/Static/*
 .kiro/

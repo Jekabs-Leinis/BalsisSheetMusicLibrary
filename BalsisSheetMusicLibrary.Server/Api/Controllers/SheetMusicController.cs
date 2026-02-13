@@ -1,4 +1,4 @@
-using BalsisSheetMusicLibrary.Server.Application.DTOs.NoteSheet;
+using BalsisSheetMusicLibrary.Server.Application.DTOs.SheetMusic;
 using BalsisSheetMusicLibrary.Server.Application.Interfaces;
 using BalsisSheetMusicLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
@@ -9,16 +9,16 @@ namespace BalsisSheetMusicLibrary.Server.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]", Name = "[controller]_[action]")]
 [Authorize(Roles = $"{Role.Admin},{Role.User}")]
-public class NoteSheetController(
-    INoteSheetService noteSheetService,
-    INoteSheetRenameService renameService,
-    ILogger<NoteSheetController> logger)
+public class SheetMusicController(
+    ISheetMusicService sheetMusicService,
+    ISheetMusicRenameService sheetRenameService,
+    ILogger<SheetMusicController> logger)
     : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var result = await noteSheetService.GetAllNoteSheetsAsync();
+        var result = await sheetMusicService.GetAllSheetMusicAsync();
 
         return Ok(result);
     }
@@ -26,13 +26,13 @@ public class NoteSheetController(
     [HttpGet("{id:int}")]
     public async Task<IActionResult> Get(uint id)
     {
-        var result = await noteSheetService.GetNoteSheetAsync(id);
+        var result = await sheetMusicService.GetSheetMusicAsync(id);
 
         if (result == null)
         {
-            logger.LogWarning("Tried to access non-existent note sheet with ID {Id}", id);
+            logger.LogWarning("Tried to access non-existent sheet music with ID {Id}", id);
             
-            return NotFound("Note sheet not found");
+            return NotFound("Sheet music not found");
         }
 
         return Ok(result);
@@ -40,11 +40,11 @@ public class NoteSheetController(
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> Add([FromForm] CreateNoteSheetDto createDto, IFormFile file)
+    public async Task<IActionResult> Add([FromForm] CreateSheetMusicDto createMusicDto, IFormFile file)
     {
         if (!ModelState.IsValid)
         {
-            logger.LogWarning("Invalid model state for CreateNoteSheetDto: {ModelState}", ModelState);
+            logger.LogWarning("Invalid model state for CreateSheetMusicDto: {ModelState}", ModelState);
             
             return BadRequest(ModelState);
         }
@@ -58,24 +58,24 @@ public class NoteSheetController(
 
         if (!file.ContentType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
         {
-            logger.LogWarning("Invalid file type for CreateNoteSheetDto: {FileType}", file.ContentType);
+            logger.LogWarning("Invalid file type for CreateSheetMusicDto: {FileType}", file.ContentType);
             
             return BadRequest("Only PDF files are allowed");
         }
 
         await using var stream = file.OpenReadStream();
-        var result = await noteSheetService.CreateNoteSheetAsync(createDto, stream);
+        var result = await sheetMusicService.CreateSheetMusicAsync(createMusicDto, stream);
 
         return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
     }
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
-    public async Task<IActionResult> Update([FromForm] UpdateNoteSheetDto updateDto, IFormFile? file)
+    public async Task<IActionResult> Update([FromForm] UpdateSheetMusicDto updateMusicDto, IFormFile? file)
     {
         if (!ModelState.IsValid)
         {
-            logger.LogWarning("Invalid model state for UpdateNoteSheetDto: {ModelState}", ModelState);
+            logger.LogWarning("Invalid model state for UpdateSheetMusicDto: {ModelState}", ModelState);
             
             return BadRequest(ModelState);
         }
@@ -84,13 +84,13 @@ public class NoteSheetController(
 
         try
         {
-            var result = await noteSheetService.UpdateNoteSheetAsync(updateDto, fileStream);
+            var result = await sheetMusicService.UpdateSheetMusicAsync(updateMusicDto, fileStream);
 
             return Ok(result);
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogError(ex, "Failed to update note sheet with ID {Id}", updateDto.Id);
+            logger.LogError(ex, "Failed to update sheet music with ID {Id}", updateMusicDto.Id);
             
             return NotFound(ex.Message);
         }
@@ -102,23 +102,23 @@ public class NoteSheetController(
     {
         try
         {
-            await noteSheetService.DeleteNoteSheetAsync(id);
+            await sheetMusicService.DeleteSheetMusicAsync(id);
         }
         catch (InvalidOperationException ex)
         {
-            logger.LogError(ex, "Failed to delete note sheet with ID {Id}", id);
+            logger.LogError(ex, "Failed to delete sheet music with ID {Id}", id);
             
             return NotFound(ex.Message);
         }
         
-        return Ok("Note sheet deleted successfully");
+        return Ok("Sheet music deleted successfully");
     }
 
     [HttpPost]
     [Authorize(Roles = Role.Admin)]
     public async Task<IActionResult> RenameAllFilenames()
     {
-        await renameService.RenameAllFilenamesAsync();
+        await sheetRenameService.RenameAllFilenamesAsync();
 
         return Ok("Rename process started in the background");
     }

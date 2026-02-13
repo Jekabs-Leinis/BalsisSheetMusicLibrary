@@ -7,7 +7,7 @@ namespace BalsisSheetMusicLibrary.Tests.Integration.SetListItem;
 public class SetListItemServiceTests : IntegrationTestBase
 {
     private const uint NonexistentSetListId = 9999;
-    private const uint NonexistentNoteSheetId = 8888;
+    private const uint NonexistentSheetMusicId = 8888;
     private readonly SetListItemService _service;
 
     public SetListItemServiceTests()
@@ -23,7 +23,7 @@ public class SetListItemServiceTests : IntegrationTestBase
     public async Task MoveSetListItemAsync_SetListNotFound_ThrowsInvalidOperationException()
     {
         // Arrange
-        var dto = new MoveSetListItemDto { SetListId = NonexistentSetListId, NoteSheetId = 1, NewOrder = 0 };
+        var dto = new MoveSetListItemDto { SetListId = NonexistentSetListId, SheetMusicId = 1, NewOrder = 0 };
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.MoveSetListItemAsync(dto));
@@ -37,7 +37,7 @@ public class SetListItemServiceTests : IntegrationTestBase
         UnitOfWork.SetLists.Add(setList);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto
-            { SetListId = setList.Id!.Value, NoteSheetId = NonexistentNoteSheetId, NewOrder = 0 };
+            { SetListId = setList.Id!.Value, SheetMusicId = NonexistentSheetMusicId, NewOrder = 0 };
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _service.MoveSetListItemAsync(dto));
@@ -49,25 +49,25 @@ public class SetListItemServiceTests : IntegrationTestBase
         // Arrange
         var setList = new Entities.SetList { Title = "List" };
         UnitOfWork.SetLists.Add(setList);
-        var noteSheets = new List<Entities.NoteSheet>
+        var SheetMusic = new List<Entities.SheetMusic>
         {
             new() { Title = "A" },
             new() { Title = "B" },
             new() { Title = "C" }
         };
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
 
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
-            new() { SetListId = setListId, NoteSheetId = noteSheets[0].Id, Order = 0 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[1].Id, Order = 1 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[0].Id, Order = 0 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[1].Id, Order = 1 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var dto = new MoveSetListItemDto { SetListId = setListId, NoteSheetId = noteSheets[2].Id!.Value, NewOrder = 0 };
+        var dto = new MoveSetListItemDto { SetListId = setListId, SheetMusicId = SheetMusic[2].Id!.Value, NewOrder = 0 };
 
         // Act
         await _service.MoveSetListItemAsync(dto);
@@ -75,9 +75,9 @@ public class SetListItemServiceTests : IntegrationTestBase
             .OrderBy(i => i.Order).ToList();
 
         // Assert
-        Assert.Equal(3u, updatedItems[0].NoteSheetId); // moved to first
-        Assert.Equal(1u, updatedItems[1].NoteSheetId);
-        Assert.Equal(2u, updatedItems[2].NoteSheetId);
+        Assert.Equal(3u, updatedItems[0].SheetMusicId); // moved to first
+        Assert.Equal(1u, updatedItems[1].SheetMusicId);
+        Assert.Equal(2u, updatedItems[2].SheetMusicId);
         Assert.Equal(0u, updatedItems[0].Order);
         Assert.Equal(1u, updatedItems[1].Order);
         Assert.Equal(2u, updatedItems[2].Order);
@@ -89,24 +89,24 @@ public class SetListItemServiceTests : IntegrationTestBase
         // Arrange
         var setList = new Entities.SetList { Title = "List" };
         UnitOfWork.SetLists.Add(setList);
-        var noteSheets = new List<Entities.NoteSheet>
+        var SheetMusic = new List<Entities.SheetMusic>
         {
             new() { Title = "A" },
             new() { Title = "B" },
             new() { Title = "C" }
         };
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
-            new() { SetListId = setListId, NoteSheetId = noteSheets[0].Id, Order = 0 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[1].Id, Order = 1 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[0].Id, Order = 0 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[1].Id, Order = 1 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var dto = new MoveSetListItemDto { SetListId = setListId, NoteSheetId = noteSheets[0].Id!.Value, NewOrder = 2 };
+        var dto = new MoveSetListItemDto { SetListId = setListId, SheetMusicId = SheetMusic[0].Id!.Value, NewOrder = 2 };
 
         // Act
         await _service.MoveSetListItemAsync(dto);
@@ -114,9 +114,9 @@ public class SetListItemServiceTests : IntegrationTestBase
             .OrderBy(i => i.Order).ToList();
 
         // Assert
-        Assert.Equal(noteSheets[1].Id, updatedItems[0].NoteSheetId); // B
-        Assert.Equal(noteSheets[2].Id, updatedItems[1].NoteSheetId); // C
-        Assert.Equal(noteSheets[0].Id, updatedItems[2].NoteSheetId); // A moved to last
+        Assert.Equal(SheetMusic[1].Id, updatedItems[0].SheetMusicId); // B
+        Assert.Equal(SheetMusic[2].Id, updatedItems[1].SheetMusicId); // C
+        Assert.Equal(SheetMusic[0].Id, updatedItems[2].SheetMusicId); // A moved to last
     }
 
     [Fact]
@@ -125,24 +125,24 @@ public class SetListItemServiceTests : IntegrationTestBase
         // Arrange
         var setList = new Entities.SetList { Title = "List" };
         UnitOfWork.SetLists.Add(setList);
-        var noteSheets = new List<Entities.NoteSheet>
+        var SheetMusic = new List<Entities.SheetMusic>
         {
             new() { Title = "A" },
             new() { Title = "B" },
             new() { Title = "C" }
         };
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
-            new() { SetListId = setListId, NoteSheetId = noteSheets[0].Id, Order = 0 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[1].Id, Order = 1 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[0].Id, Order = 0 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[1].Id, Order = 1 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var dto = new MoveSetListItemDto { SetListId = setListId, NoteSheetId = noteSheets[1].Id!.Value, NewOrder = 1 };
+        var dto = new MoveSetListItemDto { SetListId = setListId, SheetMusicId = SheetMusic[1].Id!.Value, NewOrder = 1 };
 
         // Act
         await _service.MoveSetListItemAsync(dto);
@@ -150,9 +150,9 @@ public class SetListItemServiceTests : IntegrationTestBase
             .OrderBy(i => i.Order).ToList();
 
         // Assert
-        Assert.Equal(noteSheets[0].Id, updatedItems[0].NoteSheetId); // A
-        Assert.Equal(noteSheets[1].Id, updatedItems[1].NoteSheetId); // B (same position)
-        Assert.Equal(noteSheets[2].Id, updatedItems[2].NoteSheetId); // C
+        Assert.Equal(SheetMusic[0].Id, updatedItems[0].SheetMusicId); // A
+        Assert.Equal(SheetMusic[1].Id, updatedItems[1].SheetMusicId); // B (same position)
+        Assert.Equal(SheetMusic[2].Id, updatedItems[2].SheetMusicId); // C
     }
 
     [Fact]
@@ -161,25 +161,25 @@ public class SetListItemServiceTests : IntegrationTestBase
         // Arrange
         var setList = new Entities.SetList { Title = "List" };
         UnitOfWork.SetLists.Add(setList);
-        var noteSheets = new List<Entities.NoteSheet>
+        var SheetMusic = new List<Entities.SheetMusic>
         {
             new() { Title = "A" },
             new() { Title = "B" },
             new() { Title = "C" }
         };
-        UnitOfWork.NoteSheets.AddRange(noteSheets);
+        UnitOfWork.SheetMusic.AddRange(SheetMusic);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var setListId = setList.Id!.Value;
         var items = new List<Entities.SetListItem>
         {
-            new() { SetListId = setListId, NoteSheetId = noteSheets[0].Id, Order = 0 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[1].Id, Order = 1 },
-            new() { SetListId = setListId, NoteSheetId = noteSheets[2].Id, Order = 2 }
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[0].Id, Order = 0 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[1].Id, Order = 1 },
+            new() { SetListId = setListId, SheetMusicId = SheetMusic[2].Id, Order = 2 }
         };
         UnitOfWork.SetListItems.AddRange(items);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
         var dto = new MoveSetListItemDto
-            { SetListId = setListId, NoteSheetId = noteSheets[0].Id!.Value, NewOrder = 99 }; // out of range
+            { SetListId = setListId, SheetMusicId = SheetMusic[0].Id!.Value, NewOrder = 99 }; // out of range
 
         // Act
         await _service.MoveSetListItemAsync(dto);
@@ -187,8 +187,8 @@ public class SetListItemServiceTests : IntegrationTestBase
             .OrderBy(i => i.Order).ToList();
 
         // Assert
-        Assert.Equal(noteSheets[1].Id, updatedItems[0].NoteSheetId); // B
-        Assert.Equal(noteSheets[2].Id, updatedItems[1].NoteSheetId); // C
-        Assert.Equal(noteSheets[0].Id, updatedItems[2].NoteSheetId); // A moved to last
+        Assert.Equal(SheetMusic[1].Id, updatedItems[0].SheetMusicId); // B
+        Assert.Equal(SheetMusic[2].Id, updatedItems[1].SheetMusicId); // C
+        Assert.Equal(SheetMusic[0].Id, updatedItems[2].SheetMusicId); // A moved to last
     }
 }

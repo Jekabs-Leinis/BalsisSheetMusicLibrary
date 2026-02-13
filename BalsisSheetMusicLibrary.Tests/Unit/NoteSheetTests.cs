@@ -2,19 +2,19 @@ using BalsisSheetMusicLibrary.Server.Domain.Entities;
 
 namespace BalsisSheetMusicLibrary.Tests.Unit;
 
-public class NoteSheetTests
+public class SheetMusicTests
 {
     [Fact]
     public void GetFileName_ReturnsCorrectFileName_WithAllFields()
     {
-        var noteSheet = new NoteSheet
+        var sheetMusic = new SheetMusic
         {
             Title = "SongTitle",
             Author = "Composer",
             Lyricist = "LyricistName",
             Year = 2020
         };
-        var fileName = noteSheet.GetFileName();
+        var fileName = sheetMusic.GetFileName();
         Assert.StartsWith("SongTitle, Composer, LyricistName, 2020", fileName);
         Assert.EndsWith(".pdf", fileName);
     }
@@ -22,8 +22,8 @@ public class NoteSheetTests
     [Fact]
     public void GetFileName_HandlesMissingOptionalFields()
     {
-        var noteSheet = new NoteSheet { Title = "OnlyTitle" };
-        var fileName = noteSheet.GetFileName();
+        var sheetMusic = new SheetMusic { Title = "OnlyTitle" };
+        var fileName = sheetMusic.GetFileName();
         Assert.StartsWith("OnlyTitle", fileName);
         Assert.EndsWith(".pdf", fileName);
     }
@@ -32,8 +32,8 @@ public class NoteSheetTests
     public void GetFileName_TruncatesLongFileName()
     {
         var longTitle = new string('A', 250);
-        var noteSheet = new NoteSheet { Title = longTitle };
-        var fileName = noteSheet.GetFileName();
+        var sheetMusic = new SheetMusic { Title = longTitle };
+        var fileName = sheetMusic.GetFileName();
         // 200 chars + .pdf
         Assert.True(fileName.Length == 204);
     }
@@ -41,23 +41,23 @@ public class NoteSheetTests
     [Fact]
     public void GetFileName_ThrowsIfFileNameEmpty()
     {
-        var noteSheet = new NoteSheet();
-        Assert.Throws<InvalidOperationException>(() => noteSheet.GetFileName());
+        var sheetMusic = new SheetMusic();
+        Assert.Throws<InvalidOperationException>(() => sheetMusic.GetFileName());
     }
 
     [Fact]
     public void GetSystemFileName_ReturnsCorrectSystemFileName_WithFileName()
     {
-        var noteSheet = new NoteSheet { Id = 5, FileName = "custom.pdf" };
-        var systemFileName = noteSheet.GetSystemFileName();
+        var sheetMusic = new SheetMusic { Id = 5, FileName = "custom.pdf" };
+        var systemFileName = sheetMusic.GetSystemFileName();
         Assert.Equal("5_custom.pdf", systemFileName);
     }
 
     [Fact]
     public void GetSystemFileName_ReturnsCorrectSystemFileName_WithoutFileName()
     {
-        var noteSheet = new NoteSheet { Id = 7, Title = "Title" };
-        var systemFileName = noteSheet.GetSystemFileName();
+        var sheetMusic = new SheetMusic { Id = 7, Title = "Title" };
+        var systemFileName = sheetMusic.GetSystemFileName();
         Assert.StartsWith("7_", systemFileName);
         Assert.EndsWith(".pdf", systemFileName);
     }
@@ -65,22 +65,22 @@ public class NoteSheetTests
     [Fact]
     public void GetSystemFileName_ThrowsIfIdIsNull()
     {
-        var noteSheet = new NoteSheet();
-        Assert.Throws<InvalidOperationException>(() => noteSheet.GetSystemFileName());
+        var sheetMusic = new SheetMusic();
+        Assert.Throws<InvalidOperationException>(() => sheetMusic.GetSystemFileName());
     }
 
     [Fact]
     public void GetFileName_HandlesWhitespaceFields()
     {
-        var noteSheet = new NoteSheet { Title = "   ", Author = "   ", Lyricist = "   " };
-        Assert.Throws<InvalidOperationException>(() => noteSheet.GetFileName());
+        var sheetMusic = new SheetMusic { Title = "   ", Author = "   ", Lyricist = "   " };
+        Assert.Throws<InvalidOperationException>(() => sheetMusic.GetFileName());
     }
 
     [Fact]
     public void GetFileName_SanitizesSpecialCharacters()
     {
-        var noteSheet = new NoteSheet { Title = "Test/Name:With*Invalid|Chars?" };
-        var fileName = noteSheet.GetFileName();
+        var sheetMusic = new SheetMusic { Title = "Test/Name:With*Invalid|Chars?" };
+        var fileName = sheetMusic.GetFileName();
         // Should not contain invalid filename characters
         Assert.DoesNotContain("/", fileName);
         Assert.DoesNotContain(":", fileName);
@@ -92,8 +92,8 @@ public class NoteSheetTests
     [Fact]
     public void GetFileName_HandlesCommasInFields()
     {
-        var noteSheet = new NoteSheet { Title = "A,Title", Author = "B,Author" };
-        var fileName = noteSheet.GetFileName();
+        var sheetMusic = new SheetMusic { Title = "A,Title", Author = "B,Author" };
+        var fileName = sheetMusic.GetFileName();
         // Should preserve commas in the joined string
         Assert.Contains(",", fileName);
     }
@@ -101,8 +101,8 @@ public class NoteSheetTests
     [Fact]
     public void GetFileName_HandlesUnicodeCharacters()
     {
-        var noteSheet = new NoteSheet { Title = "Тест", Author = "作者" };
-        var fileName = noteSheet.GetFileName();
+        var sheetMusic = new SheetMusic { Title = "Тест", Author = "作者" };
+        var fileName = sheetMusic.GetFileName();
         Assert.Contains("Тест", fileName);
         Assert.Contains("作者", fileName);
     }
@@ -110,16 +110,16 @@ public class NoteSheetTests
     [Fact]
     public void GetFileName_HandlesYearZero()
     {
-        var noteSheet = new NoteSheet { Title = "Title", Year = 0 };
-        var fileName = noteSheet.GetFileName();
+        var sheetMusic = new SheetMusic { Title = "Title", Year = 0 };
+        var fileName = sheetMusic.GetFileName();
         Assert.Contains("0", fileName);
     }
 
     [Fact]
     public void GetSystemFileName_HandlesWhitespaceFileName()
     {
-        var noteSheet = new NoteSheet { Id = 10, Title = "Test", FileName = "   " };
-        var systemFileName = noteSheet.GetSystemFileName();
+        var sheetMusic = new SheetMusic { Id = 10, Title = "Test", FileName = "   " };
+        var systemFileName = sheetMusic.GetSystemFileName();
         Assert.StartsWith("10_", systemFileName);
         Assert.EndsWith(".pdf", systemFileName);
     }
@@ -127,8 +127,8 @@ public class NoteSheetTests
     [Fact]
     public void GetSystemFileName_HandlesUnicodeFileName()
     {
-        var noteSheet = new NoteSheet { Id = 11, FileName = "ユニコード.pdf" };
-        var systemFileName = noteSheet.GetSystemFileName();
+        var sheetMusic = new SheetMusic { Id = 11, FileName = "ユニコード.pdf" };
+        var systemFileName = sheetMusic.GetSystemFileName();
         Assert.Contains("ユニコード", systemFileName);
     }
 }

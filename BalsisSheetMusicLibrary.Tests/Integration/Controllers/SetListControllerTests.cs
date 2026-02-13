@@ -54,21 +54,21 @@ public class SetListControllerTests : IntegrationTestBase
     }
 
     [Fact]
-    public async Task GetAll_WithNoteSheets_ReturnsSetListsWithItems()
+    public async Task GetAll_WithSheetMusic_ReturnsSetListsWithItems()
     {
         // Arrange
-        var noteSheet = new Entities.NoteSheet { Id = 1, Title = "Note" };
+        var sheetMusic = new Entities.SheetMusic { Id = 1, Title = "Sheet" };
         var setList = new Entities.SetList { Id = 1, Title = "Set" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         UnitOfWork.SetLists.Add(setList);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var item = new Entities.SetListItem { SetListId = 1, NoteSheetId = 1, Order = 1 };
+        var item = new Entities.SetListItem { SetListId = 1, SheetMusicId = 1, Order = 1 };
         UnitOfWork.SetListItems.Add(item);
         await UnitOfWork.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Act
-        var result = await _controller.GetAll(withNoteSheets: true);
+        var result = await _controller.GetAll(withSheetMusic: true);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result.Result);

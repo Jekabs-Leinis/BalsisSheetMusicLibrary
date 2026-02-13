@@ -2,7 +2,7 @@ using BalsisSheetMusicLibrary.Server.Domain.ValueObjects;
 
 namespace BalsisSheetMusicLibrary.Server.Domain.Entities;
 
-public class NoteSheet
+public class SheetMusic
 {
     public uint? Id { get; set; }
     public string? Title { get; set; }

@@ -6,14 +6,14 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace BalsisSheetMusicLibrary.Server.Application.Services;
 
-public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<NoteSheetRenameService> logger)
-    : INoteSheetRenameService
+public class SheetMusicMusicRenameService(IServiceProvider serviceProvider, ILogger<SheetMusicMusicRenameService> logger)
+    : ISheetMusicRenameService
 {
     private static readonly SemaphoreSlim RenameLock = new(1, 1);
 
     public async Task RenameAllFilenamesAsync()
     {
-        logger.LogInformation("Starting rename operation for all note sheet filenames.");
+        logger.LogInformation("Starting rename operation for all sheet music filenames.");
 
         if (!await RenameLock.WaitAsync(0))
         {
@@ -53,21 +53,20 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
             await using var scope = scopeProvider.CreateAsyncScope();
             var scopedUnitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var scopedRenameHub = scope.ServiceProvider.GetRequiredService<IHubContext<StatusHub>>();
-            var scopedEnv = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
             var scopedFileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();
             // Intentionally not awaited, as we don't want to block on this.
             _ = SendStatus(scopedRenameHub, "start", "Pārsaukšana uzsākta.");
-            var sheets = await scopedUnitOfWork.NoteSheets.GetAllAsync(); ;
+            var sheets = await scopedUnitOfWork.SheetMusic.GetAllAsync(); ;
             await RenameAllSheets(sheets, scopedUnitOfWork, scopedFileStorageService, scopedRenameHub);
             _ = SendStatus(scopedRenameHub, "complete", "Pāršaukšana pabeigta.");
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error renaming note sheets");
+            logger.LogError(ex, "Error renaming sheet music");
         }
     }
 
-    private async Task RenameAllSheets(List<NoteSheet> sheets, IUnitOfWork scopedUnitOfWork,
+    private async Task RenameAllSheets(List<SheetMusic> sheets, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage, IHubContext<StatusHub> scopedHub)
     {
         var total = sheets.Count;
@@ -90,7 +89,7 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Error renaming note sheets");
+                logger.LogError(ex, "Error renaming sheet music");
 
                 _ = SendStatus(scopedHub, "error", $"Radās kļūda pārsaucot notis {sheet.Title}: {ex.Message}");
             }
@@ -102,13 +101,13 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         }
     }
 
-    private async Task<bool> RenameSingleSheet(NoteSheet sheet, IUnitOfWork scopedUnitOfWork,
+    private async Task<bool> RenameSingleSheet(SheetMusic sheetMusic, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage)
     {
-        var newFileName = sheet.GetFileName();
-        var newSystemFileName = sheet.GetSystemFileName();
+        var newFileName = sheetMusic.GetFileName();
+        var newSystemFileName = sheetMusic.GetSystemFileName();
         var sheetsFolder = fileStorage.GetBasePath();
-        var oldPath = Path.Combine(sheetsFolder, sheet.SystemFileName ?? "");
+        var oldPath = Path.Combine(sheetsFolder, sheetMusic.SystemFileName ?? "");
         var newPath = Path.Combine(sheetsFolder, newSystemFileName);
 
         try
@@ -117,14 +116,14 @@ public class NoteSheetRenameService(IServiceProvider serviceProvider, ILogger<No
         }
         catch (FileNotFoundException ex)
         {
-            logger.LogError(ex, "File not found for NoteSheet ID {Id} at path {Path}", sheet.Id, oldPath);
+            logger.LogError(ex, "File not found for SheetMusic ID {Id} at path {Path}", sheetMusic.Id, oldPath);
 
             return false;
         }
 
-        sheet.FileName = newFileName;
-        sheet.SystemFileName = newSystemFileName;
-        scopedUnitOfWork.NoteSheets.Update(sheet);
+        sheetMusic.FileName = newFileName;
+        sheetMusic.SystemFileName = newSystemFileName;
+        scopedUnitOfWork.SheetMusic.Update(sheetMusic);
         await scopedUnitOfWork.SaveChangesAsync();
 
         return true;

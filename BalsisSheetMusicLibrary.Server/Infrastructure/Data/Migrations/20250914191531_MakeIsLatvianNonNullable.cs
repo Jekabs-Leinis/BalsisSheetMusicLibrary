@@ -12,7 +12,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
         {
             migrationBuilder.AlterColumn<bool>(
                 name: "IsLatvian",
-                table: "NoteSheets",
+                table: "SheetMusic",
                 type: "INTEGER",
                 nullable: false,
                 defaultValue: false,
@@ -26,7 +26,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
         {
             migrationBuilder.AlterColumn<bool>(
                 name: "IsLatvian",
-                table: "NoteSheets",
+                table: "SheetMusic",
                 type: "INTEGER",
                 nullable: true,
                 oldClrType: typeof(bool),

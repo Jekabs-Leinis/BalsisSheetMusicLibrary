@@ -17,7 +17,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.9");
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.NoteSheet", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic", b =>
                 {
                     b.Property<uint>("Id")
                         .ValueGeneratedOnAdd()
@@ -49,7 +49,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NoteSheets");
+                    b.ToTable("SheetMusic");
                 });
 
             modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SetList", b =>
@@ -80,15 +80,15 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                     b.Property<uint>("SetListId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("NoteSheetId")
+                    b.Property<uint>("SheetMusicId")
                         .HasColumnType("INTEGER");
 
                     b.Property<uint?>("Order")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("SetListId", "NoteSheetId");
+                    b.HasKey("SetListId", "SheetMusicId");
 
-                    b.HasIndex("NoteSheetId");
+                    b.HasIndex("SheetMusicId");
 
                     b.ToTable("SetListItems");
                 });
@@ -287,9 +287,9 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
 
             modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SetListItem", b =>
                 {
-                    b.HasOne("BalsisSheetMusicLibrary.Server.Domain.Entities.NoteSheet", "NoteSheet")
+                    b.HasOne("BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic", "SheetMusic")
                         .WithMany("SetListItems")
-                        .HasForeignKey("NoteSheetId")
+                        .HasForeignKey("SheetMusicId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -299,7 +299,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NoteSheet");
+                    b.Navigation("SheetMusic");
 
                     b.Navigation("SetList");
                 });
@@ -355,7 +355,7 @@ namespace BalsisSheetMusicLibrary.Server.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.NoteSheet", b =>
+            modelBuilder.Entity("BalsisSheetMusicLibrary.Server.Domain.Entities.SheetMusic", b =>
                 {
                     b.Navigation("SetListItems");
                 });

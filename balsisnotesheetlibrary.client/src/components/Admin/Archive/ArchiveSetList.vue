@@ -28,49 +28,56 @@ const formatDate = (dateString) => {
 <template>
   <div class="setlist-item card mb-3">
     <div
-      class="card-header d-flex text-break justify-content-between align-items-center"
+      class="card-header"
       @click="emit('toggleExpand', setList.id)"
     >
-      <i
-        class="bi"
-        :class="[isExpanded ? 'bi-chevron-up' : 'bi-chevron-down']"
-      />
-      <div class="d-flex align-items-center flex-grow-1">
-        <h5 class="mb-0 mx-3">{{ setList.title }}</h5>
-        <span class="badge text-bg-secondary">
-          Arhivēts: {{ formatDate(setList.archivedAt) }}
-        </span>
-        <div class="flex-grow-1" />
-        <button
-          class="btn btn-icon btn-action btn-sm btn-outline-secondary mx-1"
-          title="Atjaunot dziesmu sarakstu"
-          @click.stop="emit('restore', setList)"
-        >
-          <i class="bi bi-arrow-counterclockwise" />
-        </button>
-        <button
-          class="btn btn-icon btn-action btn-sm btn-outline-danger"
-          title="Dzēst dziesmu sarakstu"
-          @click.stop="emit('remove', setList)"
-        >
-          <i class="bi bi-trash" />
-        </button>
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-2 w-100">
+        <div class="d-flex align-items-center flex-grow-1 flex-md-grow-0 w-100 w-md-auto">
+          <i
+            class="bi flex-shrink-0"
+            :class="[isExpanded ? 'bi-chevron-up' : 'bi-chevron-down']"
+          />
+          <h5 class="mb-0 mx-3 text-break flex-grow-1">{{ setList.title }}</h5>
+        </div>
+
+        <div class="d-flex align-items-center gap-2 ms-0 ms-md-auto w-100 w-md-auto">
+          <span class="badge text-bg-secondary flex-shrink-0 me-auto me-md-0">
+            Arhivēts: {{ formatDate(setList.archivedAt) }}
+          </span>
+
+          <div class="d-flex gap-1 flex-shrink-0 ms-auto">
+            <button
+              class="btn btn-icon btn-action btn-sm btn-outline-secondary"
+              title="Atjaunot dziesmu sarakstu"
+              @click.stop="emit('restore', setList)"
+            >
+              <i class="bi bi-arrow-counterclockwise" />
+            </button>
+            <button
+              class="btn btn-icon btn-action btn-sm btn-outline-danger"
+              title="Dzēst dziesmu sarakstu"
+              @click.stop="emit('remove', setList)"
+            >
+              <i class="bi bi-trash" />
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="isExpanded" class="card-body">
       <div v-if="setList.items.length > 0">
         <table class="table table-hover">
           <thead>
-            <tr>
-              <th>#</th>
-              <th>Nosaukums</th>
-            </tr>
+          <tr>
+            <th>#</th>
+            <th>Nosaukums</th>
+          </tr>
           </thead>
           <tbody>
-            <tr v-for="item in setList.items" :key="item.noteSheetId">
-              <td>{{ item.order + 1 }}</td>
-              <td class="text-break">{{ item.noteSheet?.getFormattedTitle() || "N/A" }}</td>
-            </tr>
+          <tr v-for="item in setList.items" :key="item.noteSheetId">
+            <td>{{ item.order + 1 }}</td>
+            <td class="text-break">{{ item.noteSheet?.getFormattedTitle() || "N/A" }}</td>
+          </tr>
           </tbody>
         </table>
       </div>
@@ -88,5 +95,11 @@ const formatDate = (dateString) => {
 .card-header:hover {
   /* Matches bootstrap's table row hover color */
   background-color: rgba(0, 0, 0, 0.075);
+}
+
+.w-md-auto {
+  @media (min-width: 768px) {
+    width: auto !important;
+  }
 }
 </style>

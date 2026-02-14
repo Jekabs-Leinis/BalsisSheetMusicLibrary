@@ -363,7 +363,7 @@ MigrationBackup/
 FodyWeavers.xsd
 
 /BalsisSheetMusicLibrary.Server/Static/Sheets/*
-/BalsisSheetMusicLibrary.Server/app.db
+/BalsisSheetMusicLibrary.Server/app.db*
 .env
 /BalsisSheetMusicLibrary.Server/Static/*
 .kiro/

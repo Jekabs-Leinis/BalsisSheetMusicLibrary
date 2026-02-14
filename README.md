@@ -1,8 +1,16 @@
 # BalsisSheetMusicLibrary
 
-Balsis Sheet Music Library is a web SPA for choirists from choir **Balsis** to store sheet music and organize them into setlists.
+Balsis Sheet Music Library is a web SPA for choristers from choir **Balsis** to store sheet music and organize them into setlists.
 
-It includes a 
+## Project reasoning and goals
+
+This project represents a clean-room reimagination of a legacy Python 2 WSGI application. While the previous iteration was functional, its deprecated dependencies ultimately made setup difficult and rendered the project unmaintainable. Consequently, the primary objective of this new architecture is to ensure long-term viability and ease of use.
+
+Because the system is intended to be deployed by choir members with varying levels of technical proficiency, ease of setup is a critical requirement. The technology stack was specifically selected with this constraint in mind, prioritizing tools that are widely used, stable, and well-documented to facilitate straightforward maintenance.
+
+Designed strictly as a self-hosted solution for internal use, the project adopts a pragmatic security posture. Since the threat model is limited, certain deployment conveniences are prioritized over strict security best practices. For example, the system utilizes dotenv files for configuration rather than complex vault solutions and does not enforce aggressive password policies.
+
+Development also served as an opportunity to explore modern technologies and architectural patterns, specifically ASP.NET Core, the Vue 3 Composition API, and Domain-Driven Design (DDD). Note that while DDD concepts were an influence, this project is not a strict implementation of DDD and does not follow all of its principles as that would be overkill for a project of this size and scope.
 
 ## Tech stack
 
@@ -11,13 +19,11 @@ It includes a
     - Entity Framework Core + **SQLite**
     - ASP.NET Identity (authentication/authorization)
     - Serilog (logging)
-    - Swagger / OpenAPI (Swashbuckle)
 - **Frontend**
     - Vue 3 + Vite
     - Pinia, Vue Router
     - Bootstrap
     - Axios
-    - SignalR client
 
 ## Prerequisites
 
@@ -36,7 +42,7 @@ It includes a
 2. Install client dependencies:
 
 ```powershell
-   npm install --prefix .\BalsisSheetMusicLibrary.clien
+   npm install --prefix .\BalsisSheetMusicLibrary.Client
 ```
 
 3. Configure environment variables:
@@ -49,10 +55,10 @@ It includes a
 
  ```dotenv
 LIB_USER_NAME=your_user_username
-LIB_USER_PASS=
+LIB_USER_PASS=your_user_password
 
 LIB_ADMIN_NAME=your_admin_username
-LIB_ADMIN_PASS=
+LIB_ADMIN_PASS=your_admin_password
 
 # If 1, will run the seeder on application start
 # Must be enabled on first run to create initial users, then should be disabled
@@ -113,7 +119,7 @@ dotnet publish .\BalsisSheetMusicLibrary.Server\BalsisSheetMusicLibrary.Server.c
 
 Copy the contents of the `publish` folder to your server and run the executable (`BalsisSheetMusicLibrary.Server.exe` on Windows, `BalsisSheetMusicLibrary.Server` on Linux).
 
-For deployment instructions, see [the wiki]().
+For deployment instructions, see [the wiki](https://github.com/Jekabs-Leinis/BalsisNoteSheetLibrary/wiki/Deployment-Guide).
 
 ## Testing
 
@@ -125,12 +131,6 @@ Run all tests:
 dotnet test .\BalsisSheetMusicLibrary.sln
 ```
 
-Collect coverage (via `coverlet.collector` / .NET test data collector):
-
-```powershell
-dotnet test .\BalsisSheetMusicLibrary.sln --collect:"XPlat Code Coverage"
-```
-
 Notes:
 
 - Unit and integration tests live in `BalsisSheetMusicLibrary.Tests`.
@@ -138,58 +138,11 @@ Notes:
     - Unit testing guidelines: `Docs/ForLLMs/Guidelines/UnitTestingGuidelines.md`
     - Integration testing guidelines: `Docs/ForLLMs/Guidelines/IntegrationTestingGuidelines.md`
 
-## Dependencies and services
-
-| Dependency | Purpose | Notes |
-|-----------|---------|------|
-| **SQLite (`app.db`)** | Primary data store | Connection string: `Data Source=app.db` (`appsettings.json`) |
-| **Serilog** | Logging | Logs to console and `Logs/log-.txt` |
-| **Swagger (Swashbuckle)** | API documentation | Enabled in development profile |
-
-## Folder structure
-
-```text
-BalsisNotis/
-  BalsisSheetMusicLibrary.Server/      # ASP.NET Core backend (API + SPA proxy)
-    Api/
-    Application/
-    Domain/
-    Infrastructure/
-    Properties/
-    Static/
-      Sheets/                         # PDF files stored on disk
-  BalsisSheetMusicLibrary.Tests/       # xUnit test project
-    Integration/
-    Unit/
-  BalsisSheetMusicLibrary.Client/      # Vue 3 + Vite frontend
-    src/
-      api/
-      assets/
-      components/
-      config/
-      directives/
-      models/
-      router/
-      services/
-      static/
-      stores/
-      views/
-  Docs/                               # project docs (incl. testing guidelines)
-    ForLLMs/
-      Commands/
-      Guidelines/
-      Research/
-  Installation.md                     # deployment notes (kept separate from developer README)
-  LICENSE.txt                         
-```
-
 ## Deployment
 
 Developer README intentionally stays focused on local development.
 
-- For deployment instructions, see: `Installation.md`.
-- CI/CD:
-    - No pipeline is currently configured (the `.github/workflows/` directory is empty).
+- For deployment instructions, see [the wiki](https://github.com/Jekabs-Leinis/BalsisNoteSheetLibrary/wiki/Deployment-Guide).
 
 ## License
 

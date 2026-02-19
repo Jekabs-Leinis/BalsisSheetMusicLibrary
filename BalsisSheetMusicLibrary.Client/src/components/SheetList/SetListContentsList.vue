@@ -1,11 +1,9 @@
 <script setup>
-/** @type {import("vue").DefineProps<{
- sheetMusic: SheetMusic[],
- setLists: SetList[],
- }>} */
 const props = defineProps({
-  sheetMusic: Array,
-  setLists: Array,
+  /** @type import('vue').PropType<SheetMusic[]> */
+  sheetMusic: { type: Array, required: true },
+  /** @type import('vue').PropType<SetList[]> */
+  setLists: { type: Array, required: true },
 });
 </script>
 
@@ -21,13 +19,19 @@ const props = defineProps({
         >
           <ul>
             <li>
-              <h2 class="pt-0 my-3"><b>{{ setList.title }}</b></h2>
+              <h2 class="pt-0 my-3">
+                <b>{{ setList.title }}</b>
+              </h2>
             </li>
             <li
               v-for="sheet in setList.getSheetMusic(props.sheetMusic)"
               :key="sheet.id"
             >
-              <a :href="`/api/download/${sheet.id}/${sheet.fileName}`" class="text-decoration-none" target="_blank">
+              <a
+                :href="`/api/download/${sheet.id}/${sheet.fileName}`"
+                class="text-decoration-none"
+                target="_blank"
+              >
                 <b>{{ sheet.title }}</b></a
               >{{ sheet.getFormattedAdditionalData() }}
             </li>

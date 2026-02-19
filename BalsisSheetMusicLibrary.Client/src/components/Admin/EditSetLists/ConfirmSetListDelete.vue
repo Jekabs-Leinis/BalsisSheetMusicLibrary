@@ -3,7 +3,7 @@ import { computed } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 
 const props = defineProps({
-  /** @type {SetList} */
+  /** @type import('vue').PropType<SetList> */
   setList: {
     type: Object,
     default: null,
@@ -37,7 +37,9 @@ function onDeleteConfirm() {
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p class="text-break">Vai tiešām vēlaties dzēst dziesmu sarakstu "{{ setList.title }}"?</p>
+      <p class="text-break">
+        Vai tiešām vēlaties dzēst dziesmu sarakstu "{{ setList.title }}"?
+      </p>
       <p class="text-danger">
         <strong>Šī darbība ir neatgriezeniska.</strong>
       </p>

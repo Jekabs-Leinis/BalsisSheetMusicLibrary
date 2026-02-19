@@ -10,7 +10,7 @@ import { useSetListStore } from "@/stores/setlistStore.js";
 import { useToast } from "vue-toastification";
 
 const props = defineProps({
-  /** @type {SetList} */
+  /** @type import('vue').PropType<SetList> */
   setList: {
     type: Object,
     required: true,

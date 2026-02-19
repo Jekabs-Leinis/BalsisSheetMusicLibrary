@@ -36,7 +36,7 @@ onMounted(async () => {
     :set-lists="setListStore.setLists"
   />
   <div id="lv-sheets">
-    <div class="container" v-loading="sheetMusicStore.isLoading">
+    <div v-loading="sheetMusicStore.isLoading" class="container">
       <SheetMusicList
         title="Latviešu skaņdarbi"
         :sheet-music="sheetMusicStore.filteredLatvianSheetMusic"
@@ -44,7 +44,7 @@ onMounted(async () => {
     </div>
   </div>
   <div id="foreign-sheets">
-    <div class="container" v-loading="sheetMusicStore.isLoading">
+    <div v-loading="sheetMusicStore.isLoading" class="container">
       <SheetMusicList
         title="Ārzemju skaņdarbi"
         :sheet-music="sheetMusicStore.filteredForeignSheetMusic"

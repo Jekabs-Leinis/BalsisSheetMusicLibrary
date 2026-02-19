@@ -3,6 +3,7 @@ import { computed } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 
 const props = defineProps({
+  /** @type import('vue').PropType<SetList> */
   setList: {
     type: Object,
     default: null,
@@ -36,7 +37,9 @@ function onArchiveConfirm() {
     @hidden="emit('close')"
   >
     <template v-if="setList">
-      <p class="text-break">Vai tiešām vēlies arhivēt dziesmu sarakstu "{{ setList.title }}"?</p>
+      <p class="text-break">
+        Vai tiešām vēlies arhivēt dziesmu sarakstu "{{ setList.title }}"?
+      </p>
     </template>
 
     <template #footer>

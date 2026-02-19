@@ -8,6 +8,7 @@ const sheetMusicStore = useSheetMusicStore();
 const toast = useToast();
 
 const props = defineProps({
+  /** @type import('vue').PropType<SheetMusic> */
   sheet: {
     type: Object,
     default: null,

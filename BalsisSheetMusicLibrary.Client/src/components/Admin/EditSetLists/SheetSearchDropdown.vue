@@ -1,8 +1,9 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
+// noinspection JSValidateTypes
 const props = defineProps({
-  /** @type {SheetMusic[]} */
+  /** @type import('vue').PropType<SheetMusic[]> */
   sheets: {
     type: Array,
     required: true,

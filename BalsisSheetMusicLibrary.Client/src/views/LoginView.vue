@@ -41,34 +41,34 @@ async function attemptLogin() {
       <h1 class="fw-normal">Nošu arhīvs</h1>
       <label for="userName" class="mt-3">Username</label>
       <input
-        class="form-control form-control-sm"
         id="userName"
+        v-model="userName"
+        class="form-control form-control-sm"
         name="userName"
         type="text"
         value=""
-        v-model="userName"
       />
 
       <label for="password" class="mt-3">Password</label>
       <input
-        class="form-control form-control-sm"
         id="password"
+        v-model="password"
+        class="form-control form-control-sm"
         name="password"
         type="password"
         value=""
-        v-model="password"
         @keydown.enter="attemptLogin"
       />
 
-      <div class="info mt-3 text-white" v-if="errorMessage">
+      <div v-if="errorMessage" class="info mt-3 text-white">
         {{ errorMessage }}
       </div>
 
       <div class="w-100">
         <button
+          id="submit"
           v-loading.bg="loading"
           class="mt-3"
-          id="submit"
           name="submit"
           value="Login"
           @click="attemptLogin"

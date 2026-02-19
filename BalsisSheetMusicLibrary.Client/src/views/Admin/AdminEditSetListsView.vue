@@ -204,14 +204,14 @@ const onArchiveConfirmed = (setList) => {
     </div>
   </div>
   <ConfirmSetListDelete
-    :set-list="setListToDelete"
     v-model:show="showDeleteConfirm"
+    :set-list="setListToDelete"
     @confirm="onDeleteConfirmed"
     @close="setListToDelete = null"
   />
   <ConfirmSetListArchive
-    :set-list="setListToArchive"
     v-model:show="showArchiveConfirm"
+    :set-list="setListToArchive"
     @confirm="onArchiveConfirmed"
     @close="setListToArchive = null"
   />

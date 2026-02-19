@@ -56,7 +56,7 @@ async function onConfirm() {
     >
       <div class="mb-3">
         <label for="userSelect" class="form-label">Izvēlieties lietotāju</label>
-        <select id="userSelect" class="form-select" v-model="selectedUserName">
+        <select id="userSelect" v-model="selectedUserName" class="form-select">
           <option value="" disabled>Izvēlieties...</option>
           <option
             v-for="user in users"
@@ -71,9 +71,9 @@ async function onConfirm() {
         <label for="newPassword" class="form-label">Jaunā parole</label>
         <input
           id="newPassword"
+          v-model="newPassword"
           type="text"
           class="form-control"
-          v-model="newPassword"
           autocomplete="new-password"
         />
       </div>
@@ -87,10 +87,10 @@ async function onConfirm() {
             Atcelt
           </button>
           <button
+            v-loading.bg="loading"
             type="button"
             class="btn btn-success"
             :disabled="loading || !selectedUserName || !newPassword"
-            v-loading.bg="loading"
             @click="onConfirm"
           >
             Mainīt

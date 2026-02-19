@@ -5,7 +5,7 @@ import { SetList } from "@/models/sheetModels.js";
 import { useToast } from "vue-toastification";
 
 const props = defineProps({
-  /** @type {SetList} */
+  /** @type import('vue').PropType<SetList> */
   setList: {
     type: Object,
     required: true,
@@ -74,7 +74,7 @@ const saveTitle = async () => {
       <i class="bi bi-grip-vertical text-muted"></i>
     </span>
     <div v-if="!isEditing" class="d-flex align-items-center flex-grow-1">
-      <h5 class="mb-0 me-2 ">{{ setList.title }}</h5>
+      <h5 class="mb-0 me-2">{{ setList.title }}</h5>
       <button
         :disabled="isLoading"
         aria-label="Edit title"

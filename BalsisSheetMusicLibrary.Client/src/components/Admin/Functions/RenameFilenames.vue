@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 import VModal from "@/components/Common/VModal.vue";
 import { useToast, TYPE } from "vue-toastification";
 import StatusHubService from "@/services/statusHubService";
-import axios from "axios";
+import { renameAllSheetMusic } from "@/api/sheetMusicApi.js";
 
 const showModal = ref(false);
 
@@ -18,11 +18,11 @@ async function onConfirm() {
 
   showModal.value = false;
   try {
-    await axios.post("/api/sheetMusic/RenameAllFilenames");
+    await renameAllSheetMusic();
   } catch (err) {
-    const message = err?.response?.data?.error || err.message;
-
-    showToastMessage(`Kļūda, nevar sākt pārsaukšanu: ${message}`, TYPE.ERROR);
+    console.log(err);
+    
+    showToastMessage(`Kļūda, nevar sākt pārsaukšanu: ${err.message}`, TYPE.ERROR);
   }
 }
 
@@ -45,7 +45,7 @@ function handleStatus(data) {
   showToastMessage(data.message, variantMap[data.status] ?? TYPE.INFO);
 }
 
-async function showToastMessage(content, type) {
+function showToastMessage(content, type) {
   if (type === TYPE.INFO) {
     if (!infoToastId.value) {
       infoToastId.value = toast(content, {

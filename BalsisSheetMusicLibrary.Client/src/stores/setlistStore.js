@@ -14,9 +14,9 @@ import { moveSetListItem as moveSetListItemApi } from "@/api/setListItemApi";
 import { SetList } from "@/models/sheetModels";
 
 export const useSetListStore = defineStore("setlist", () => {
-  /** @type {import('vue').Ref<import('@/models/sheetModels').SetList[]>} */
+  /** @type {import('vue').Ref<SetList[]>} */
   const setLists = ref([]);
-  /** @type {import('vue').Ref<import('@/models/sheetModels').SetList[]>} */
+  /** @type {import('vue').Ref<SetList[]>} */
   const archivedSetLists = ref([]);
   /** @type {import('vue').Ref<boolean>} */
   const isLoading = ref(false);

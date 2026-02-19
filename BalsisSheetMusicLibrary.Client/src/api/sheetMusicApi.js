@@ -76,3 +76,11 @@ export async function deleteSheetMusic(sheetMusicId) {
     throw new ResponseError(e, "Failed to delete sheet music");
   }
 }
+
+export async function renameAllSheetMusic() {
+  try {
+    await axios.post("/api/sheetMusic/RenameAllFilenames");
+  } catch (e) {
+    throw new ResponseError(e, "Failed to rename sheet music");
+  }
+}

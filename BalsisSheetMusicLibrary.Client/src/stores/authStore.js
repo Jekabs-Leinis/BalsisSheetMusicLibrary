@@ -7,7 +7,7 @@ import { User } from "@/models/userModels.js";
 import { ref } from "vue";
 
 export const useAuthStore = defineStore("auth", () => {
-  /** @type {import('vue').Ref<import('@/models/userModels').User|null>} */
+  /** @type {import('vue').Ref<User|null>} */
   const user = ref(null);
   /** @type {import('vue').Ref<boolean>} */
   const isAuthenticated = ref(false);

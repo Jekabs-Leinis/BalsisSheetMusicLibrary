@@ -49,7 +49,7 @@ async function attemptLogout() {
       </a>
       <form class="d-flex my-3 flex-grow-1" role="search" @submit.prevent>
         <div class="input-group search-box">
-          <span class="input-group-text pe-0" id="basic-addon1">
+          <span id="basic-addon1" class="input-group-text pe-0">
             <i class="bi bi-search" />
           </span>
           <input
@@ -79,13 +79,13 @@ async function attemptLogout() {
         <span class="navbar-toggler-icon"></span>
       </button>
       <div
+        id="offcanvasNavbar"
         class="offcanvas offcanvas-end bg-dark text-white flex-md-grow-0"
         tabindex="-1"
-        id="offcanvasNavbar"
         aria-labelledby="offcanvasNavbarLabel"
       >
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+          <h5 id="offcanvasNavbarLabel" class="offcanvas-title">
             Nošu bibliotēka
           </h5>
           <button
@@ -111,7 +111,7 @@ async function attemptLogout() {
                 >Ārzemju skaņdarbi</a
               >
             </li>
-            <li class="nav-item text-end" v-if="isAdmin">
+            <li v-if="isAdmin" class="nav-item text-end">
               <RouterLink
                 :to="{ name: 'AdminFunctions' }"
                 class="nav-link text-nowrap pe-2 pe-lg-0 text-light"

@@ -6,6 +6,7 @@ import { useToast } from "vue-toastification";
 import { useSheetMusicStore } from "@/stores/sheetMusicStore.js";
 
 const props = defineProps({
+  /** @type import('vue').PropType<SheetMusic> */
   sheet: {
     type: Object,
     default: null,
@@ -182,8 +183,8 @@ function onInputBlur(field) {
           class="form-control"
           placeholder="Ievadiet dziesmas nosaukumu"
           required
-          @blur="onInputBlur('title')"
           :class="{ 'is-invalid': !formData.title.trim() }"
+          @blur="onInputBlur('title')"
         />
       </div>
 
@@ -223,10 +224,10 @@ function onInputBlur(field) {
 
       <div class="form-check py-2 mb-3">
         <input
-          class="form-check-input"
-          type="checkbox"
           id="latvian-checkbox"
           v-model="formData.isLatvian"
+          class="form-check-input"
+          type="checkbox"
         />
         <label class="form-check-label" for="latvian-checkbox">
           Latviešu dziesma
@@ -266,12 +267,12 @@ function onInputBlur(field) {
 
         <div class="input-group">
           <input
+            id="file-input"
             type="file"
             class="form-control"
-            id="file-input"
             accept="application/pdf"
-            @change="onFileChanged"
             :class="{ 'is-invalid': fileError }"
+            @change="onFileChanged"
           />
         </div>
 
@@ -291,8 +292,8 @@ function onInputBlur(field) {
           Atcelt
         </button>
         <button
-          type="button"
           v-loading.bg="isSaving"
+          type="button"
           class="btn btn-primary"
           @click="onSave"
         >

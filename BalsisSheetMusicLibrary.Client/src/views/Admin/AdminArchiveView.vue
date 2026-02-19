@@ -108,7 +108,7 @@ const onDeleteConfirm = (setList) => {
     <div class="container py-4">
       <div class="row justify-content-center">
         <div class="col-12 col-lg-10 col-xl-8">
-          <ArchiveSearchBar @search="onSearch" class="mb-4" />
+          <ArchiveSearchBar class="mb-4" @search="onSearch" />
 
           <div v-if="isInitializing" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
@@ -138,10 +138,10 @@ const onDeleteConfirm = (setList) => {
               :key="setList.id"
               :set-list="setList"
               :is-expanded="expandedSetLists.has(setList.id)"
+              class="mb-3"
               @toggle-expand="toggleExpand"
               @restore="onRestore"
               @remove="onDelete"
-              class="mb-3"
             />
           </div>
         </div>

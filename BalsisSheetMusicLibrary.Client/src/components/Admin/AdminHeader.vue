@@ -26,13 +26,13 @@ const route = useRoute();
         <span class="navbar-toggler-icon"></span>
       </button>
       <div
+        id="offcanvasNavbar"
         class="offcanvas offcanvas-end bg-dark text-white flex-md-grow-0"
         tabindex="-1"
-        id="offcanvasNavbar"
         aria-labelledby="offcanvasNavbarLabel"
       >
         <div class="offcanvas-header">
-          <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+          <h5 id="offcanvasNavbarLabel" class="offcanvas-title">
             Administrācija
           </h5>
           <button

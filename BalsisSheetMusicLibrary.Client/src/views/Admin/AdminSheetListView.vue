@@ -75,10 +75,10 @@ const openEditModal = (sheetId) => {
             <i class="bi bi-search"></i>
           </span>
           <input
+            v-model="searchInput"
             type="text"
             class="form-control"
             placeholder="Meklē notis..."
-            v-model="searchInput"
           />
         </div>
       </div>
@@ -94,28 +94,28 @@ const openEditModal = (sheetId) => {
       <table class="table table-striped table-hover">
         <thead class="table-dark">
           <tr>
-            <th @click="onSort('title')" class="sort-header">
+            <th class="sort-header" @click="onSort('title')">
               Nosaukums
               <i
                 v-if="sortField === 'title'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="onSort('author')" class="sort-header">
+            <th class="sort-header" @click="onSort('author')">
               Mūzikas autors
               <i
                 v-if="sortField === 'author'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="onSort('lyricist')" class="sort-header">
+            <th class="sort-header" @click="onSort('lyricist')">
               Vārdu autors
               <i
                 v-if="sortField === 'lyricist'"
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="onSort('year')" class="sort-header">
+            <th class="sort-header" @click="onSort('year')">
               Gads
               <i
                 v-if="sortField === 'year'"
@@ -123,8 +123,8 @@ const openEditModal = (sheetId) => {
               ></i>
             </th>
             <th
-              @click="onSort('isLatvian')"
               class="sort-header text-center"
+              @click="onSort('isLatvian')"
             >
               Valoda
               <i
@@ -132,7 +132,7 @@ const openEditModal = (sheetId) => {
                 :class="['bi', getSortIcon(), 'ms-1']"
               ></i>
             </th>
-            <th @click="onSort('fileName')" class="sort-header">
+            <th class="sort-header" @click="onSort('fileName')">
               Faila nosaukums
               <i
                 v-if="sortField === 'filename'"
@@ -187,9 +187,9 @@ const openEditModal = (sheetId) => {
           </tr>
           <tr v-if="sheetMusicStore.filteredSheetMusic.length === 0">
             <td
+              v-loading="sheetMusicStore.isLoading"
               colspan="7"
               class="text-center py-3"
-              v-loading="sheetMusicStore.isLoading"
             >
               <template v-if="!sheetMusicStore.isLoading">
                 Notis nav atrastas
@@ -203,16 +203,16 @@ const openEditModal = (sheetId) => {
 
   <!-- Delete confirmation modal -->
   <DeleteSheet
-    :sheet="sheetToDelete"
     v-model:show="showDeleteModal"
+    :sheet="sheetToDelete"
     @close="sheetToDelete = null"
     @deleted="sheetToDelete = null"
   />
 
   <!-- Edit sheet modal -->
   <EditSheet
-    :sheet="sheetToEdit"
     v-model:show="showEditModal"
+    :sheet="sheetToEdit"
     @close="sheetToEdit = null"
     @save="sheetToEdit = null"
   />

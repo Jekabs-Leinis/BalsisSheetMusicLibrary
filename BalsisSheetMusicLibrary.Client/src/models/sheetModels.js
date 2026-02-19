@@ -99,7 +99,7 @@ export class SetListItem {
   
   /** @type {Number} */
   sheetMusicId;
-  /** @type {string} */
+  /** @type {Number} */
   setListId;
   /** @type {Number} */
   order;

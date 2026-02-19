@@ -46,8 +46,8 @@ onUnmounted(() => {
       <div v-if="showButton" class="position-fixed d-block back-to-top">
         <a
           class="btn btn-icon btn-secondary d-flex justify-content-center align-items-center"
-          @click="scrollToTop"
           aria-label="Back to top"
+          @click="scrollToTop"
         >
           <i class="bi bi-arrow-up" />
         </a>

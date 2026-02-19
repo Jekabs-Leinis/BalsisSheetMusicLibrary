@@ -9,7 +9,7 @@ export function filterAndSortSheetMusic(
   sortField,
   sortDirection,
 ) {
-  let filtered = [];
+  let filtered;
   const search = query.trim().toLowerCase();
 
   if (!search) {

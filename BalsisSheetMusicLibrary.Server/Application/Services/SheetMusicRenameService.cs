@@ -104,8 +104,9 @@ public class SheetMusicMusicRenameService(IServiceProvider serviceProvider, ILog
     private async Task<bool> RenameSingleSheet(SheetMusic sheetMusic, IUnitOfWork scopedUnitOfWork,
         IFileStorageService fileStorage)
     {
-        var newFileName = sheetMusic.GetFileName();
-        var newSystemFileName = sheetMusic.GetSystemFileName();
+        var oldExtension = Path.GetExtension(sheetMusic.SystemFileName);
+        var newFileName = sheetMusic.GetFileName(oldExtension);
+        var newSystemFileName = sheetMusic.GetSystemFileName(oldExtension);
         var sheetsFolder = fileStorage.GetBasePath();
         var oldPath = Path.Combine(sheetsFolder, sheetMusic.SystemFileName ?? "");
         var newPath = Path.Combine(sheetsFolder, newSystemFileName);

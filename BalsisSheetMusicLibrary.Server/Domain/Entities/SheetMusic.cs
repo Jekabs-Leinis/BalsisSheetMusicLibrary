@@ -16,7 +16,7 @@ public class SheetMusic
 
    public IEnumerable<SetListItem>? SetListItems { get; set; }
 
-    public string GetFileName()
+    public string GetFileName(string? extension = null)
     {
         var nameParts = new List<string> { Title ?? "" };
 
@@ -36,19 +36,21 @@ public class SheetMusic
         }
 
         var fileName = string.Join(", ", nameParts);
+        
+        fileName += extension ?? ".pdf";
 
         fileName = SanitizedFileName.Create(fileName);
 
-        return fileName + ".pdf";
+        return fileName;
     }
 
-    public string GetSystemFileName()
+    public string GetSystemFileName(string? extension = null)
     {
         if (Id is null)
         {
             throw new InvalidOperationException("Sheet id cannot be null.");
         }
 
-        return $"{Id}_{GetFileName()}";
+        return $"{Id}_{GetFileName(extension)}";
     }
 }

@@ -101,12 +101,9 @@ Run all tests:
 dotnet test .\BalsisSheetMusicLibrary.sln
 ```
 
-Notes:
-
 - Unit and integration tests live in `BalsisSheetMusicLibrary.Tests`.
-- Project guidance:
-    - Unit testing guidelines: `Docs/ForLLMs/Guidelines/UnitTestingGuidelines.md`
-    - Integration testing guidelines: `Docs/ForLLMs/Guidelines/IntegrationTestingGuidelines.md`
+- Unit testing guidelines: `Docs/ForLLMs/Guidelines/UnitTestingGuidelines.md`
+- Integration testing guidelines: `Docs/ForLLMs/Guidelines/IntegrationTestingGuidelines.md`
 
 ## License
 

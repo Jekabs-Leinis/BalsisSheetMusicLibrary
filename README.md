@@ -12,6 +12,10 @@ Designed strictly as a self-hosted solution for internal use, the project adopts
 
 Development also served as an opportunity to explore modern technologies and architectural patterns, specifically ASP.NET Core, the Vue 3 Composition API, and Domain-Driven Design (DDD). Note that while DDD concepts were an influence, this project is not a strict implementation of DDD and does not follow all of its principles as that would be overkill for a project of this size and scope.
 
+## Deployment & Usage
+
+For deployment instructions, see [Installation.md](https://github.com/Jekabs-Leinis/BalsisNoteSheetLibrary/blob/master/Docs/Installation.md).
+
 ## Tech stack
 
 - **Backend**
@@ -49,41 +53,7 @@ Development also served as an opportunity to explore modern technologies and arc
 
     - Copy `BalsisSheetMusicLibrary.Server/.env.example` to `BalsisSheetMusicLibrary.Server/.env`
     - Fill in passwords and adjust seeding flags as needed.
-    - Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where sheet music PDFs will be stored. This should be either a relative path from the server binary (e.g., `./Sheets`) or an absolute path (e.g., `C:/BalsisSheets`).
-
-   Example `.env`:
-
- ```dotenv
-LIB_USER_NAME=your_user_username
-LIB_USER_PASS=your_user_password
-
-LIB_ADMIN_NAME=your_admin_username
-LIB_ADMIN_PASS=your_admin_password
-
-# If 1, will run the seeder on application start
-# Must be enabled on first run to create initial users, then should be disabled
-# Password can be changed afterwards via web interface after login
-LIB_ENABLE_SEEDERS=1
-
-# If 1, will allow seeding to overwrite existing user passwords with LIB_USER_PASS and LIB_ADMIN_PASS
-# Used as a recovery option in case passwords are lost.
-LIB_ALLOW_SEEDER_PASSWORD_RESET=0
-
-# If 1, will allow manual password reset for admin via web interface
-# Can be disabled for public testing deployments
-LIB_ALLOW_MANUAL_PASSWORD_RESET=1
-
-# Path to the folder where the sheets are stored. Path can be either absolute or relative.
-# If relative, it must not begin with a '/' or '\', and will be relative to the binary location.
-LIB_SHEETS_FOLDER_PATH=path/to/sheets/folder
-
-# If 1, will disable soft delete functionality and permanently delete sheets instead of moving them to the trash folder.
-LIB_SOFT_DELETE_DISABLED=0
-
-# Path to the folder where the deleted sheets are moved to when soft delete is enabled. Path can be either absolute or relative to LIB_SHEETS_FOLDER_PATH.
-# If not set a default "trash" folder will be used within the sheets folder.
-LIB_TRASH_FOLDER_PATH=trash
-```
+    - Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where sheet music PDFs will be stored. This should be either a relative path from the server binary BalsisSheetMusicLibrary.Server folder (e.g., `files/sheets`) or an absolute path (e.g., `C:/BalsisSheets`).
 
    > [!IMPORTANT]
    > `BalsisSheetMusicLibrary.Server/.env` is intentionally gitignored. Do not commit secrets.
@@ -137,12 +107,6 @@ Notes:
 - Project guidance:
     - Unit testing guidelines: `Docs/ForLLMs/Guidelines/UnitTestingGuidelines.md`
     - Integration testing guidelines: `Docs/ForLLMs/Guidelines/IntegrationTestingGuidelines.md`
-
-## Deployment
-
-Developer README intentionally stays focused on local development.
-
-- For deployment instructions, see [the wiki](https://github.com/Jekabs-Leinis/BalsisNoteSheetLibrary/wiki/Deployment-Guide).
 
 ## License
 

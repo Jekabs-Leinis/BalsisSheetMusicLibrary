@@ -64,6 +64,10 @@ function showToastMessage(content, type) {
       );
     }
   } else {
+    if (infoToastId.value) {
+      toast.dismiss(infoToastId.value);
+      infoToastId.value = null;
+    }
     toast(content, { type });
   }
 }

@@ -367,3 +367,4 @@ FodyWeavers.xsd
 .env
 /BalsisSheetMusicLibrary.Server/Static/*
 .kiro/
+.idea/

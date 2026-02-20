@@ -104,6 +104,9 @@ If the folder specified in `LIB_SHEETS_FOLDER_PATH` does not exist, the app will
 
 It is recommended to turn the seeders on for the first run to create the initial admin and user accounts, then turn them off afterwards to prevent accidental password resets.
 
+> [!NOTE]
+> Without setting user passwords in the `.env` file, you will not be able to log in to the app.
+
 ## 5. Set up app service
 
 If your server restarts, or if the app crashes, you want it to turn back on automatically. We use a built-in tool called **Systemd** to create a background service for your app.

@@ -74,9 +74,19 @@ public class SheetMusicMusicService(
 
         if (fileStream != null)
         {
-            if (!string.IsNullOrEmpty(sheetMusic.SystemFileName))
+            try
             {
-                await fileStorageService.DeleteFile(sheetMusic.SystemFileName, "update");
+                if (!string.IsNullOrEmpty(sheetMusic.SystemFileName))
+                {
+                    await fileStorageService.DeleteFile(sheetMusic.SystemFileName, "update");
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                // File has somehow been lost, local state is corrupt, but we proceed with update because:
+                // 1. This could be user error, by manually adjusting files
+                // 2. Crashing here would make this entry not updatable unless a file is produced.
+                // It's better to just allow user to insert a new file.
             }
 
             sheetMusic.FileName = sheetMusic.GetFileName();
@@ -114,9 +124,18 @@ public class SheetMusicMusicService(
             throw new InvalidOperationException("SheetMusic not found");
         }
 
-        if (!string.IsNullOrEmpty(sheetMusic.SystemFileName))
+        try
         {
-            await fileStorageService.DeleteFile(sheetMusic.SystemFileName, "delete");
+            if (!string.IsNullOrEmpty(sheetMusic.SystemFileName))
+            {
+                await fileStorageService.DeleteFile(sheetMusic.SystemFileName, "delete");
+            }
+        }
+        catch (FileNotFoundException)
+        {
+            // File has somehow been lost, local state is corrupt, but we proceed with deletion because:
+            // 1. This could be user error, by manually adjusting files
+            // 2. Crashing here would make this entry undeletable unless a file is produced.
         }
 
         unitOfWork.SheetMusic.Remove(sheetMusic);

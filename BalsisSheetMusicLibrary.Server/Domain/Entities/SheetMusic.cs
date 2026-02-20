@@ -49,9 +49,6 @@ public class SheetMusic
             throw new InvalidOperationException("Sheet id cannot be null.");
         }
 
-        // Minor optimisation, if filename has already been set, trust it to be valid
-        return string.IsNullOrWhiteSpace(FileName)
-            ? $"{Id}_{GetFileName()}"
-            : $"{Id}_{FileName}";
+        return $"{Id}_{GetFileName()}";
     }
 }

@@ -1,14 +1,14 @@
 # Unit Testing Guidelines
 
-This document outlines the standards and best practices for writing unit tests in the Balsis Note Sheet Library project.
+This document outlines the standards and best practices for writing unit tests in the Balsis Sheet Music Library project.
 
 ## Test Structure
 
 ### Test Class Organization
 
-- Place unit test classes in the `BasisNoteSheetLibrary.Tests` project, under the `Unit` folder.
+- Place unit test classes in the `BasisSheetMusicLibrary.Tests` project, under the `Unit` folder.
 - Mirror the project structure of the code being tested.
-- Name test classes after the class under test, suffixed with `Tests` (e.g., `NoteSheetTests`).
+- Name test classes after the class under test, suffixed with `Tests` (e.g., `SheetMusicTests`).
 - **Do not** inherit from `IntegrationTestBase` for unit tests.
 - Use `Xunit` as the testing framework.
 
@@ -104,15 +104,15 @@ public void MethodName_StateUnderTest_ExpectedBehavior()
 ## Example Test
 
 ```csharp
-public class NoteSheetTests
+public class SheetMusicTests
 {
     [Fact]
     public void GetFileName_WithValidFields_ReturnsExpectedFileName()
     {
         // Arrange
-        var noteSheet = new NoteSheet { Title = "Test", Author = "Composer" };
+        var noteSheet = new SheetMusic { Title = "Test", Author = "Composer" };
         // Act
-        var fileName = noteSheet.GetFileName();
+        var fileName = sheetMusic.GetFileName();
         // Assert
         Assert.StartsWith("Test, Composer", fileName);
         Assert.EndsWith(".pdf", fileName);

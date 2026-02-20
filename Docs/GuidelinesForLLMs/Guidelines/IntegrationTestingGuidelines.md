@@ -1,11 +1,11 @@
 # Integration Testing Guidelines
 
-This document outlines the testing standards and best practices for the Balsis Note Sheet Library project.
+This document outlines the testing standards and best practices for the Balsis Sheet Music Library project.
 
 ## Test Structure
 
 ### Test Class Organization
-- Test classes should be placed in the `BasisNoteSheetLibrary.Tests` project
+- Test classes should be placed in the `BasisSheetMusicLibrary.Tests` project
 - Test classes should mirror the project structure of the code being tested
 - Name test classes with the same name as the class under test, suffixed with `Tests`
 - Inherit from `IntegrationTestBase` for integration tests
@@ -117,34 +117,34 @@ public void MethodName_StateUnderTest_ExpectedBehavior()
 ## Example Test
 
 ```csharp
-public class NoteSheetServiceTests : IntegrationTestBase
+public class SheetMusicServiceTests : IntegrationTestBase
 {
     private const uint NonexistentId = 999;
     private readonly Mock<IFileStorageService> _fileStorageServiceMock = new();
-    private readonly NoteSheetService _service;
+    private readonly SheetMusicService _service;
 
-    public NoteSheetServiceTests()
+    public SheetMusicServiceTests()
     {
-        _service = new NoteSheetService(UnitOfWork, _fileStorageServiceMock.Object);
+        _service = new SheetMusicService(UnitOfWork, _fileStorageServiceMock.Object);
         // Clean up database before each test
-        UnitOfWork.NoteSheets.RemoveRange(UnitOfWork.NoteSheets);
+        UnitOfWork.SheetMusic.RemoveRange(UnitOfWork.SheetMusic);
         UnitOfWork.SaveChanges();
     }
 
     [Fact]
-    public async Task GetNoteSheetAsync_WithExistingId_ReturnsNoteSheet()
+    public async Task GetSheetMusicAsync_WithExistingId_ReturnsSheetMusic()
     {
         // Arrange
-        var noteSheet = new NoteSheet { Id = 1, Title = "Test" };
-        UnitOfWork.NoteSheets.Add(noteSheet);
+        var sheetMusic = new SheetMusic { Id = 1, Title = "Test" };
+        UnitOfWork.SheetMusic.Add(sheetMusic);
         await UnitOfWork.SaveChangesAsync();
 
         // Act
-        var result = await _service.GetNoteSheetAsync(1);
+        var result = await _service.GetSheetMusicAsync(1);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(noteSheet.Title, result.Title);
+        Assert.Equal(sheeetMusic.Title, result.Title);
     }
 }
 ```

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace BalsisSheetMusicLibrary.Server.Application.Services;
 
-public class SheetMusicMusicRenameService(IServiceProvider serviceProvider, ILogger<SheetMusicMusicRenameService> logger)
+public class SheetMusicMusicRenameService(IServiceScopeFactory serviceScopeFactory, ILogger<SheetMusicMusicRenameService> logger)
     : ISheetMusicRenameService
 {
     private static readonly SemaphoreSlim RenameLock = new(1, 1);
@@ -26,7 +26,7 @@ public class SheetMusicMusicRenameService(IServiceProvider serviceProvider, ILog
         {
             try
             {
-                await RenameAllFilenamesTask(serviceProvider);
+                await RenameAllFilenamesTask(serviceScopeFactory);
             }
             catch (Exception ex)
             {
@@ -46,11 +46,11 @@ public class SheetMusicMusicRenameService(IServiceProvider serviceProvider, ILog
         }, TaskScheduler.Default);
     }
 
-    private async Task RenameAllFilenamesTask(IServiceProvider scopeProvider)
+    private async Task RenameAllFilenamesTask(IServiceScopeFactory scopeFactory)
     {
         try
         {
-            await using var scope = scopeProvider.CreateAsyncScope();
+            await using var scope = scopeFactory.CreateAsyncScope();
             var scopedUnitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
             var scopedRenameHub = scope.ServiceProvider.GetRequiredService<IHubContext<StatusHub>>();
             var scopedFileStorageService = scope.ServiceProvider.GetRequiredService<IFileStorageService>();

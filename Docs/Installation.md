@@ -1,4 +1,4 @@
-# Beginner's Guide: Deploying the Balsis Sheet Music Library
+# Deploying the Balsis Sheet Music Library
 
 Welcome! This guide will walk you through setting up the **Balsis Sheet Music Library** on your very own Linux server (often called a VPS, or Virtual Private Server).
 

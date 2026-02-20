@@ -190,4 +190,12 @@ const saveTitle = async () => {
 .no-down-arrow-padding {
   padding-right: 3.1rem !important;
 }
+
+.list-drag-handle {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
 </style>

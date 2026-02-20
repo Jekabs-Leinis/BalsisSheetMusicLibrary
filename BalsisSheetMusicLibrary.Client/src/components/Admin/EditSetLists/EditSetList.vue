@@ -30,7 +30,7 @@ const setListStore = useSetListStore();
 const toast = useToast();
 
 const availableSheets = computed(() => {
-  return getSheetsNotInList(sheetMusicStore.sheetMusic, setList.value);
+  return getSheetsNotInList(sheetMusicStore.sheetMusicArray, setList.value);
 });
 
 const addSheet = async (sheet) => {
@@ -87,7 +87,7 @@ const moveItem = (item, newOrder) => {
 <template>
   <div class="setlist-item card mb-3">
     <div
-      class="card-header d-flex justify-content-between align-items-center setlist-header"
+      class="card-header d-flex justify-content-between align-items-center"
     >
       <EditSetListTitle
         :set-list="setList"
@@ -112,7 +112,7 @@ const moveItem = (item, newOrder) => {
         >
           <div class="d-flex text-break align-items-center flex-grow-1">
             <span class="sheet-drag-handle me-2">
-              <i class="bi bi-grip-vertical text-muted"></i>
+              <i class="bi bi-grip-vertical text-muted" />
             </span>
             <span>
               {{ item.order + 1 }}.
@@ -161,10 +161,6 @@ const moveItem = (item, newOrder) => {
   &:hover {
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   }
-}
-
-.setlist-header {
-  cursor: move;
 }
 
 .sheets-list {

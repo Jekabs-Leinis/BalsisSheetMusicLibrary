@@ -1,7 +1,7 @@
 <script setup>
 const props = defineProps({
   /** @type import('vue').PropType<SheetMusic[]> */
-  sheetMusic: { type: Array, required: true },
+  sheetMusicArray: { type: Array, required: true },
   /** @type import('vue').PropType<SetList[]> */
   setLists: { type: Array, required: true },
 });
@@ -24,7 +24,7 @@ const props = defineProps({
               </h2>
             </li>
             <li
-              v-for="sheet in setList.getSheetMusic(props.sheetMusic)"
+              v-for="sheet in setList.getSheetMusic(props.sheetMusicArray)"
               :key="sheet.id"
             >
               <a

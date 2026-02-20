@@ -59,7 +59,7 @@ const showEditModal = ref(false);
 const sheetToEdit = ref(null);
 
 const openEditModal = (sheetId) => {
-  const sheet = sheetMusicStore.sheetMusic.find((s) => s.id === sheetId);
+  const sheet = sheetMusicStore.sheetMusicArray.find((s) => s.id === sheetId);
   sheetToEdit.value = new SheetMusic(sheet);
   showEditModal.value = true;
 };

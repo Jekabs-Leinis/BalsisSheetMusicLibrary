@@ -54,7 +54,7 @@ function onFileChanged(event) {
   const file = event.target?.files?.[0];
   if (file) {
     if (file.type !== "application/pdf") {
-      fileError.value = "Tikai PDF faili ir atbalstīti.";
+      fileError.value = "Nošu failam jābūt PDF formātā.";
       selectedFile.value = null;
       return;
     }

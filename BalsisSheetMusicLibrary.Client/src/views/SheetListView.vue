@@ -32,14 +32,14 @@ onMounted(async () => {
   <SetListContentsList
     id="active-sheets"
     v-loading="setListStore.isLoading"
-    :sheet-music="sheetMusicStore.filteredSheetMusic"
+    :sheet-music-array="sheetMusicStore.filteredSheetMusic"
     :set-lists="setListStore.setLists"
   />
   <div id="lv-sheets">
     <div v-loading="sheetMusicStore.isLoading" class="container">
       <SheetMusicList
         title="Latviešu skaņdarbi"
-        :sheet-music="sheetMusicStore.filteredLatvianSheetMusic"
+        :sheet-music-array="sheetMusicStore.filteredLatvianSheetMusic"
       />
     </div>
   </div>
@@ -47,7 +47,7 @@ onMounted(async () => {
     <div v-loading="sheetMusicStore.isLoading" class="container">
       <SheetMusicList
         title="Ārzemju skaņdarbi"
-        :sheet-music="sheetMusicStore.filteredForeignSheetMusic"
+        :sheet-music-array="sheetMusicStore.filteredForeignSheetMusic"
       />
     </div>
   </div>

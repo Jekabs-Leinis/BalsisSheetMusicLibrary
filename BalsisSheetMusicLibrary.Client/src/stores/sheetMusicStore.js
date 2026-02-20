@@ -15,7 +15,7 @@ import {
 
 export const useSheetMusicStore = defineStore("sheetMusic", () => {
   /** @type import('vue').Ref<SheetMusic[]> */
-  const sheetMusic = ref([]);
+  const sheetMusicArray = ref([]);
   /** @type import('vue').Ref<boolean> */
   const isLoading = ref(true);
   /** @type import('vue').Ref<string> */
@@ -29,7 +29,7 @@ export const useSheetMusicStore = defineStore("sheetMusic", () => {
     isLoading.value = true;
 
     try {
-      sheetMusic.value = await getAllSheetMusic();
+      sheetMusicArray.value = await getAllSheetMusic();
     } finally {
       isLoading.value = false;
     }
@@ -63,7 +63,7 @@ export const useSheetMusicStore = defineStore("sheetMusic", () => {
 
   const filteredSheetMusic = computed(() =>
     filterAndSortSheetMusic(
-      sheetMusic.value,
+      sheetMusicArray.value,
       searchQuery.value,
       sortField.value,
       sortDirection.value,
@@ -80,32 +80,32 @@ export const useSheetMusicStore = defineStore("sheetMusic", () => {
 
   async function deleteSheetMusic(id) {
     await deleteSheetMusicApi(id);
-    sheetMusic.value = sheetMusic.value.filter((sheet) => sheet.id !== id);
+    sheetMusicArray.value = sheetMusicArray.value.filter((sheet) => sheet.id !== id);
   }
 
   async function createSheetMusic(sheetMusic, file) {
     const newSheetMusic = await createSheetMusicApi(sheetMusic, file);
-    sheetMusic.value.push(newSheetMusic);
+    sheetMusicArray.value.push(newSheetMusic);
 
     return newSheetMusic;
   }
 
   async function updateSheetMusic(sheetMusic, file) {
     const updatedSheetMusic = await updateSheetMusicApi(sheetMusic, file);
-    const index = sheetMusic.value.findIndex(
+    const index = sheetMusicArray.value.findIndex(
       (sheet) => sheet.id === updatedSheetMusic.id,
     );
     if (index !== -1) {
-      sheetMusic.value[index] = updatedSheetMusic;
+      sheetMusicArray.value[index] = updatedSheetMusic;
     } else {
-      sheetMusic.value.push(updatedSheetMusic);
+      sheetMusicArray.value.push(updatedSheetMusic);
     }
 
     return updatedSheetMusic;
   }
 
   return {
-    sheetMusic,
+    sheetMusicArray,
     isLoading,
     searchQuery,
     sortField,

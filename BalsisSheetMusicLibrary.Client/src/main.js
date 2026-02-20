@@ -29,7 +29,7 @@ router.beforeEach(async (to) => {
     }
   }
 
-  if (to.path.startsWith('/admin') && !authStore.user?.isAdmin) {
+  if (to.path.startsWith("/admin") && !authStore.user?.isAdmin) {
     return { name: "SheetListView" };
   }
 });
@@ -43,12 +43,15 @@ router.afterEach(() => {
 });
 
 app.use(router);
+
 app.use(Toast, {
-  position: POSITION.TOP_RIGHT,
+  // 944 is bs Large breakpoints where the navbar collapses
+  position: window.outerWidth > 992 ?  POSITION.BOTTOM_RIGHT : POSITION.TOP_LEFT,
   timeout: 5000,
   closeOnClick: true,
   pauseOnHover: true,
   draggable: true,
+  maxToasts: 5,
 });
 
 app.directive("loading", vLoading);

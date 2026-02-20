@@ -51,7 +51,7 @@ const formatDate = (dateString) => {
               title="Atjaunot dziesmu sarakstu"
               @click.stop="emit('restore', setList)"
             >
-              <i class="bi bi-arrow-counterclockwise" />
+              <i class="bi bi-box-arrow-up" />
             </button>
             <button
               class="btn btn-icon btn-action btn-sm btn-outline-danger"

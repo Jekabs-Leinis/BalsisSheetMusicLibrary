@@ -1,121 +1,124 @@
-This document outlines the steps to deploy the self-contained Linux x64 release of the **Balsis Note Sheet Library** to a fresh Ubuntu or Debian VPS.
-## 1. Preconditions
+# Beginner's Guide: Deploying the Balsis Sheet Music Library
 
-* A fresh VPS running Ubuntu or your favorite distro.
-* Access to a self-contained release build. Download from [Releases]() or build your own using:
+Welcome! This guide will walk you through setting up the **Balsis Sheet Music Library** on your very own Linux server (often called a VPS, or Virtual Private Server).
+
+## 1. Prerequisites
+
+* A fresh VPS running Ubuntu or Debian.
+* Have the download link for the latest "self-contained release" from the Balsis GitHub Releases page ready.
+* A web address (like `my-library.com`) that is already configured to point to your server's IP address.
+
+## 2. Preparing Your Server
+
+Connect to your server
 
 ```bash
-dotnet publish BalsisSheetMusicLibrary.Server --configuration Release --runtime linux-x64 --self-contained true -o ./publish
+ssh root@<YOUR_SERVER_IP>
 ```
-* A valid DNS entry pointing to your VPS IP address.
 
----
-
-## 2. On-VPS Setup
-
-### 2.1. Log in to your VPS via SSH and update the package list. Install Nginx and necessary utility tools.
-
-Update repositories
+Load info about latest software updates
 
 ```bash
 sudo apt update
 ```
 
-Install Nginx, Firewall, and utilities
+Install required tools
 
 ```bash
-sudo apt install nginx ufw curl tar unzip -y
+sudo apt install nginx ufw curl tar unzip wget -y
 ```
 
-### 2.2. Create the application directory and assign ownership to the `www-data` user.
+We need a dedicated folder to hold your app's files. We will also assign ownership of this folder to `www-data`, which is the default user account that Nginx uses to run websites securely.
 
-
-Create directory
+Create the folder:
 
 ```bash
 sudo mkdir -p /var/www/BalsisSheetMusicLibrary
 ```
-Set ownership to www-data (Nginx default user)
+
+Give ownership to the web user:
 
 ```bash
 sudo chown -R www-data:www-data /var/www/BalsisSheetMusicLibrary
 ```
 
----
+> [!IMPORTANT]
+> If you later ever modify any files manually, for example replacing the app.db with your own preconfigured app.db, you will need to repeat this command.
 
-## 3. Transfer and Install Files
+## 3. Download the App
 
-You can deploy the files by downloading them directly from GitHub Releases or by uploading them from your local machine.
-
-### Option A: Download from GitHub Releases (Recommended)
-
-Navigate to the app directory:
+First, move into the folder we just created:
 
 ```bash
 cd /var/www/BalsisSheetMusicLibrary
 ```
 
-Download the release (replace <GITHUB_RELEASE_URL> with the real URL). Run the command as the `www-data` user:
+Download the release file. Replace `<GITHUB_RELEASE_URL>` with the actual link to the `.zip` file from the app's release page. We run this as the web user (`www-data`) so permissions stay correct:
 
 ```bash
 sudo -u www-data wget <GITHUB_RELEASE_URL> -O release.zip
 ```
 
-Unzip the contents (run as `www-data`):
+Unzip the files:
 
 ```bash
 sudo -u www-data unzip release.zip
 ```
 
-Cleanup (remove the downloaded zip file):
+Delete the downloaded zip file to keep things tidy:
 
 ```bash
 sudo -u www-data rm release.zip
 ```
 
-### Option B: Upload via SCP
-
-If building locally, upload the contents of your `./publish` folder.
-
-Run this from your LOCAL machine:
-
-```bash
-scp -r ./publish/* user@<YOUR_VPS_IP>:/var/www/BalsisSheetMusicLibrary
-```
-
-### Final Permissions Check
-
-Ensure the main executable has run permissions:
-
-Make the binary executable:
+Give the server permission to run the app's main file:
 
 ```bash
 sudo chmod +x /var/www/BalsisSheetMusicLibrary/BalsisSheetMusicLibrary.Server
 ```
 
-Ensure `www-data` owns the files (if uploaded via SCP as root/user):
+*(Note: If you are an advanced user building the app on your own computer, you can securely copy your `./publish` folder directly to `/var/www/BalsisSheetMusicLibrary` using SCP instead of downloading it via wget).*
+
+## 4. Set up .env configuration
+
+Copy the example environment variable file to a new file named `.env`:
 
 ```bash
-sudo chown -R www-data:www-data /var/www/BalsisSheetMusicLibrary
+sudo -u www-data cp /var/www/BalsisSheetMusicLibrary/.env.example /var/www/BalsisSheetMusicLibrary/.env
 ```
 
----
+Open the new `.env` file in the nano text editor:
 
-## 4. Systemd Service Configuration
+```bash
+sudo nano /var/www/BalsisSheetMusicLibrary/.env
+```
+> [!TIP]
+> **How to save and exit in Nano:**
+> 1. Press `Ctrl + O` (the letter O, not zero) to save.
+> 2. Press `Enter` to confirm the file name.
+> 3. Press `Ctrl + X` to exit.
 
-Configure Systemd to manage the application process. This ensures the app restarts automatically if it crashes or the server reboots.
+Fill in the required values, especially the usernames and passwords. Adjust seeding flags as needed. Configure `LIB_SHEETS_FOLDER_PATH` to point to the folder where sheet music PDFs will be stored. This should be either a relative path from the server binary (e.g., `files/sheets`) or an absolute path (e.g., `/var/www/BalsisSheetMusicLibrary/files/sheets`).
 
-Create the service file:
+If the folder specified in `LIB_SHEETS_FOLDER_PATH` does not exist, the app will attempt to create it automatically on startup.
+
+It is recommended to turn the seeders on for the first run to create the initial admin and user accounts, then turn them off afterwards to prevent accidental password resets.
+
+## 5. Set up app service
+
+If your server restarts, or if the app crashes, you want it to turn back on automatically. We use a built-in tool called **Systemd** to create a background service for your app.
+
+Open a new file in a simple text editor called `nano`:
 
 ```bash
 sudo nano /etc/systemd/system/BalsisSheetMusicLibrary.service
 ```
 
-Paste the following configuration verbatim into that file:
+Copy the text below and paste it into the terminal (usually by right-clicking):
 
 ```ini
 [Unit]
-Description = Balsis Note Sheet Library
+Description = Balsis Sheet Music Library
 
 [Service]
 WorkingDirectory = /var/www/BalsisSheetMusicLibrary
@@ -131,48 +134,38 @@ Environment="DOTNET_PRINT_TELEMETRY_MESSAGE=false"
 WantedBy = multi-user.target
 ```
 
-Save and exit the editor (e.g. `Ctrl+O`, `Enter`, `Ctrl+X` in nano).
-
-Start the service by running the following commands one at a time.
-
-Reload systemd to recognize the new file:
-
+Load the new service configuration:
 ```bash
 sudo systemctl daemon-reload
 ```
 
 Enable the service to start on boot:
-
 ```bash
 sudo systemctl enable BalsisSheetMusicLibrary.service
 ```
 
-Start the service immediately:
-
+Start the service:
 ```bash
 sudo systemctl start BalsisSheetMusicLibrary.service
 ```
 
----
 
-## 5. Nginx Reverse Proxy Configuration
+## 6. Configure Nginx
 
-Configure Nginx to proxy HTTP requests to the Kestrel server running on localhost:5000.
+Right now, your app is running internally on the server, but the outside world can't see it. We will configure Nginx to take requests from the internet and passing them to your app.
 
-Create the site configuration file:
+Create a new configuration file for your website:
 
 ```bash
 sudo nano /etc/nginx/sites-available/BalsisSheetMusicLibrary
 ```
 
-Replace the `server_name` values with your actual domain (for example: `example.com www.example.com`).
-
-Paste the following configuration into the file:
+Paste the following text. **Important:** Change `example.com` to your actual domain name!
 
 ```nginx
 server {
-    listen 80;
-    server_name example.com www.example.com;
+listen 80;
+server_name example.com www.example.com;
 
     location / {
         proxy_pass http://localhost:5000;
@@ -185,7 +178,7 @@ server {
 }
 ```
 
-Enable the site and restart Nginx by running these commands one at a time.
+Save and exit ( `Ctrl + O`, `Enter`, `Ctrl + X` ).
 
 Create a symbolic link to enable the site:
 
@@ -205,84 +198,67 @@ Restart Nginx:
 sudo systemctl restart nginx
 ```
 
-### TLS / SSL Configuration
+The library should be accessible at this point from your domain, though it will be using HTTP. If your application is not loading, check that your URL starts with `http://`. By default modern browsers will try to use HTTPS.
 
-Secure your deployment with HTTPS. **Follow the official guide here:** <LETS_ENCRYPT_TUTORIAL_URL>
+## 7. TLS / SSL Configuration
+It is strongly recommended to set up HTTPS for your site.
 
----
+Recommended option is to use Let's Encrypt, but other options exist.
 
-## 6. Firewall Setup
+Follow the [official Let's Encrypt guide](https://letsencrypt.org/getting-started/) to do this.
 
-Allow Nginx traffic through the firewall.
+## 8. Open the Firewall
 
-Allow HTTP/HTTPS traffic for Nginx:
+It is recommended to have a firewall enabled on your server for security.
 
+Set up firewall rules for Nginx:
 ```bash
-sudo ufw allow 'Nginx Full'
+sudo ufw allow "Nginx Full"
+sudo ufw allow "OpenSSH"
 ```
 
-Enable the firewall (if not already enabled):
+Verify that the rules are added:
+```bash
+sudo ufw show added
+```
 
+> [!WARNING]
+> If you do not allow "OpenSSH" through the firewall, you may lock yourself out of your server and will potentially need to reinstall the operating system to regain access.
+
+Enable the firewall:
 ```bash
 sudo ufw enable
 ```
+*(If it asks to confirm enabling the firewall, type `y` and press Enter).*
 
----
+## 9. About Your Database
 
-## 7. Database Persistence
+The application automatically uses a local database file named `app.db`. It lives inside your `/var/www/BalsisSheetMusicLibrary` folder.
 
-The application uses a local SQLite database named `app.db` located in the application directory.
+If you want to back up your library data, simply download a copy of `app.db`.
 
-* **Persistence:** Ensure `app.db` is present in `/var/www/BalsisSheetMusicLibrary`.
-* **Backups:** Regularly back up `/var/www/BalsisSheetMusicLibrary/app.db`.
-* **Updates:** When deploying a new version, **DO NOT** overwrite `app.db` if you want to keep existing data.
+> [!CAUTION]
+> If you ever download a newer version of the app in the future, **do not** delete or overwrite your `app.db` file, or you will lose your saved music library!
 
----
+## 10. Troubleshooting
 
-## 8. Verification
+If the website isn't loading, use these commands to find out why:
 
-1.  Check local connection (expected: HTTP 200 OK or similar):
-
-```bash
-curl -I http://localhost:5000
-```
-
-2.  Check public access: open `http://<YOUR_DOMAIN_OR_IP>` in a browser.
-
-3.  Check service status:
+Check if the background service is running properly by typing:
 
 ```bash
 sudo systemctl status BalsisSheetMusicLibrary.service
 ```
+*(Look for a green "active (running)" message. Press `q` to exit this screen).*
 
----
+Check the App Logs:
+  ```bash
+  sudo journalctl -u BalsisSheetMusicLibrary -f
+  ```
+*(Press `Ctrl + C` to exit)*
 
-## 9. Troubleshooting
-
-If the application is not accessible, check the following.
-
-A. Application Logs — view the output from the .NET application:
-
-```bash
-sudo journalctl -u BalsisSheetMusicLibrary -f
-```
-
-B. Nginx Error Logs — check for proxy connection errors:
-
-```bash
-sudo tail -f /var/log/nginx/error.log
-```
-
-C. Port Conflicts — ensure port 5000 is being listened to by the application:
-
-```bash
-sudo ss -ltnp | grep 5000
-```
-
-D. Permission Issues — ensure the User in the systemd file matches the file owner. The following should show `www-data:www-data` as the owner/group:
-
-```bash
-ls -la /var/www/BalsisSheetMusicLibrary
-```
-
----
+Check the Nginx Logs:
+  ```bash
+  sudo tail -f /var/log/nginx/error.log
+  ```
+*(Press `Ctrl + C` to exit)*

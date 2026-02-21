@@ -53,7 +53,7 @@ First, move into the folder we just created:
 cd /var/www/BalsisSheetMusicLibrary
 ```
 
-Download the release file. Replace `<GITHUB_RELEASE_URL>` with the actual link to the `.zip` file from the app's release page. We run this as the web user (`www-data`) so permissions stay correct:
+Download the release file to your server. Replace `<GITHUB_RELEASE_URL>` with the actual link to the `.zip` file from the [app's release page](https://github.com/Jekabs-Leinis/BalsisSheetMusicLibrary/releases). We run this as the web user (`www-data`) so permissions stay correct:
 
 ```bash
 sudo -u www-data wget <GITHUB_RELEASE_URL> -O release.zip

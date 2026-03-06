@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { searchCollection } from "@/services/collectionSearchService.js";
 
 // noinspection JSValidateTypes
 const props = defineProps({
@@ -16,18 +17,11 @@ const searchQuery = ref("");
 const showDropdown = ref(false);
 
 /** @type {SheetMusic[]} */
-const filteredSheets = computed(() => {
-  if (!searchQuery.value.trim()) return props.sheets;
-
-  // Fuzzy search - "Lan she" will match "Landscape with Shepherds"
-  const query = new RegExp(
-    searchQuery.value.toLowerCase().replace(/\s+/g, ".*"),
-  );
-
-  return props.sheets.filter((sheet) =>
-    sheet.getFormattedTitle().toLowerCase().match(query),
-  );
-});
+const filteredSheets = computed(() =>
+  searchCollection(props.sheets, searchQuery.value, (sheet) =>
+    sheet.getFormattedTitle(),
+  ),
+);
 
 const selectItem = (item) => {
   emit("select", item);

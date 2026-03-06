@@ -7,6 +7,7 @@ import ArchiveSearchBar from "@/components/Admin/Archive/ArchiveSearchBar.vue";
 import ConfirmSetListDelete from "@/components/Admin/EditSetLists/ConfirmSetListDelete.vue";
 import ConfirmSetListRestore from "@/components/Admin/Archive/ConfirmSetListRestore.vue";
 import { useToast } from "vue-toastification";
+import { searchCollection } from "@/services/collectionSearchService.js";
 
 const setListStore = useSetListStore();
 const toast = useToast();
@@ -42,16 +43,19 @@ const filteredSetLists = computed(() => {
   }
 
   const query = searchQuery.value.toLowerCase().trim();
-  const fuzzyQuery = new RegExp(query.replace(/\s+/g, ".*"));
   const filteredSetLists = setListStore.archivedSetLists.filter((setList) => {
     if (!query) return true;
 
-    // Check if title matches
-    if (setList.title.toLowerCase().includes(query)) return true;
+    // Check if set list title matches
+    if (searchCollection([setList], query, (item) => item.title).length > 0) {
+      return true;
+    }
 
-    // Fuzzy search for song data
-    return setList.items.some((item) =>
-      item.sheetMusic?.getFormattedTitle().toLowerCase().match(fuzzyQuery),
+    // Check if any sheet music title in the set list matches
+    return (
+      searchCollection(setList.items, query, (item) =>
+        item.sheetMusic?.getFormattedTitle(),
+      ).length > 0
     );
   });
 

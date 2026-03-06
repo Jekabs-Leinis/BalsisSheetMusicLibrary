@@ -8,18 +8,18 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="list-container w-100 pt-5 pb-3">
+  <div class="list-container w-100 pt-4 pb-3">
     <div class="container">
-      <h1 class="set-list-title fw-bold ps-2">Aktuālās notis</h1>
+      <h1 class="set-list-title fw-bold ps-2 mb-3">Aktuālās notis</h1>
       <div class="row">
         <div
           v-for="setList in setLists"
           :key="setList.title"
-          class="col-12 mt-4 text-break"
+          class="col-12 text-break"
         >
           <ul>
             <li>
-              <h2 class="pt-0 my-3">
+              <h2 class="pt-0 mb-3">
                 <b>{{ setList.title }}</b>
               </h2>
             </li>

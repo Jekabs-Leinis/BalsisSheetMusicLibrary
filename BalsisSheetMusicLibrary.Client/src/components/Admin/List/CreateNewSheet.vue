@@ -21,7 +21,7 @@ const emit = defineEmits(["sheet-created"]);
 
 <template>
   <div>
-    <button class="btn btn-primary" @click="openModal">
+    <button class="btn btn-primary d-flex align-items-center" @click="openModal">
       <i class="bi bi-plus-circle me-2"></i>
       Pievienot notis
     </button>

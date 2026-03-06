@@ -47,18 +47,18 @@ const formatDate = (dateString) => {
 
           <div class="d-flex gap-1 flex-shrink-0 ms-auto">
             <button
-              class="btn btn-icon btn-action btn-sm btn-outline-secondary"
+              class="btn btn-action btn-sm btn-outline-secondary"
               title="Atjaunot dziesmu sarakstu"
               @click.stop="emit('restore', setList)"
             >
-              <i class="bi bi-box-arrow-up" />
+              <i class="bi bi-box-arrow-up bi-no-text" />
             </button>
             <button
-              class="btn btn-icon btn-action btn-sm btn-outline-danger"
+              class="btn btn-action btn-sm btn-outline-danger"
               title="Dzēst dziesmu sarakstu"
               @click.stop="emit('remove', setList)"
             >
-              <i class="bi bi-trash" />
+              <i class="bi bi-trash bi-no-text" />
             </button>
           </div>
         </div>
@@ -101,5 +101,15 @@ const formatDate = (dateString) => {
   @media (min-width: 768px) {
     width: auto !important;
   }
+}
+
+.btn-action {
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  padding: 0 0.5rem;
 }
 </style>

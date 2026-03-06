@@ -171,16 +171,16 @@ const openEditModal = (sheetId) => {
             <td>
               <div class="btn-group">
                 <button
-                  class="btn btn-icon btn-sm btn-primary me-1"
+                  class="btn btn-action btn-sm btn-primary me-1"
                   @click="openEditModal(sheet.id)"
                 >
-                  <i class="bi bi-pencil"></i>
+                  <i class="bi bi-pencil bi-no-text"></i>
                 </button>
                 <button
-                  class="btn btn-icon btn-sm btn-danger"
+                  class="btn btn-action btn-sm btn-danger"
                   @click="openDeleteModal(sheet)"
                 >
-                  <i class="bi bi-trash"></i>
+                  <i class="bi bi-trash bi-no-text"></i>
                 </button>
               </div>
             </td>
@@ -240,6 +240,16 @@ const openEditModal = (sheetId) => {
   &:hover {
     background-color: var(--bs-table-hover-bg);
   }
+}
+
+.btn-action {
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  padding: 0 0.5rem;
 }
 </style>
 

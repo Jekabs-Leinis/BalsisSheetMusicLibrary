@@ -45,7 +45,7 @@ onUnmounted(() => {
     <transition name="fade">
       <div v-if="showButton" class="position-fixed d-block back-to-top">
         <a
-          class="btn btn-icon btn-secondary d-flex justify-content-center align-items-center"
+          class="btn btn-secondary d-flex justify-content-center align-items-center"
           aria-label="Back to top"
           @click="scrollToTop"
         >

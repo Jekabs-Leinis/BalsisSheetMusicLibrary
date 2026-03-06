@@ -78,7 +78,7 @@ const saveTitle = async () => {
       <button
         :disabled="isLoading"
         aria-label="Edit title"
-        class="btn btn-icon btn-action btn-sm ms-1"
+        class="btn btn-action btn-sm ms-1"
         title="Rediģēt"
         @click="startEditing"
       >
@@ -101,7 +101,7 @@ const saveTitle = async () => {
           <button
             :disabled="isLoading"
             aria-label="Cancel editing"
-            class="btn btn-icon btn-action btn-sm btn-secondary"
+            class="btn btn-action btn-sm btn-secondary"
             title="Atcelt rediģēšanu"
             type="button"
             @click="cancelEditing"
@@ -111,7 +111,7 @@ const saveTitle = async () => {
           <button
             :disabled="!isValid || isLoading"
             aria-label="Save changes"
-            class="btn btn-icon btn-action btn-sm btn-primary"
+            class="btn btn-action btn-sm btn-primary"
             title="Saglabāt izmaiņas"
             type="button"
             @click="saveTitle"
@@ -122,7 +122,7 @@ const saveTitle = async () => {
       </div>
     </div>
     <div class="flex-grow-1" />
-    <div class="action-buttons d-flex align-items-center gap-1 ms-2">
+    <div class="d-flex align-items-center gap-1 ms-2">
       <button
         v-if="setList.order > 0"
         :class="[
@@ -141,34 +141,24 @@ const saveTitle = async () => {
         <i class="bi bi-arrow-down movement-arrows" />
       </button>
       <button
-        class="btn btn-icon btn-action btn-sm btn-outline-secondary"
+        class="btn btn-action btn-sm btn-outline-secondary"
         title="Arhivēt dziesmu sarakstu"
         @click.stop="emit('archive', setList)"
       >
-        <i class="bi bi-archive" />
+        <i class="bi bi-no-text bi-archive" />
       </button>
       <button
-        class="btn btn-icon btn-action btn-sm btn-outline-danger"
+        class="btn btn-action btn-sm btn-outline-danger"
         title="Dzēst dziesmu sarakstu"
         @click.stop="emit('delete', setList)"
       >
-        <i class="bi bi-trash" />
+        <i class="bi bi-no-text bi-trash" />
       </button>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.action-buttons .btn {
-  min-width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  padding: 0 0.5rem;
-}
-
 .btn-action {
   min-width: 38px;
   height: 38px;

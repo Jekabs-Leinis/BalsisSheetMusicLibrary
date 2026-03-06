@@ -24,10 +24,20 @@ h3 {
 }
 
 /* 
- Fixes centering for icons which are somehow shifted upwards
+ Icons are by default not vertically offset to match text, so this class is used to vertically center icons in cases where there is no text.
  */
-.bi::before {
-  font-size:initial;
+.bi-no-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  
+  &::before {
+    vertical-align: middle;
+  }
+}
+
+/* Bump the offset for the rest of the icons, as this looks better */
+.bi:not(.bi-no-text)::before {
   vertical-align: -0.2em;
 }
 

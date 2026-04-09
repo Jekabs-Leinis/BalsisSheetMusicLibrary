@@ -18,7 +18,12 @@ public class SheetMusic
 
     public string GetFileName(string? extension = null)
     {
-        var nameParts = new List<string> { Title ?? "" };
+        var nameParts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(Title))
+        {
+            nameParts.Add(Title);
+        }
 
         if (!string.IsNullOrWhiteSpace(Author))
         {
@@ -33,6 +38,11 @@ public class SheetMusic
         if (Year is not null)
         {
             nameParts.Add(Year.ToString() ?? string.Empty);
+        }
+
+        if (nameParts.Count == 0)
+        {
+            throw new InvalidOperationException("At least one of Title, Author, Lyricist, or Year must be provided.");
         }
 
         var fileName = string.Join(", ", nameParts);

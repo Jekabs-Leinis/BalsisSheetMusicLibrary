@@ -34,8 +34,7 @@ public class SheetMusicTests
         var longTitle = new string('A', 250);
         var sheetMusic = new SheetMusic { Title = longTitle };
         var fileName = sheetMusic.GetFileName();
-        // 200 chars + .pdf
-        Assert.True(fileName.Length == 204);
+        Assert.Equal(200, fileName.Length);
     }
 
     [Fact]
@@ -48,7 +47,7 @@ public class SheetMusicTests
     [Fact]
     public void GetSystemFileName_ReturnsCorrectSystemFileName_WithFileName()
     {
-        var sheetMusic = new SheetMusic { Id = 5, FileName = "custom.pdf" };
+        var sheetMusic = new SheetMusic { Id = 5, Title = "custom" };
         var systemFileName = sheetMusic.GetSystemFileName();
         Assert.Equal("5_custom.pdf", systemFileName);
     }
@@ -127,7 +126,7 @@ public class SheetMusicTests
     [Fact]
     public void GetSystemFileName_HandlesUnicodeFileName()
     {
-        var sheetMusic = new SheetMusic { Id = 11, FileName = "ユニコード.pdf" };
+        var sheetMusic = new SheetMusic { Id = 11, Title = "ユニコード.pdf" };
         var systemFileName = sheetMusic.GetSystemFileName();
         Assert.Contains("ユニコード", systemFileName);
     }

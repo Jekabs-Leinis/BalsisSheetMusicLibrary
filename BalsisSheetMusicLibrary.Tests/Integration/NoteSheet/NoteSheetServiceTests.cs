@@ -4,7 +4,7 @@ using BalsisSheetMusicLibrary.Server.Domain.Interfaces;
 using Moq;
 using Entities = BalsisSheetMusicLibrary.Server.Domain.Entities;
 
-namespace BalsisSheetMusicLibrary.Tests.Integration.SheetMusic;
+namespace BalsisSheetMusicLibrary.Tests.Integration.NoteSheet;
 
 public class SheetMusicMusicServiceTests : IntegrationTestBase
 {

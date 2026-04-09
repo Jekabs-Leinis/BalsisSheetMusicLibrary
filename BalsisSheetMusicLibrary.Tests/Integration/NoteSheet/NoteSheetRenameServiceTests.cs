@@ -1,6 +1,5 @@
 using BalsisSheetMusicLibrary.Server.Application.Services;
 using BalsisSheetMusicLibrary.Server.Domain.Interfaces;
-using BalsisSheetMusicLibrary.Server.Domain.ValueObjects;
 using BalsisSheetMusicLibrary.Server.Infrastructure.Hubs;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
@@ -9,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Entities = BalsisSheetMusicLibrary.Server.Domain.Entities;
 
-namespace BalsisSheetMusicLibrary.Tests.Integration.SheetMusic;
+namespace BalsisSheetMusicLibrary.Tests.Integration.NoteSheet;
 
 public class SheetMusicMusicRenameServiceTests : IntegrationTestBase
 {
@@ -17,9 +16,7 @@ public class SheetMusicMusicRenameServiceTests : IntegrationTestBase
     private readonly Mock<IFileStorageService> _fileStorageServiceMock = new();
     private readonly Mock<IHubContext<StatusHub>> _hubContextMock = new();
     private readonly Mock<ILogger<SheetMusicMusicRenameService>> _loggerMock = new();
-    private readonly Mock<IServiceScopeFactory> _scopeFactoryMock = new();
     private readonly SheetMusicMusicRenameService _service;
-    private readonly Mock<IServiceProvider> _serviceProviderMock = new();
 
     public SheetMusicMusicRenameServiceTests()
     {
@@ -30,18 +27,22 @@ public class SheetMusicMusicRenameServiceTests : IntegrationTestBase
         // Set up environment mock
         _envMock.Setup(e => e.ContentRootPath).Returns("C:");
 
-        // Set up scope factory to return a scope with our service provider
-        _scopeFactoryMock.Setup(f => f.CreateScope()).Returns(new TestScope(_serviceProviderMock.Object));
-        _serviceProviderMock.Setup(x => x.GetService(typeof(IServiceScopeFactory))).Returns(_scopeFactoryMock.Object);
+        // Set up service provider with mocked services
+        var services = new ServiceCollection();
+        services.AddScoped<IUnitOfWork>(_ => UnitOfWork);
+        services.AddScoped<IFileStorageService>(_ => _fileStorageServiceMock.Object);
+        services.AddScoped<IHubContext<StatusHub>>(_ => _hubContextMock.Object);
+        services.AddScoped<IWebHostEnvironment>(_ => _envMock.Object);
+        var serviceProvider = services.BuildServiceProvider();
 
-        // Set up service provider to return required dependencies
-        _serviceProviderMock.Setup(x => x.GetService(typeof(IUnitOfWork))).Returns(UnitOfWork);
-        _serviceProviderMock.Setup(x => x.GetService(typeof(IFileStorageService)))
-            .Returns(_fileStorageServiceMock.Object);
-        _serviceProviderMock.Setup(x => x.GetService(typeof(IHubContext<StatusHub>))).Returns(_hubContextMock.Object);
-        _serviceProviderMock.Setup(x => x.GetService(typeof(IWebHostEnvironment))).Returns(_envMock.Object);
+        var serviceScope = new TestScope(serviceProvider);
 
-        _service = new SheetMusicMusicRenameService(_serviceProviderMock.Object, _loggerMock.Object);
+        var serviceScopeFactory = new Mock<IServiceScopeFactory>();
+        serviceScopeFactory
+            .Setup(x => x.CreateScope())
+            .Returns(serviceScope);
+
+        _service = new SheetMusicMusicRenameService(serviceScopeFactory.Object, _loggerMock.Object);
     }
 
     [Fact]
@@ -100,10 +101,10 @@ public class SheetMusicMusicRenameServiceTests : IntegrationTestBase
     // Helper for IServiceScope
     private class TestScope(IServiceProvider provider) : IServiceScope
     {
-        public IServiceProvider ServiceProvider { get; } = provider;
-
         public void Dispose()
         {
         }
+
+        public IServiceProvider ServiceProvider { get; } = provider;
     }
 }

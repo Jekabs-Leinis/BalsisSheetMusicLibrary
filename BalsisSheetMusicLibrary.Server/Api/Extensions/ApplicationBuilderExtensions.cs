@@ -25,10 +25,6 @@ public static class ApplicationBuilderExtensions
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        else
-        {
-            app.UseHttpsRedirection();
-        }
 
         app.UseMiddleware<RequestLoggingMiddleware>();
         app.UseMiddleware<ExceptionHandlingMiddleware>();

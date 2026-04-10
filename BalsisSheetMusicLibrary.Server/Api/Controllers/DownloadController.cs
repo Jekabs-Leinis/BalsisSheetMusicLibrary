@@ -16,6 +16,8 @@ public class DownloadController(
 {
     /**
      * We don't really care about the filename, but we include it in the URL to ensure human readability.
+     * The download filename should come from Content-Disposition header, but without it filename from the url is used
+     * Thus we redirect to a correct value if it is changed.
      */
     [HttpGet("{id:int}/{filename}")]
     public async Task<IActionResult> Index(uint id, string filename)
@@ -27,6 +29,13 @@ public class DownloadController(
             logger.LogWarning("User attempted to download a non-existent sheet music with ID {Id}.", id);
 
             return NotFound("Sheet music not found.");
+        }
+        
+        if (!string.Equals(filename, sheet.FileName, StringComparison.OrdinalIgnoreCase))
+        {
+            // Redirect to the exact same action, but with the correct filename.
+            // This changes the URL in the user's browser.
+            return RedirectToAction(nameof(Index), new { id, filename = sheet.FileName });
         }
 
         if (!sheetMusicService.HasValidFile(sheet))
@@ -40,6 +49,29 @@ public class DownloadController(
             return NotFound("No valid file associated with this sheet music.");
         }
 
-        return PhysicalFile(fileStorageService.GetSafeFilePath(sheet.SystemFileName!), "application/octet-stream", sheet.FileName);
+        var filePath = fileStorageService.GetSafeFilePath(sheet.SystemFileName!);
+        var mimeType = GetMimeType(sheet.FileName!);
+        
+        
+        var contentDisposition = new System.Net.Mime.ContentDisposition
+        {
+            FileName = sheet.FileName,
+            Inline = true 
+        };
+        Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+
+        return PhysicalFile(filePath, mimeType, null);
+    }
+
+    private static string GetMimeType(string filename)
+    {
+        var extension = Path.GetExtension(filename).ToLowerInvariant();
+        return extension switch
+        {
+            ".pdf" => "application/pdf",
+            ".jpg" or ".jpeg" => "image/jpeg",
+            ".png" => "image/png",
+            _ => "application/octet-stream"
+        };
     }
 }

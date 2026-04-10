@@ -3,6 +3,7 @@ using BalsisSheetMusicLibrary.Server.Domain.Interfaces;
 using BalsisSheetMusicLibrary.Server.Domain.ValueObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 
 namespace BalsisSheetMusicLibrary.Server.Api.Controllers;
 
@@ -52,13 +53,12 @@ public class DownloadController(
         var filePath = fileStorageService.GetSafeFilePath(sheet.SystemFileName!);
         var mimeType = GetMimeType(sheet.FileName!);
         
-        
-        var contentDisposition = new System.Net.Mime.ContentDisposition
-        {
-            FileName = sheet.FileName,
-            Inline = true 
-        };
-        Response.Headers.Append("Content-Disposition", contentDisposition.ToString());
+        var contentDisposition = new ContentDispositionHeaderValue("inline");
+    
+        // SetHttpFileName safely encodes non-ASCII characters (like Latvian letters) for HTTP headers
+        contentDisposition.SetHttpFileName(sheet.FileName!);
+
+        Response.Headers.Append(HeaderNames.ContentDisposition, contentDisposition.ToString());
 
         return PhysicalFile(filePath, mimeType, null);
     }

@@ -2,13 +2,14 @@
 using BalsisSheetMusicLibrary.Server.Domain.Entities;
 using BalsisSheetMusicLibrary.Server.Infrastructure.Data.DbContext.Configurations;
 using BalsisSheetMusicLibrary.Server.Infrastructure.Data.Extensions;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace BalsisSheetMusicLibrary.Server.Infrastructure.Data.DbContext;
 
-public class AppDbContext : IdentityDbContext
+public class AppDbContext : IdentityDbContext, IDataProtectionKeyContext
 {
     private bool _collationRegistered = false;
     
@@ -52,6 +53,8 @@ public class AppDbContext : IdentityDbContext
     public DbSet<SheetMusic> SheetMusic { get; set; } = null!;
     public DbSet<SetList> SetLists { get; set; } = null!;
     public DbSet<SetListItem> SetListItems { get; set; } = null!;
+    
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

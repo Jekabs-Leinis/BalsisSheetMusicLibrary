@@ -8,6 +8,7 @@ using BalsisSheetMusicLibrary.Server.Infrastructure.Data.Repositories;
 using BalsisSheetMusicLibrary.Server.Infrastructure.Data.UnitOfWork;
 using BalsisSheetMusicLibrary.Server.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,8 @@ public static class WebApplicationBuilderExtensions
     public static void AddApplicationServices(this WebApplicationBuilder builder)
     {
         RegisterDb(builder);
+        builder.Services.AddDataProtection()
+            .PersistKeysToDbContext<AppDbContext>();
         RegisterAuthentication(builder);
         builder.Services.AddAuthorizationBuilder();
         RegisterAntiforgery(builder);

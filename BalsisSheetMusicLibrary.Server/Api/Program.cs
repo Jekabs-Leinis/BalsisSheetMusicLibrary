@@ -26,15 +26,15 @@ try
     builder.AddApplicationServices();
 
     var app = builder.Build();
-
-    await app.ConfigurePipeline();
-
+    
     if (!args.Contains("skip-migrate"))
     {
         using var scope = app.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         db.Database.Migrate();
     }
+
+    await app.ConfigurePipeline();
 
     app.Run();
 }

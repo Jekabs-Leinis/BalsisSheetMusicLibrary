@@ -1,7 +1,9 @@
 using BalsisSheetMusicLibrary.Server.Api.Extensions;
+using BalsisSheetMusicLibrary.Server.Infrastructure.Data.DbContext;
 using Serilog;
 using Serilog.Events;
 using dotenv.net;
+using Microsoft.EntityFrameworkCore;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -26,6 +28,13 @@ try
     var app = builder.Build();
 
     await app.ConfigurePipeline();
+
+    if (!args.Contains("skip-migrate"))
+    {
+        using var scope = app.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        db.Database.Migrate();
+    }
 
     app.Run();
 }

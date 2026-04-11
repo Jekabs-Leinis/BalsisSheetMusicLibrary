@@ -54,20 +54,4 @@
             </ResolvedFileToPublish>
         </ItemGroup>
     </Target>
-    <Target Name="CreateMigrationBundle" BeforeTargets="ComputeFilesToPublish">
-        <Message Text="Generating fresh efbundle from migrations in output directory..." Importance="High" />
-        <PropertyGroup>
-            <EfBundlePath>$(OutputPath)efbundle</EfBundlePath>
-        </PropertyGroup>
-
-        <Delete Files="$(EfBundlePath)" Condition="Exists('$(EfBundlePath)')" />
-        <Exec Command="dotnet ef migrations bundle --configuration $(Configuration) --target-runtime $(RuntimeIdentifier) --force -o $(EfBundlePath)" />
-
-        <ItemGroup>
-            <ResolvedFileToPublish Include="$(EfBundlePath)">
-                <RelativePath>efbundle</RelativePath>
-                <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-            </ResolvedFileToPublish>
-        </ItemGroup>
-    </Target>
 </Project>

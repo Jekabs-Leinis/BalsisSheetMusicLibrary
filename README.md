@@ -15,6 +15,7 @@ Development also served as an opportunity to explore modern technologies and arc
 ## Deployment & Usage
 
 For deployment instructions, see [Installation.md](https://github.com/Jekabs-Leinis/BalsisNoteSheetLibrary/blob/master/Docs/Installation.md).
+For updating instructions, see [Updating.md](https://github.com/Jekabs-Leinis/BalsisSheetMusicLibrary/blob/master/Docs/Updating.md)
 
 ## Tech stack
 

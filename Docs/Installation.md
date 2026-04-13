@@ -1,6 +1,6 @@
 # Deploying the Balsis Sheet Music Library
 
-This guide will walk you through setting up the **Balsis Sheet Music Library** on your very own Linux server.
+This guide will walk you through setting up the **Balsis Sheet Music Library** on your very own Linux server. For updating your app see [Updating.md](https://github.com/Jekabs-Leinis/BalsisSheetMusicLibrary/blob/master/Docs/Updating.md)
 
 ## 1. Prerequisites
 

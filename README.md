@@ -32,7 +32,7 @@ For updating instructions, see [Updating.md](https://github.com/Jekabs-Leinis/Ba
 
 ## Prerequisites
 
-- `dotnet` SDK **9.x** (project targets `net9.0`)
+- `dotnet` SDK **10.x** (project targets `net10.0`)
 - `node` **>= 18** minimum (recommended **>= 20**)
 - `npm` (ships with Node)
 

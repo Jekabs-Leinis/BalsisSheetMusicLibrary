@@ -178,6 +178,14 @@ server_name example.com www.example.com;
         proxy_set_header Host $host;
         proxy_cache_bypass $http_upgrade;
     }
+
+sendfile on;
+tcp_nopush on;
+tcp_nodelay on;
+
+client_max_body_size 500M;
+# Keep RAM usage reasonable, can increase depending on your set-up
+client_body_buffer_size 256k;
 }
 ```
 

@@ -20,7 +20,7 @@ For updating instructions, see [Updating.md](https://github.com/Jekabs-Leinis/Ba
 ## Tech stack
 
 - **Backend**
-    - ASP.NET Core (.NET `net9.0`)
+    - ASP.NET Core (.NET `net10.0`)
     - Entity Framework Core + **SQLite**
     - ASP.NET Identity (authentication/authorization)
     - Serilog (logging)
